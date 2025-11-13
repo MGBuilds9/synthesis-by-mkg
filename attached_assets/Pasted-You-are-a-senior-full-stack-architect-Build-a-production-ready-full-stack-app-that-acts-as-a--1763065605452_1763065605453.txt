@@ -1,0 +1,262 @@
+You are a senior full-stack architect. 
+
+Build a production-ready full-stack app that acts as a **unified personal console** with:
+
+1. 🔔 Unified messaging
+2. 📦 Unified storage
+3. 🧠 Unified AI chat (OpenAI, Gemini, Claude)
+
+This app should be designed so it can later be wrapped as an iOS app (e.g. with Capacitor/React Native wrapper), but for now it will be a **web app** with a clean, mobile-first UI.
+
+--------------------------------------------------
+HIGH-LEVEL PRODUCT SPEC
+--------------------------------------------------
+
+Core idea: One app where I can:
+
+- See and reply to messages from:
+  - **Discord** (server channels via a bot the user authorizes)
+  - **WhatsApp** via the **official WhatsApp Business Cloud API ONLY** 
+    - Do NOT use scraping, unofficial libraries or personal account hacks.
+  - **Gmail**
+  - **Microsoft Outlook / Microsoft 365 mail** (via Microsoft Graph)
+
+- Browse and search files from:
+  - **Multiple Google Drive accounts**
+  - **Multiple OneDrive accounts**
+
+- Connect and query:
+  - **Notion** (pages, databases) using the official Notion API, with support for multiple workspaces.
+
+- Use a **main chat interface** where:
+  - I can pick an AI provider per conversation:
+    - `OpenAI` (Chat Completions API)
+    - `Google Gemini`
+    - `Anthropic Claude`
+  - The assistant can optionally pull context from:
+    - My connected messages
+    - My cloud storage (Drive/OneDrive)
+    - My Notion workspace(s)
+  - The UI makes it obvious which provider is active and lets me switch.
+
+--------------------------------------------------
+TECH STACK & ARCHITECTURE
+--------------------------------------------------
+
+Use a **single repo** with:
+
+- Frontend:
+  - **Next.js 14+** (App Router)
+  - **TypeScript**
+  - **React**
+  - **Tailwind CSS**
+  - Component abstraction for “unified list views” and “chat views”
+
+- Backend (inside the same Next.js project):
+  - Next.js **route handlers** (or a small internal API layer) for all server logic
+  - **TypeScript** everywhere
+  - **PostgreSQL** for persistence (use Prisma ORM)
+
+- Auth:
+  - Use **NextAuth.js** (or equivalent) with:
+    - Email/password or magic link + OAuth
+    - Support for connecting multiple external accounts per user (e.g., multiple Google accounts, multiple Microsoft accounts, multiple Notion workspaces)
+  - Store tokens/refresh tokens securely and refresh automatically.
+
+- DB via Prisma (sketch schema, then implement):
+  - `User`
+  - `ConnectedAccount`:
+    - `userId`
+    - `provider` (e.g. "gmail", "outlook", "gdrive", "onedrive", "discord", "whatsapp_business", "notion")
+    - `providerAccountId`
+    - `accessToken`, `refreshToken`, `expiresAt` etc.
+  - `MessageThread`
+  - `Message`
+  - `FileItem`
+  - `NotionResource`
+  - `AiChatSession`
+  - `AiMessage`
+  - `AiProviderPreference` (per user or per session)
+
+Make the schema flexible enough to support **multiple accounts per provider** and **normalized message/file structures**.
+
+--------------------------------------------------
+INTEGRATIONS (BACKEND DETAILS)
+--------------------------------------------------
+
+1. Discord
+   - Use the official **Discord bot + OAuth** flow.
+   - Let the user add a bot to specific servers and authorize the app.
+   - Limit reading messages to:
+     - Channels where the bot is present and the API allows it.
+   - Create a backend service that:
+     - Fetches recent messages from selected channels.
+     - Normalizes them into the unified `Message` model.
+   - Do **not** attempt to scrape user DMs.
+
+2. WhatsApp
+   - Integrate **only** with the **WhatsApp Business Cloud API**.
+   - Allow user to configure a WhatsApp Business account (environment variables + UI).
+   - Use webhooks for inbound messages and HTTP calls for outbound.
+   - Normalize WhatsApp messages into the `Message` model.
+
+3. Gmail
+   - Use **Gmail API** with OAuth2.
+   - Scopes limited to mail read/send.
+   - Features:
+     - Fetch and store threads + messages in `MessageThread`/`Message`.
+     - Minimal sync strategy (e.g. sync most recent N threads).
+     - Ability to send replies from the unified UI.
+
+4. Outlook / Microsoft 365
+   - Use **Microsoft Graph API**.
+   - Implement OAuth for Microsoft accounts.
+   - Fetch and send mail via Graph, normalized into the same `Message` entities as Gmail.
+
+5. Google Drive
+   - Use **Google Drive API** with OAuth.
+   - Support **multiple Drive accounts** per user.
+   - Fetch:
+     - File/folder metadata (name, type, size, modified time, link).
+   - Provide:
+     - Paginated “Files” view
+     - Simple search by name.
+   - Do not download full file contents by default; just metadata and links.
+
+6. OneDrive
+   - Use **Microsoft Graph API** for OneDrive.
+   - Same as Google Drive:
+     - Multiple OneDrive accounts per user.
+     - File/folder metadata, links, and basic search.
+
+7. Notion
+   - Use the official **Notion API**.
+   - Allow connecting **multiple workspaces**.
+   - Fetch:
+     - List of pages + databases.
+   - Provide helper endpoints:
+     - `searchNotionResources(query)` to feed the AI chat with context.
+   - Store minimal metadata locally for faster search.
+
+8. AI Providers (LLM layer)
+   - Abstract all AI calls behind a single server-side interface, e.g.:
+     - `callLLM({ provider, model, messages, systemPrompt, tools? })`
+   - Implement providers:
+     - OpenAI (Chat Completions API)
+     - Google Gemini
+     - Anthropic Claude
+   - Use environment variables for all API keys.
+   - Make sure each provider is easy to swap and extend.
+
+--------------------------------------------------
+FRONTEND UX FLOWS
+--------------------------------------------------
+
+Design a clean, minimal dashboard with these main sections:
+
+1. **Home / Overview**
+   - High-level cards:
+     - “Unread Messages” (total count + per provider)
+     - “Recent Files” across all Drives
+     - “Recent Notion pages”
+   - Quick actions:
+     - “Open AI Chat”
+     - “Connect a new account” (Gmail / Outlook / Drive / OneDrive / Discord / WhatsApp / Notion)
+
+2. **Messages**
+   - Tabs or sidebar filters:
+     - “All”
+     - “Discord”
+     - “WhatsApp”
+     - “Email” (with sub-filters Gmail/Outlook)
+   - Unified thread list:
+     - Show provider icon
+     - Last message preview
+     - Timestamp
+     - Unread indicator
+   - Thread view:
+     - Bubble layout
+     - Show clearly which provider each message is from.
+     - Input box for reply if that provider supports sending.
+   - Basic search by sender/subject/content (server-side).
+
+3. **Storage**
+   - Tabs:
+     - “All files”
+     - “Google Drive”
+     - “OneDrive”
+   - Account selector if multiple accounts exist for a provider.
+   - File list with:
+     - Name, type, size, modified time, provider, account label.
+   - Click → open in new tab (link to provider), not full in-app preview (can be added later).
+
+4. **Notion**
+   - List of connected workspaces.
+   - Search box to filter pages/databases.
+   - Option to “Add as context” for the AI chat.
+
+5. **AI Chat**
+   - Layout similar to a chat app.
+   - Controls:
+     - Dropdown to choose provider: `OpenAI`, `Gemini`, `Claude`.
+     - Option toggles to include context from:
+       - Messages
+       - Files (Drive/OneDrive)
+       - Notion
+   - When context is enabled:
+     - Server performs lightweight retrieval (e.g., “top N relevant items” per domain) and sends them as context (summarized) to the model.
+   - Show provider badge and model name per chat session.
+   - Persist chat history in database.
+
+6. **Settings**
+   - Account management:
+     - Connect/disconnect providers.
+     - Label each account (e.g., “Personal Gmail”, “Work Outlook”).
+   - AI settings:
+     - Default provider/model per new chat.
+     - Token/budget controls (just config UI; actual billing is not required now).
+   - Security:
+     - Show connected OAuth scopes.
+     - Option to revoke tokens.
+
+--------------------------------------------------
+IMPLEMENTATION DETAILS & QUALITY BAR
+--------------------------------------------------
+
+- Use **clean, modular TypeScript**.
+- Strong typing for all provider responses and normalized entities.
+- Central “provider” abstraction layer for:
+  - Messaging providers
+  - Storage providers
+  - Knowledge providers (Notion)
+- Build out at least:
+  - Sample Prisma migrations
+  - Example routes for:
+    - `/api/messages/list`
+    - `/api/messages/send`
+    - `/api/files/list`
+    - `/api/notion/search`
+    - `/api/ai/chat`
+- Provide basic error handling and loading states on the frontend.
+- Use a **simple but elegant Tailwind design**:
+  - Light theme
+  - Sidebar layout on desktop, bottom-nav style on mobile.
+
+- Include:
+  - A short `README.md` with:
+    - Project overview
+    - How to run locally
+    - Where to configure OAuth and API keys for each provider
+  - Example `.env.example` listing all keys and callback URLs needed:
+    - Google (Gmail + Drive)
+    - Microsoft (Outlook + OneDrive)
+    - Discord
+    - WhatsApp Business Cloud
+    - Notion
+    - OpenAI
+    - Gemini
+    - Claude
+
+The output should be:
+- A working Next.js + PostgreSQL + Prisma codebase
+- With clearly separated modules and enough scaffolding to start wiring real keys and accounts immediately.

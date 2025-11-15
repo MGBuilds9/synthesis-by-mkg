@@ -1,0 +1,56 @@
+Refine the app spec and UI implementation with the following changes:
+
+1. Information architecture
+   - Split "Messages" into:
+     - **Inbox (Email)** for Gmail + Outlook only.
+     - **Chats** for Discord, WhatsApp Business, Slack, and Telegram.
+   - Inbox page:
+     - Filter chips: All / Gmail / Outlook.
+     - Dropdown to filter by specific email address when multiple accounts are connected.
+   - Chats page:
+     - Filter chips: All / Discord / WhatsApp / Slack / Telegram.
+     - For Discord/Slack: workspace/server + channel selectors.
+     - For Telegram: list of chats the bot is allowed to access, user can choose which to show.
+
+2. Dashboard redesign
+   - Add a persistent left sidebar with navigation for: Dashboard, Inbox, Chats, Storage, Notion, AI Assistant, Settings.
+   - Dashboard content:
+     - "Today" widgets: new emails, new chat messages, recent files, recent Notion pages.
+     - Quick navigation tiles: Inbox, Chats, Storage, Notion, AI Assistant.
+     - A horizontal "Connected Accounts" strip showing provider status (connected / needs attention / connect).
+   - Make the dashboard more of a command center for navigation, not just metric cards.
+
+3. AI Assistant behavior and RAG
+   - Each AI chat session stores:
+     - Selected model provider: OpenAI, Gemini, or Claude.
+     - Selected context domains: Emails, Chats, Files, Notion (toggles).
+     - A flag "askBeforeSearchingContext" (default true).
+   - Implement a retrieval orchestrator (can be backed by n8n and/or Google AI search + a RAG database):
+     - Classify if a user question needs external context.
+     - Predict likely sources (emails, chats, files, Notion).
+     - If sources are ambiguous, ask the user which sources or folders/workspaces to search before querying, to avoid unnecessary token usage.
+     - Query the RAG index (built from selected Drive/OneDrive/Notion scopes and optionally emails) with filters by provider, scope, and time window.
+     - Summarize retrieved items before sending them to the LLM as context.
+   - Show a "Sources used" area in the UI for AI responses.
+
+4. Account connection & scopes
+   - Implement a unified "Connected Accounts" settings page.
+   - After OAuth or configuration for each provider, immediately prompt the user to select **scopes**:
+     - Gmail: which labels to sync.
+     - Outlook: which folders to sync.
+     - Discord: which servers + channels to sync.
+     - Slack: which workspaces + channels to sync.
+     - Telegram: which chats to sync (limited to chats the bot can access).
+     - Google Drive / OneDrive: which folders act as sync roots.
+     - Notion: which workspaces + databases/pages are indexable.
+   - Store scopes in a generic table (e.g., SyncScope) and use them in all sync/retrieval logic.
+
+5. Filtering and search
+   - Inbox page:
+     - Filter by provider (Gmail/Outlook), by specific email address, and by date.
+     - Full-text search over subject, from/to, and body (using DB search or provider search APIs).
+   - Chats page:
+     - Filter by platform (Discord/WhatsApp/Slack/Telegram), and by workspace/server/channel where applicable.
+     - Text search over message content and sender names.
+
+Please adjust the existing components and routes (dashboard, messages, storage, AI chat, settings) to match this updated UX and architecture while keeping the modular provider abstraction layer and Prisma schema approach you already planned.

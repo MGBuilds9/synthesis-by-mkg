@@ -82,3 +82,20 @@ export interface ProviderHealth {
     expiresAt?: Date
   }
 }
+
+export enum ContextDomain {
+  EMAILS = 'EMAILS',
+  CHATS = 'CHATS',
+  FILES = 'FILES',
+  NOTION = 'NOTION'
+}
+
+export interface RetrievalSource {
+  provider: ProviderType
+  resourceId: string
+  resourceType: 'message' | 'file' | 'notion'
+  title: string
+  excerpt: string
+  url?: string
+  timestamp: Date
+}

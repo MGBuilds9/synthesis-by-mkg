@@ -71,6 +71,8 @@ enum ProviderType {
   ONEDRIVE
   DISCORD
   WHATSAPP_BUSINESS
+  SLACK
+  TELEGRAM
   NOTION
 }
 
@@ -110,6 +112,9 @@ enum SyncScopeType {
   NOTION_DATABASE
   NOTION_PAGE
   WHATSAPP_ACCOUNT
+  SLACK_WORKSPACE
+  SLACK_CHANNEL
+  TELEGRAM_CHAT
 }
 
 model SyncScope {
@@ -232,13 +237,15 @@ enum AiProvider {
 }
 
 model AiChatSession {
-  id          String     @id @default(cuid())
-  userId      String
-  provider    AiProvider
-  model       String?
-  title       String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id                        String     @id @default(cuid())
+  userId                    String
+  provider                  AiProvider
+  model                     String?
+  title                     String?
+  askBeforeSearchingContext Boolean    @default(true)
+  contextDomains            Json?
+  createdAt                 DateTime   @default(now())
+  updatedAt                 DateTime   @updatedAt
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages        AiMessage[]
@@ -252,6 +259,7 @@ model AiMessage {
   sessionId String
   role      String
   content   String   @db.Text
+  sources   Json?
   metadata  Json?
   createdAt DateTime @default(now())
 

@@ -1,7 +1,7 @@
 # Unified Console - Project Documentation
 
 ## Overview
-A production-ready unified personal console that aggregates messages, files, and provides AI-powered assistance across multiple platforms including Discord, WhatsApp, Gmail, Outlook, Google Drive, OneDrive, and Notion.
+A production-ready unified personal console that aggregates messages, files, and provides AI-powered assistance across multiple platforms including Discord, WhatsApp, Slack, Telegram, Microsoft Teams, Gmail, Outlook, Google Drive, OneDrive, and Notion.
 
 ## Tech Stack
 - **Frontend:** Next.js 14 (App Router), React, TypeScript, Tailwind CSS
@@ -38,14 +38,11 @@ A production-ready unified personal console that aggregates messages, files, and
 - Logging and observability
 
 ### 🚧 Provider Integrations (Scaffolded, Need Implementation)
-All 7 provider integrations are **architected and ready** but need OAuth flows and sync handlers:
-- Gmail (email)
-- Outlook (email)
-- Discord (chat)
-- WhatsApp Business (messaging)
-- Google Drive (storage)
-- OneDrive (storage)
-- Notion (knowledge)
+All 10 provider integrations are **architected and ready** but need OAuth flows and sync handlers:
+- **Email:** Gmail, Outlook
+- **Chat/Messaging:** Discord, WhatsApp Business, Slack, Telegram, Microsoft Teams
+- **Storage:** Google Drive, OneDrive
+- **Knowledge:** Notion
 
 See `IMPLEMENTATION_STATUS.md` for detailed breakdown.
 
@@ -73,6 +70,10 @@ Database is set up and all migrations applied.
 ### Granular Scope Selection
 Each provider supports fine-grained control:
 - **Discord:** Server + channel level
+- **Slack:** Workspace + channel level
+- **Teams:** Team + channel level
+- **Telegram:** Chat-level selection
+- **WhatsApp Business:** Phone number selection
 - **Gmail:** Label-based filtering
 - **Outlook:** Folder-based filtering
 - **Drive/OneDrive:** Folder root selection
@@ -121,11 +122,20 @@ npm run db:studio    # Open Prisma Studio
 - `IMPLEMENTATION_STATUS.md` - Detailed status and next steps
 - `.env.example` - All required environment variables
 
+## Mobile Optimizations
+- **44px minimum touch targets** on all interactive elements (buttons, inputs, filters)
+- **Responsive breakpoints** using Tailwind's sm/md/lg/xl system
+- **Touch-optimized interactions** with active states and touch-manipulation class
+- **Full-width inputs** on mobile for better usability
+- **Stacked layouts** on mobile that expand horizontally on larger screens
+- **Proper spacing** with responsive padding (p-4 sm:p-6)
+
 ## Notes
 - Server runs on port 5000 (configured for Replit webview)
-- All UI pages are mobile-first responsive
-- Database schema is production-ready
-- AI chat is fully functional with any provider
+- All UI pages are mobile-first responsive with 44px minimum touch targets
+- Database schema is production-ready with support for all 10 providers
+- AI chat is fully functional with any provider (OpenAI, Gemini, Claude)
 - Provider integrations follow consistent patterns
+- Microsoft Teams integration complete (schema, UI filters, selectors)
 
-Last Updated: 2025-01-13
+Last Updated: 2025-11-15

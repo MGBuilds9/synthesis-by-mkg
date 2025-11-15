@@ -73,6 +73,7 @@ enum ProviderType {
   WHATSAPP_BUSINESS
   SLACK
   TELEGRAM
+  TEAMS
   NOTION
 }
 
@@ -115,6 +116,8 @@ enum SyncScopeType {
   SLACK_WORKSPACE
   SLACK_CHANNEL
   TELEGRAM_CHAT
+  TEAMS_WORKSPACE
+  TEAMS_CHANNEL
 }
 
 model SyncScope {

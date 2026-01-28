@@ -37,8 +37,9 @@ export async function retrieveAIContext(options: ContextOptions) {
     notionPages: [],
   }
 
-  for (const contextScope of session.contextScopes) {
-    if (!contextScope.syncScope) continue
+  // Bolt: Optimized to run scope queries in parallel
+  const scopePromises = session.contextScopes.map(async (contextScope) => {
+    if (!contextScope.syncScope) return null
 
     const { connectedAccount, scopeType } = contextScope.syncScope
 
@@ -60,13 +61,16 @@ export async function retrieveAIContext(options: ContextOptions) {
         },
       })
 
-      contextData.messages.push(...messages.map(msg => ({
-        provider: msg.provider,
-        sender: msg.sender,
-        content: msg.content,
-        sentAt: msg.sentAt,
-        subject: msg.thread.subject,
-      })))
+      return {
+        type: 'messages',
+        data: messages.map(msg => ({
+          provider: msg.provider,
+          sender: msg.sender,
+          content: msg.content,
+          sentAt: msg.sentAt,
+          subject: msg.thread.subject,
+        }))
+      }
     }
 
     // Fetch files if this is a storage scope
@@ -82,12 +86,15 @@ export async function retrieveAIContext(options: ContextOptions) {
         take: maxItemsPerScope,
       })
 
-      contextData.files.push(...files.map(file => ({
-        provider: file.provider,
-        name: file.name,
-        modifiedTime: file.modifiedTime,
-        webViewLink: file.webViewLink,
-      })))
+      return {
+        type: 'files',
+        data: files.map(file => ({
+          provider: file.provider,
+          name: file.name,
+          modifiedTime: file.modifiedTime,
+          webViewLink: file.webViewLink,
+        }))
+      }
     }
 
     // Fetch Notion resources if this is a Notion scope
@@ -103,14 +110,33 @@ export async function retrieveAIContext(options: ContextOptions) {
         take: maxItemsPerScope,
       })
 
-      contextData.notionPages.push(...notionResources.map(resource => ({
-        title: resource.title,
-        type: resource.resourceType,
-        lastEditedTime: resource.lastEditedTime,
-        url: resource.url,
-      })))
+      return {
+        type: 'notionPages',
+        data: notionResources.map(resource => ({
+          title: resource.title,
+          type: resource.resourceType,
+          lastEditedTime: resource.lastEditedTime,
+          url: resource.url,
+        }))
+      }
     }
-  }
+
+    return null
+  })
+
+  const results = await Promise.all(scopePromises)
+
+  results.forEach(result => {
+    if (!result) return
+
+    if (result.type === 'messages') {
+      contextData.messages.push(...(result.data as any[]))
+    } else if (result.type === 'files') {
+      contextData.files.push(...(result.data as any[]))
+    } else if (result.type === 'notionPages') {
+      contextData.notionPages.push(...(result.data as any[]))
+    }
+  })
 
   return contextData
 }

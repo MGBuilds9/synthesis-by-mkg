@@ -33,22 +33,24 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const files = await prisma.fileItem.findMany({
-      where: whereClause,
-      include: {
-        connectedAccount: {
-          select: {
-            accountLabel: true,
-            provider: true,
+    // Bolt: Optimized to run findMany and count in parallel to reduce latency
+    const [files, total] = await Promise.all([
+      prisma.fileItem.findMany({
+        where: whereClause,
+        include: {
+          connectedAccount: {
+            select: {
+              accountLabel: true,
+              provider: true,
+            },
           },
         },
-      },
-      orderBy: { modifiedTime: 'desc' },
-      take: limit,
-      skip: offset,
-    })
-
-    const total = await prisma.fileItem.count({ where: whereClause })
+        orderBy: { modifiedTime: 'desc' },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.fileItem.count({ where: whereClause }),
+    ])
 
     return NextResponse.json({
       files,

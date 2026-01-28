@@ -25,26 +25,28 @@ export async function GET(request: NextRequest) {
       whereClause.provider = provider
     }
 
-    const threads = await prisma.messageThread.findMany({
-      where: whereClause,
-      include: {
-        messages: {
-          orderBy: { sentAt: 'desc' },
-          take: 1,
-        },
-        connectedAccount: {
-          select: {
-            accountLabel: true,
-            provider: true,
+    // Bolt: Optimized to run findMany and count in parallel to reduce latency
+    const [threads, total] = await Promise.all([
+      prisma.messageThread.findMany({
+        where: whereClause,
+        include: {
+          messages: {
+            orderBy: { sentAt: 'desc' },
+            take: 1,
+          },
+          connectedAccount: {
+            select: {
+              accountLabel: true,
+              provider: true,
+            },
           },
         },
-      },
-      orderBy: { lastMessageAt: 'desc' },
-      take: limit,
-      skip: offset,
-    })
-
-    const total = await prisma.messageThread.count({ where: whereClause })
+        orderBy: { lastMessageAt: 'desc' },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.messageThread.count({ where: whereClause }),
+    ])
 
     return NextResponse.json({
       threads,

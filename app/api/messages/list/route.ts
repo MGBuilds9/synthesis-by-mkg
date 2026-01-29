@@ -31,6 +31,15 @@ export async function GET(request: NextRequest) {
         where: whereClause,
         include: {
           messages: {
+            // Bolt: Select only necessary fields to reduce payload size (excludes htmlContent)
+            select: {
+              id: true,
+              sender: true,
+              content: true,
+              sentAt: true,
+              isRead: true,
+              providerMessageId: true,
+            },
             orderBy: { sentAt: 'desc' },
             take: 1,
           },

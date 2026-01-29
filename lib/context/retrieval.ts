@@ -56,8 +56,17 @@ export async function retrieveAIContext(options: ContextOptions) {
         },
         orderBy: { sentAt: 'desc' },
         take: maxItemsPerScope,
-        include: {
-          thread: true,
+        // Bolt: Optimized to select only necessary fields, avoiding large htmlContent and metadata
+        select: {
+          provider: true,
+          sender: true,
+          content: true,
+          sentAt: true,
+          thread: {
+            select: {
+              subject: true,
+            },
+          },
         },
       })
 
@@ -84,6 +93,13 @@ export async function retrieveAIContext(options: ContextOptions) {
         },
         orderBy: { modifiedTime: 'desc' },
         take: maxItemsPerScope,
+        // Bolt: Optimized to select only necessary fields
+        select: {
+          provider: true,
+          name: true,
+          modifiedTime: true,
+          webViewLink: true,
+        },
       })
 
       return {
@@ -108,6 +124,13 @@ export async function retrieveAIContext(options: ContextOptions) {
         },
         orderBy: { lastEditedTime: 'desc' },
         take: maxItemsPerScope,
+        // Bolt: Optimized to select only necessary fields
+        select: {
+          title: true,
+          resourceType: true,
+          lastEditedTime: true,
+          url: true,
+        },
       })
 
       return {

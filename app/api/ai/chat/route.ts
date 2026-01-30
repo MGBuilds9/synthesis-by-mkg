@@ -24,9 +24,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create chat session
+    // Bolt: Optimized to select only necessary fields (role, content) for context construction.
+    // This avoids fetching potentially large 'sources' and 'metadata' JSON fields.
     let chatSession = await prisma.aiChatSession.findUnique({
       where: { id: sessionId },
-      include: { messages: { orderBy: { createdAt: 'asc' } } },
+      include: {
+        messages: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            role: true,
+            content: true,
+          },
+        },
+      },
     })
 
     if (!chatSession) {
@@ -36,7 +47,15 @@ export async function POST(request: NextRequest) {
           provider: provider as AiProvider,
           model,
         },
-        include: { messages: true },
+        include: {
+          messages: {
+            select: {
+              id: true,
+              role: true,
+              content: true,
+            },
+          },
+        },
       })
     }
 

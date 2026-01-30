@@ -5,3 +5,7 @@
 ## 2026-01-29 - Optimizing Prisma Selections
 **Learning:** Fetching full Prisma models with `include` retrieves all scalar fields, including large `Text` or `Json` columns (e.g., `htmlContent`), even if unused.
 **Action:** Use `select` to explicitly fetch only required fields when querying models with potentially large columns, especially in high-traffic or list views.
+
+## 2026-01-30 - Optimizing Relation Loading in Prisma
+**Learning:** When using `include` to load relations, Prisma fetches all fields of the related model by default. For models with large columns (like `sources` JSON), this causes unnecessary data transfer.
+**Action:** Nest `select` inside `include` to fetch only the fields required for the operation. Ensure fallback queries (like `create`) use the same selection shape to maintain type compatibility.

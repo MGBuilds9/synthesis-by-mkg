@@ -114,7 +114,8 @@ export class SyncEngine {
   async syncAllEnabledScopes() {
     const enabledScopes = await prisma.syncScope.findMany({
       where: { syncEnabled: true },
-      include: { connectedAccount: true },
+      // Bolt: Optimized to only select IDs as full scope data is re-fetched in syncScope
+      select: { id: true },
     })
 
     const syncPromises = enabledScopes.map(scope => 

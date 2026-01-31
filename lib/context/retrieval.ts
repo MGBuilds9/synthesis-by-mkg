@@ -17,8 +17,9 @@ export async function retrieveAIContext(options: ContextOptions) {
         where: { enabled: true },
         include: {
           syncScope: {
-            include: {
-              connectedAccount: true,
+            select: {
+              connectedAccountId: true,
+              scopeType: true,
             },
           },
         },
@@ -41,14 +42,14 @@ export async function retrieveAIContext(options: ContextOptions) {
   const scopePromises = session.contextScopes.map(async (contextScope) => {
     if (!contextScope.syncScope) return null
 
-    const { connectedAccount, scopeType } = contextScope.syncScope
+    const { connectedAccountId, scopeType } = contextScope.syncScope
 
     // Fetch messages if this is a messaging scope
     if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) {
       const messages = await prisma.message.findMany({
         where: {
           thread: {
-            connectedAccountId: connectedAccount.id,
+            connectedAccountId: connectedAccountId,
           },
           sentAt: {
             gte: cutoffDate,
@@ -86,7 +87,7 @@ export async function retrieveAIContext(options: ContextOptions) {
     if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) {
       const files = await prisma.fileItem.findMany({
         where: {
-          connectedAccountId: connectedAccount.id,
+          connectedAccountId: connectedAccountId,
           modifiedTime: {
             gte: cutoffDate,
           },
@@ -117,7 +118,7 @@ export async function retrieveAIContext(options: ContextOptions) {
     if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(scopeType)) {
       const notionResources = await prisma.notionResource.findMany({
         where: {
-          connectedAccountId: connectedAccount.id,
+          connectedAccountId: connectedAccountId,
           lastEditedTime: {
             gte: cutoffDate,
           },

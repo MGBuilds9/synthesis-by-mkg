@@ -9,3 +9,7 @@
 ## 2026-01-30 - Optimizing Relation Loading in Prisma
 **Learning:** When using `include` to load relations, Prisma fetches all fields of the related model by default. For models with large columns (like `sources` JSON), this causes unnecessary data transfer.
 **Action:** Nest `select` inside `include` to fetch only the fields required for the operation. Ensure fallback queries (like `create`) use the same selection shape to maintain type compatibility.
+
+## 2026-02-18 - Avoid Unnecessary Relation Joins for FK Access
+**Learning:** Fetching a relation (e.g., `include: { connectedAccount: true }`) just to access its ID is wasteful if the foreign key (e.g., `connectedAccountId`) is already present on the source model.
+**Action:** Check if the required fields (like IDs) are available on the current model before joining a relation. Use `select` to fetch only specific fields if a relation must be accessed.

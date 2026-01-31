@@ -60,17 +60,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Add user message to database
-    await prisma.aiMessage.create({
+    // Bolt: Optimized to start DB write in background and await it in parallel with LLM call
+    const saveUserMessagePromise = prisma.aiMessage.create({
       data: {
         sessionId: chatSession.id,
         role: 'user',
         content: message,
       },
     })
+    // Bolt: Ensure unhandled rejections are caught if the request fails early (e.g. context retrieval error)
+    saveUserMessagePromise.catch(() => {})
 
     // Retrieve context if requested
     let systemPrompt: string | undefined
     if (useContext) {
+      // Bolt: Context retrieval runs while user message is being saved
       const contextData = await retrieveAIContext({ sessionId: chatSession.id })
       if (contextData) {
         systemPrompt = `You have access to the following context from the user's connected accounts:\n\n${summarizeContext(contextData)}`
@@ -86,7 +90,13 @@ export async function POST(request: NextRequest) {
 
     // Call LLM
     const llmProvider = getLLMProvider(provider as AiProvider)
-    const response = await llmProvider.chat(messages, model, systemPrompt)
+
+    // Bolt: Optimized to await user message save and LLM response in parallel
+    // This removes the DB write latency from the critical path
+    const [_, response] = await Promise.all([
+      saveUserMessagePromise,
+      llmProvider.chat(messages, model, systemPrompt),
+    ])
 
     // Save assistant response
     await prisma.aiMessage.create({

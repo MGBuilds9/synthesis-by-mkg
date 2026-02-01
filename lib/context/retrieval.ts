@@ -20,6 +20,11 @@ export async function retrieveAIContext(options: ContextOptions) {
             select: {
               connectedAccountId: true,
               scopeType: true,
+              connectedAccount: {
+                select: {
+                  provider: true,
+                },
+              },
             },
           },
         },
@@ -42,12 +47,13 @@ export async function retrieveAIContext(options: ContextOptions) {
   const scopePromises = session.contextScopes.map(async (contextScope) => {
     if (!contextScope.syncScope) return null
 
-    const { connectedAccountId, scopeType } = contextScope.syncScope
+    const { connectedAccountId, scopeType, connectedAccount } = contextScope.syncScope
 
     // Fetch messages if this is a messaging scope
     if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) {
       const messages = await prisma.message.findMany({
         where: {
+          provider: connectedAccount.provider, // Bolt: Uses [provider, sentAt] index to avoid full table scan
           thread: {
             connectedAccountId: connectedAccountId,
           },

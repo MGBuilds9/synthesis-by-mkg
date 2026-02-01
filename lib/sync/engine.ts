@@ -8,15 +8,38 @@ export class SyncEngine {
     const syncScope = await prisma.syncScope.findUnique({
       where: { id: syncScopeId },
       include: {
-        connectedAccount: true,
+        connectedAccount: {
+          select: {
+            id: true,
+            provider: true,
+            providerAccountId: true,
+            accessToken: true,
+            refreshToken: true,
+            metadata: true,
+            accountLabel: true,
+          }
+        },
       },
     })
 
-    if (!syncScope || !syncScope.syncEnabled) {
+    if (!syncScope) {
+      return
+    }
+
+    await this.processSync(syncScope)
+  }
+
+  private async processSync(syncScope: any) {
+    if (!syncScope.syncEnabled) {
       return
     }
 
     const { connectedAccount } = syncScope
+    if (!connectedAccount) {
+      return
+    }
+
+    const syncScopeId = syncScope.id
     const cutoffDate = subDays(new Date(), syncScope.historicalDays)
     const lastSyncedAt = syncScope.lastSyncedAt || cutoffDate
 
@@ -112,14 +135,26 @@ export class SyncEngine {
   }
 
   async syncAllEnabledScopes() {
+    // Bolt: Optimized to fetch all necessary data in one query to avoid N+1 problem
     const enabledScopes = await prisma.syncScope.findMany({
       where: { syncEnabled: true },
-      // Bolt: Optimized to only select IDs as full scope data is re-fetched in syncScope
-      select: { id: true },
+      include: {
+        connectedAccount: {
+          select: {
+            id: true,
+            provider: true,
+            providerAccountId: true,
+            accessToken: true,
+            refreshToken: true,
+            metadata: true,
+            accountLabel: true,
+          }
+        },
+      },
     })
 
     const syncPromises = enabledScopes.map(scope => 
-      this.syncScope(scope.id).catch(error => {
+      this.processSync(scope).catch(error => {
         console.error(`Failed to sync scope ${scope.id}:`, error)
       })
     )

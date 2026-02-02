@@ -17,3 +17,7 @@
 ## 2026-02-18 - Optimized AI Chat Context Loading
 **Learning:** Fetching the entire message history for an AI chat session causes performance degradation and token limit issues as the conversation grows.
 **Action:** Limit message retrieval to a fixed window (e.g., last 50 messages) using `take` and `orderBy: desc`, then reverse the array in code to restore chronological order for the LLM.
+
+## 2026-05-21 - Dynamic Prisma Includes and Type Safety
+**Learning:** Constructing Prisma `include` objects dynamically (e.g., using `any`) breaks type inference for the result. TypeScript may infer incorrect types or default to `any`, requiring explicit type casting or handling.
+**Action:** When using dynamic `include`, explicitly type the result variable (e.g., `as any` or a specific payload type) and cast related properties to avoid implicit 'any' errors.

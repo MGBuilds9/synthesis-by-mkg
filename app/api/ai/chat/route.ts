@@ -26,20 +26,42 @@ export async function POST(request: NextRequest) {
     // Get or create chat session
     // Bolt: Optimized to select only necessary fields (role, content) for context construction.
     // This avoids fetching potentially large 'sources' and 'metadata' JSON fields.
-    let chatSession = await prisma.aiChatSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        messages: {
-          // Bolt: Optimized to fetch only the last 50 messages to prevent context overflow and reduce DB load
-          orderBy: { createdAt: 'desc' },
-          take: 50,
-          select: {
-            id: true,
-            role: true,
-            content: true,
-          },
+    const include: any = {
+      messages: {
+        // Bolt: Optimized to fetch only the last 50 messages to prevent context overflow and reduce DB load
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+        select: {
+          id: true,
+          role: true,
+          content: true,
         },
       },
+    }
+
+    // Bolt: Pre-fetch context scopes if context is requested to avoid redundant DB query in retrieveAIContext
+    if (useContext) {
+      include.contextScopes = {
+        where: { enabled: true },
+        include: {
+          syncScope: {
+            select: {
+              connectedAccountId: true,
+              scopeType: true,
+              connectedAccount: {
+                select: {
+                  provider: true,
+                },
+              },
+            },
+          },
+        },
+      }
+    }
+
+    let chatSession: any = await prisma.aiChatSession.findUnique({
+      where: { id: sessionId },
+      include,
     })
 
     // Bolt: Reverse messages to restore chronological order (oldest -> newest) for the LLM
@@ -54,15 +76,7 @@ export async function POST(request: NextRequest) {
           provider: provider as AiProvider,
           model,
         },
-        include: {
-          messages: {
-            select: {
-              id: true,
-              role: true,
-              content: true,
-            },
-          },
-        },
+        include,
       })
     }
 
@@ -81,15 +95,19 @@ export async function POST(request: NextRequest) {
     // Retrieve context if requested
     let systemPrompt: string | undefined
     if (useContext) {
-      // Bolt: Context retrieval runs while user message is being saved
-      const contextData = await retrieveAIContext({ sessionId: chatSession.id })
+      // Bolt: Context retrieval runs while user message is being saved.
+      // We pass the pre-fetched contextScopes to avoid re-fetching the session.
+      const contextData = await retrieveAIContext(
+        { sessionId: chatSession.id },
+        (chatSession as any).contextScopes
+      )
       if (contextData) {
         systemPrompt = `You have access to the following context from the user's connected accounts:\n\n${summarizeContext(contextData)}`
       }
     }
 
     // Prepare messages for LLM
-    const messages = chatSession.messages.map(msg => ({
+    const messages = chatSession.messages.map((msg: any) => ({
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
     }))

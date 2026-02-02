@@ -30,7 +30,9 @@ export async function POST(request: NextRequest) {
       where: { id: sessionId },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' },
+          // Bolt: Optimized to fetch only the last 50 messages to prevent context overflow and reduce DB load
+          orderBy: { createdAt: 'desc' },
+          take: 50,
           select: {
             id: true,
             role: true,
@@ -39,6 +41,11 @@ export async function POST(request: NextRequest) {
         },
       },
     })
+
+    // Bolt: Reverse messages to restore chronological order (oldest -> newest) for the LLM
+    if (chatSession) {
+      chatSession.messages.reverse()
+    }
 
     if (!chatSession) {
       chatSession = await prisma.aiChatSession.create({

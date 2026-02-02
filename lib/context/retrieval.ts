@@ -7,33 +7,37 @@ export interface ContextOptions {
   maxItemsPerScope?: number
 }
 
-export async function retrieveAIContext(options: ContextOptions) {
+export async function retrieveAIContext(options: ContextOptions, preFetchedScopes?: any[]) {
   const { sessionId, timeWindowDays = 30, maxItemsPerScope = 10 } = options
+  let contextScopes = preFetchedScopes
 
-  const session = await prisma.aiChatSession.findUnique({
-    where: { id: sessionId },
-    include: {
-      contextScopes: {
-        where: { enabled: true },
-        include: {
-          syncScope: {
-            select: {
-              connectedAccountId: true,
-              scopeType: true,
-              connectedAccount: {
-                select: {
-                  provider: true,
+  if (!contextScopes) {
+    const session = await prisma.aiChatSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        contextScopes: {
+          where: { enabled: true },
+          include: {
+            syncScope: {
+              select: {
+                connectedAccountId: true,
+                scopeType: true,
+                connectedAccount: {
+                  select: {
+                    provider: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  })
+    })
 
-  if (!session) {
-    return null
+    if (!session) {
+      return null
+    }
+    contextScopes = session.contextScopes
   }
 
   const cutoffDate = subDays(new Date(), timeWindowDays)
@@ -44,7 +48,7 @@ export async function retrieveAIContext(options: ContextOptions) {
   }
 
   // Bolt: Optimized to run scope queries in parallel
-  const scopePromises = session.contextScopes.map(async (contextScope) => {
+  const scopePromises = contextScopes.map(async (contextScope: any) => {
     if (!contextScope.syncScope) return null
 
     const { connectedAccountId, scopeType, connectedAccount } = contextScope.syncScope

@@ -13,3 +13,7 @@
 ## 2026-02-18 - Avoid Unnecessary Relation Joins for FK Access
 **Learning:** Fetching a relation (e.g., `include: { connectedAccount: true }`) just to access its ID is wasteful if the foreign key (e.g., `connectedAccountId`) is already present on the source model.
 **Action:** Check if the required fields (like IDs) are available on the current model before joining a relation. Use `select` to fetch only specific fields if a relation must be accessed.
+
+## 2026-02-18 - Optimized AI Chat Context Loading
+**Learning:** Fetching the entire message history for an AI chat session causes performance degradation and token limit issues as the conversation grows.
+**Action:** Limit message retrieval to a fixed window (e.g., last 50 messages) using `take` and `orderBy: desc`, then reverse the array in code to restore chronological order for the LLM.

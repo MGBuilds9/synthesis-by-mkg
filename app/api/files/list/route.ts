@@ -37,7 +37,14 @@ export async function GET(request: NextRequest) {
     const [files, total] = await Promise.all([
       prisma.fileItem.findMany({
         where: whereClause,
-        include: {
+        // Bolt: Optimized to select only necessary fields to reduce payload size
+        select: {
+          id: true,
+          name: true,
+          provider: true,
+          size: true,
+          modifiedTime: true,
+          webViewLink: true,
           connectedAccount: {
             select: {
               accountLabel: true,

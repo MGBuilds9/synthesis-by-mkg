@@ -1,5 +1,5 @@
 import { prisma } from '../prisma'
-import { logProviderActivity } from '../logger'
+import logger, { logProviderActivity } from '../logger'
 import { ProviderType, SyncScopeType } from '@prisma/client'
 import { subDays } from 'date-fns'
 
@@ -44,14 +44,13 @@ export class SyncEngine {
     const lastSyncedAt = syncScope.lastSyncedAt || cutoffDate
 
     try {
-      await logProviderActivity(
-        connectedAccount.provider,
-        'SYNC_START',
-        'INFO',
-        `Starting sync for scope: ${syncScope.scopeName}`,
-        undefined,
-        { syncScopeId, scopeType: syncScope.scopeType }
-      )
+      // Bolt: Use default logger for SYNC_START to avoid DB write (optimization)
+      logger.info(`Starting sync for scope: ${syncScope.scopeName}`, {
+        provider: connectedAccount.provider,
+        operation: 'SYNC_START',
+        syncScopeId,
+        scopeType: syncScope.scopeType
+      })
 
       // Route to appropriate sync handler based on provider type
       switch (connectedAccount.provider) {

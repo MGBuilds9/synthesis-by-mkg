@@ -21,3 +21,7 @@
 ## 2026-05-21 - Dynamic Prisma Includes and Type Safety
 **Learning:** Constructing Prisma `include` objects dynamically (e.g., using `any`) breaks type inference for the result. TypeScript may infer incorrect types or default to `any`, requiring explicit type casting or handling.
 **Action:** When using dynamic `include`, explicitly type the result variable (e.g., `as any` or a specific payload type) and cast related properties to avoid implicit 'any' errors.
+
+## 2026-05-22 - Optimized Sync Logging
+**Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
+**Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.

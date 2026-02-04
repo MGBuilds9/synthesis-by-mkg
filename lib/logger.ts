@@ -26,22 +26,21 @@ export async function logProviderActivity(
   errorDetails?: string,
   metadata?: any
 ) {
-  logger.log(level.toLowerCase(), `[${provider}] ${operation}: ${message}`, { metadata })
+  logger.log(level.toLowerCase(), `[${provider}] ${operation}: ${message}`, { metadata });
 
-  try {
-    await prisma.providerLog.create({
-      data: {
-        provider,
-        operation,
-        level,
-        message,
-        errorDetails,
-        metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined,
-      },
-    })
-  } catch (error) {
+  // Bolt: Fire-and-forget DB logging to avoid blocking the main thread
+  prisma.providerLog.create({
+    data: {
+      provider,
+      operation,
+      level,
+      message,
+      errorDetails,
+      metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined,
+    },
+  }).catch(error => {
     logger.error('Failed to write provider log to database', { error })
-  }
+  })
 }
 
 export default logger

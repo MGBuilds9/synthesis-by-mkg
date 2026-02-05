@@ -21,3 +21,7 @@
 ## 2026-05-21 - Dynamic Prisma Includes and Type Safety
 **Learning:** Constructing Prisma `include` objects dynamically (e.g., using `any`) breaks type inference for the result. TypeScript may infer incorrect types or default to `any`, requiring explicit type casting or handling.
 **Action:** When using dynamic `include`, explicitly type the result variable (e.g., `as any` or a specific payload type) and cast related properties to avoid implicit 'any' errors.
+
+## 2026-05-22 - Memoization for High-Frequency State Updates
+**Learning:** In interactive components like chat interfaces, typing into an input field updates state on every keystroke, causing the entire component tree to re-render. If the component includes a long list (like chat history), this causes significant performance degradation.
+**Action:** Extract static or append-only lists (like message history) into separate components and wrap them in `React.memo` to prevent re-renders when only unrelated parent state (like input value) changes.

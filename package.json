@@ -7,12 +7,13 @@
     "dev": "next dev -p 5000",
     "build": "next build",
     "start": "next start -p 5000",
-    "lint": "next lint",
+    "lint": "eslint .",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "vitest run --exclude e2e/**",
+    "test:watch": "vitest",
+    "e2e": "playwright test --reporter=line"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
@@ -44,12 +45,16 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.1.6",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.1.3",
     "jsdom": "^28.0.0",
-    "vitest": "^4.0.18"
-  }
+    "vitest": "^4.0.18",
+    "@playwright/test": "^1.56.1"
+  },
+  "packageManager": "npm@11.7.0"
 }

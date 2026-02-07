@@ -3,12 +3,12 @@
 ## Project Context
 
 - **Type:** Next.js App (App Router)
-- **Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS, Prisma, PostgreSQL
+- **Stack:** Next.js 16.1, React 19, TypeScript, Tailwind CSS, Prisma, PostgreSQL
 - **Auth:** NextAuth v4 (credentials + Google OAuth)
 - **AI Providers:** OpenAI, Anthropic Claude, Google Gemini (via lib/providers/llm/)
 - **Test Runner:** `npm test` (Vitest + React Testing Library, 123 tests)
 - **Build Command:** `npm run build`
-- **Deploy Target:** Coolify (192.168.0.229) + Cloudflare Tunnel
+- **Deploy Target:** Vercel (production) + Coolify (192.168.0.229) + Cloudflare Tunnel (future)
 - **Package Manager:** npm
 - **Key Directories:**
   - `app/` — Next.js pages and API routes
@@ -44,11 +44,15 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 - `"type": "module"` in package.json — all .js files must use ESM syntax
 - Current codebase will be largely replaced in Phase 1 (strip sync engine, browsing pages)
 - Tests exist for current code but will need rewriting as architecture changes
+- Auth (NextAuth v4) is configured but sign-in form is a placeholder — not wired to `signIn()`. Dashboard pages have no session protection. Env vars (NEXTAUTH_SECRET, DATABASE_URL, GOOGLE_CLIENT_ID/SECRET) not set on Vercel.
 
 ## Session Log
 
+### Feb 6, 2026 — CVE fix, Vercel deploy, auth audit
+- **Changes:** Upgraded Next.js 16.0.3 → 16.1.6 to fix CVE-2025-66478 (React2Shell RCE). Deployed to Vercel successfully. Audited auth system — NextAuth v4 configured but sign-in form not wired, no middleware, missing env vars.
+- **Decisions:** Vercel now primary deploy target (was Coolify-only). Auth needs either quick-wire or full Phase 1 rebuild.
+- **Tests:** 123 passed, 0 failed, 0 new (dependency-only change)
+- **Next steps:** Decide: quick-wire existing auth OR jump to Phase 1 rebuild. Set Vercel env vars (NEXTAUTH_SECRET, DATABASE_URL, GOOGLE_CLIENT_ID/SECRET).
+
 ### Feb 6, 2026 — Architecture blueprint, test suite bootstrap, ESM fix
-- **Changes:** Fixed CJS/ESM conflict (package.json "type": "module" + next.config.js export default). Bootstrapped Vitest test infrastructure with 123 tests across 16 files. Created full architecture blueprint for AI-first rebuild.
-- **Decisions:** Rearchitected from unified inbox to AI-first knowledge assistant. MCP-first (no local sync), chat-first UI, 6-table Prisma schema replacing current 14 models. Coolify + Cloudflare Tunnel deployment. PWA for mobile.
-- **Tests:** 123 passed, 0 failed, 123 new tests added (16 files)
-- **Next steps:** Phase 1 — strip current app, implement new Prisma schema, build chat UI, wire Claude tool use to Craft MCPs
+- Fixed CJS/ESM conflict, bootstrapped 123 tests, created AI-first architecture blueprint (123/123, 5a3ddd3)

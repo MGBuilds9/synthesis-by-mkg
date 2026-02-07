@@ -25,3 +25,7 @@
 ## 2026-05-22 - Memoization for High-Frequency State Updates
 **Learning:** In interactive components like chat interfaces, typing into an input field updates state on every keystroke, causing the entire component tree to re-render. If the component includes a long list (like chat history), this causes significant performance degradation.
 **Action:** Extract static or append-only lists (like message history) into separate components and wrap them in `React.memo` to prevent re-renders when only unrelated parent state (like input value) changes.
+
+## 2026-05-23 - Avoiding Implicit Joins on Large Tables
+**Learning:** Filtering a large table (e.g., `MessageThread`) by a relation's field (e.g., `connectedAccount.userId`) forces a database join or subquery, which can be slow.
+**Action:** Fetch the related IDs first (e.g., `connectedAccountIds`) and use `IN` clause (e.g., `connectedAccountId: { in: ids }`) to leverage indexes on foreign keys directly and avoid the join.

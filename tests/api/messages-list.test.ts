@@ -12,6 +12,9 @@ vi.mock('@/lib/prisma', () => ({
       findMany: vi.fn(),
       count: vi.fn(),
     },
+    connectedAccount: {
+      findMany: vi.fn(),
+    },
   },
 }))
 
@@ -25,6 +28,11 @@ import { prisma } from '@/lib/prisma'
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Default mock behavior for connectedAccount
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
+      { id: 'acc-1' },
+      { id: 'acc-2' },
+    ] as any)
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {
@@ -109,11 +117,16 @@ describe('GET /api/messages/list', () => {
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
+    expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-123',
+      },
+      select: { id: true },
+    })
+
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1', 'acc-2'] },
       },
       include: {
         messages: {
@@ -142,9 +155,7 @@ describe('GET /api/messages/list', () => {
 
     expect(prisma.messageThread.count).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1', 'acc-2'] },
       },
     })
   })
@@ -190,11 +201,17 @@ describe('GET /api/messages/list', () => {
     expect(data.threads[0].provider).toBe('GMAIL')
     expect(data.total).toBe(1)
 
+    expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-123',
+        provider: 'GMAIL',
+      },
+      select: { id: true },
+    })
+
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1', 'acc-2'] },
         provider: 'GMAIL',
       },
       include: expect.any(Object),
@@ -248,9 +265,7 @@ describe('GET /api/messages/list', () => {
 
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1', 'acc-2'] },
       },
       include: expect.any(Object),
       orderBy: { lastMessageAt: 'desc' },
@@ -393,6 +408,7 @@ describe('GET /api/messages/list', () => {
       user: { id: 'user-123' },
     } as any)
 
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([])
     vi.mocked(prisma.messageThread.findMany).mockRejectedValue(
       new Error('Database connection failed')
     )

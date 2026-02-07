@@ -70,12 +70,31 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
     const queryPromise = (async () => {
       // Fetch messages if this is a messaging scope
       if (category === 'messages') {
+        // Bolt: Optimized query strategy
+        // 1. Fetch relevant thread IDs using the efficient [connectedAccountId, lastMessageAt] index
+        // This avoids scanning the large Message table by provider and joining on thread
+        const threads = await prisma.messageThread.findMany({
+          where: {
+            connectedAccountId: connectedAccountId,
+            lastMessageAt: {
+              gte: cutoffDate,
+            },
+          },
+          select: { id: true },
+          orderBy: { lastMessageAt: 'desc' },
+          take: maxItemsPerScope, // Optimistic take: top threads likely contain top messages
+        })
+
+        const threadIds = threads.map(t => t.id)
+
+        if (threadIds.length === 0) {
+          return { type: 'messages', data: [] }
+        }
+
+        // 2. Fetch messages using the thread IDs
         const messages = await prisma.message.findMany({
           where: {
-            provider: connectedAccount.provider,
-            thread: {
-              connectedAccountId: connectedAccountId,
-            },
+            threadId: { in: threadIds },
             sentAt: {
               gte: cutoffDate,
             },
@@ -83,7 +102,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
           orderBy: { sentAt: 'desc' },
           take: maxItemsPerScope,
           select: {
-            id: true, // Bolt: Added ID for deduplication
+            id: true,
             provider: true,
             sender: true,
             content: true,

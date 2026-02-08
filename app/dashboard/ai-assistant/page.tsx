@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp } from 'lucide-react'
+import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
 
 export default function AIChatPage() {
@@ -186,9 +186,20 @@ export default function AIChatPage() {
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label={loading ? 'Sending message' : 'Send message'}
+            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-all min-w-[100px]"
           >
-            Send
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Sending</span>
+              </>
+            ) : (
+              <>
+                <span>Send</span>
+                <Send className="h-4 w-4" />
+              </>
+            )}
           </button>
         </div>
       </div>

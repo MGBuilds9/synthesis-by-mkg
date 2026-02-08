@@ -64,9 +64,10 @@ const MessageList = memo(function MessageList({ messages, loading }: MessageList
         )}
 
         {loading && (
-          <div className="flex justify-start">
+          <div className="flex justify-start" role="status" aria-live="polite">
             <div className="bg-white rounded-lg px-4 py-3 shadow">
               <div className="flex gap-1">
+                <span className="sr-only">AI is thinking...</span>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>

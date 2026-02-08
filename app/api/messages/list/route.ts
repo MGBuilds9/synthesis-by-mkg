@@ -15,9 +15,27 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
+    // Bolt: Optimize query by fetching relevant account IDs first.
+    // This avoids a cross-table join filter on MessageThread, allowing the database
+    // to utilize the `@@index([connectedAccountId, lastMessageAt])` for efficient
+    // sorting and pagination (O(K) vs O(N)).
+    const accountWhere: any = {
+      userId: session.user.id,
+    }
+    if (provider) {
+      accountWhere.provider = provider
+    }
+
+    const connectedAccounts = await prisma.connectedAccount.findMany({
+      where: accountWhere,
+      select: { id: true },
+    })
+
+    const connectedAccountIds = connectedAccounts.map((acc) => acc.id)
+
     const whereClause: any = {
-      connectedAccount: {
-        userId: session.user.id,
+      connectedAccountId: {
+        in: connectedAccountIds,
       },
     }
 

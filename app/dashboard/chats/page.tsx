@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { MessageSquare, Search, Filter, ChevronDown, Hash } from 'lucide-react'
 
 export default function ChatsPage() {
@@ -24,6 +25,7 @@ export default function ChatsPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setSelectedPlatform('all')}
+              aria-label="Show all chats"
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'all'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -34,6 +36,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('discord')}
+              aria-label="Filter by Discord"
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'discord'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -44,6 +47,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('whatsapp')}
+              aria-label="Filter by WhatsApp"
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'whatsapp'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -54,6 +58,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('slack')}
+              aria-label="Filter by Slack"
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'slack'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -64,6 +69,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('teams')}
+              aria-label="Filter by Teams"
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'teams'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -74,6 +80,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('telegram')}
+              aria-label="Filter by Telegram"
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'telegram'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -89,6 +96,7 @@ export default function ChatsPage() {
             <input
               type="text"
               placeholder="Search chats..."
+              aria-label="Search chats"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
@@ -97,6 +105,7 @@ export default function ChatsPage() {
 
           <button 
             onClick={() => setShowFilters(!showFilters)}
+            aria-label="Toggle filters"
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
           >
             <Filter className="h-5 w-5 text-gray-600" />
@@ -107,11 +116,12 @@ export default function ChatsPage() {
           <div className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
             {showWorkspaceSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                <label htmlFor="workspace-select" className="text-sm font-medium text-gray-700 whitespace-nowrap">
                   {selectedPlatform === 'discord' ? 'Server:' : selectedPlatform === 'teams' ? 'Team:' : 'Workspace:'}
                 </label>
                 <div className="relative w-full sm:w-auto">
                   <select
+                    id="workspace-select"
                     value={selectedWorkspace}
                     onChange={(e) => setSelectedWorkspace(e.target.value)}
                     className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
@@ -127,9 +137,10 @@ export default function ChatsPage() {
 
             {showChannelSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Channel:</label>
+                <label htmlFor="channel-select" className="text-sm font-medium text-gray-700 whitespace-nowrap">Channel:</label>
                 <div className="relative w-full sm:w-auto">
                   <select
+                    id="channel-select"
                     value={selectedChannel}
                     onChange={(e) => setSelectedChannel(e.target.value)}
                     className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
@@ -146,9 +157,10 @@ export default function ChatsPage() {
 
             {selectedPlatform === 'telegram' && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Chat:</label>
+                <label htmlFor="chat-select" className="text-sm font-medium text-gray-700 whitespace-nowrap">Chat:</label>
                 <div className="relative w-full sm:w-auto">
                   <select
+                    id="chat-select"
                     value={selectedChannel}
                     onChange={(e) => setSelectedChannel(e.target.value)}
                     className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
@@ -169,7 +181,13 @@ export default function ChatsPage() {
         <div className="p-6 sm:p-8 text-center text-gray-500">
           <MessageSquare className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" />
           <p className="text-base sm:text-lg font-medium">No chats yet</p>
-          <p className="text-sm mt-1 px-4">Connect your Discord, WhatsApp, Slack, Teams, or Telegram to get started</p>
+          <p className="text-sm mt-1 mb-4 px-4">Connect your Discord, WhatsApp, Slack, Teams, or Telegram to get started</p>
+          <Link
+            href="/dashboard/settings"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            Connect Account
+          </Link>
         </div>
       </div>
     </div>

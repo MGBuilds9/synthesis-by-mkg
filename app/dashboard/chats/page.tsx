@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { MessageSquare, Search, Filter, ChevronDown, Hash } from 'lucide-react'
 
 export default function ChatsPage() {
@@ -21,9 +22,10 @@ export default function ChatsPage() {
 
       <div className="mb-6 space-y-3 sm:space-y-4">
         <div className="flex gap-3 sm:gap-4 flex-wrap items-center">
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap" role="group" aria-label="Platform filter">
             <button
               onClick={() => setSelectedPlatform('all')}
+              aria-pressed={selectedPlatform === 'all'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'all'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -34,6 +36,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('discord')}
+              aria-pressed={selectedPlatform === 'discord'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'discord'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -44,6 +47,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('whatsapp')}
+              aria-pressed={selectedPlatform === 'whatsapp'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'whatsapp'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -54,6 +58,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('slack')}
+              aria-pressed={selectedPlatform === 'slack'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'slack'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -64,6 +69,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('teams')}
+              aria-pressed={selectedPlatform === 'teams'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'teams'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -74,6 +80,7 @@ export default function ChatsPage() {
             </button>
             <button
               onClick={() => setSelectedPlatform('telegram')}
+              aria-pressed={selectedPlatform === 'telegram'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                 selectedPlatform === 'telegram'
                   ? 'bg-indigo-100 text-indigo-700'
@@ -85,10 +92,11 @@ export default function ChatsPage() {
           </div>
 
           <div className="flex-1 min-w-full sm:min-w-[300px] sm:max-w-md relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search chats..."
+              aria-label="Search chats"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
@@ -97,9 +105,11 @@ export default function ChatsPage() {
 
           <button 
             onClick={() => setShowFilters(!showFilters)}
+            aria-label="Toggle filters"
+            aria-expanded={showFilters}
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
           >
-            <Filter className="h-5 w-5 text-gray-600" />
+            <Filter className="h-5 w-5 text-gray-600" aria-hidden="true" />
           </button>
         </div>
 
@@ -113,6 +123,7 @@ export default function ChatsPage() {
                 <div className="relative w-full sm:w-auto">
                   <select
                     value={selectedWorkspace}
+                    aria-label={selectedPlatform === 'discord' ? 'Select Server' : selectedPlatform === 'teams' ? 'Select Team' : 'Select Workspace'}
                     onChange={(e) => setSelectedWorkspace(e.target.value)}
                     className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
                   >
@@ -120,7 +131,7 @@ export default function ChatsPage() {
                     <option value="1">{selectedPlatform === 'discord' ? 'Gaming Server' : selectedPlatform === 'teams' ? 'Engineering Team' : 'Work Team'}</option>
                     <option value="2">{selectedPlatform === 'discord' ? 'Work Team' : selectedPlatform === 'teams' ? 'Marketing Team' : 'Side Project'}</option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
                 </div>
               </div>
             )}
@@ -131,6 +142,7 @@ export default function ChatsPage() {
                 <div className="relative w-full sm:w-auto">
                   <select
                     value={selectedChannel}
+                    aria-label="Select Channel"
                     onChange={(e) => setSelectedChannel(e.target.value)}
                     className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
                   >
@@ -139,7 +151,7 @@ export default function ChatsPage() {
                     <option value="2"># random</option>
                     <option value="3"># announcements</option>
                   </select>
-                  <Hash className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <Hash className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
                 </div>
               </div>
             )}
@@ -150,6 +162,7 @@ export default function ChatsPage() {
                 <div className="relative w-full sm:w-auto">
                   <select
                     value={selectedChannel}
+                    aria-label="Select Chat"
                     onChange={(e) => setSelectedChannel(e.target.value)}
                     className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
                   >
@@ -157,7 +170,7 @@ export default function ChatsPage() {
                     <option value="1">Family Group</option>
                     <option value="2">Tech News</option>
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
                 </div>
               </div>
             )}
@@ -167,9 +180,13 @@ export default function ChatsPage() {
 
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 sm:p-8 text-center text-gray-500">
-          <MessageSquare className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" />
+          <MessageSquare className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" aria-hidden="true" />
           <p className="text-base sm:text-lg font-medium">No chats yet</p>
-          <p className="text-sm mt-1 px-4">Connect your Discord, WhatsApp, Slack, Teams, or Telegram to get started</p>
+          <p className="text-sm mt-1 px-4">
+            <Link href="/dashboard/settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+              Connect your accounts
+            </Link> to get started
+          </p>
         </div>
       </div>
     </div>

@@ -22,11 +22,6 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
               select: {
                 connectedAccountId: true,
                 scopeType: true,
-                connectedAccount: {
-                  select: {
-                    provider: true,
-                  },
-                },
               },
             },
           },
@@ -53,7 +48,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
   const scopePromises = contextScopes.map(async (contextScope: any) => {
     if (!contextScope.syncScope) return null
 
-    const { connectedAccountId, scopeType, connectedAccount } = contextScope.syncScope
+    const { connectedAccountId, scopeType } = contextScope.syncScope
     let category = ''
     if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) category = 'messages'
     else if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) category = 'files'
@@ -70,11 +65,31 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
     const queryPromise = (async () => {
       // Fetch messages if this is a messaging scope
       if (category === 'messages') {
-        const messages = await prisma.message.findMany({
+        // Bolt: Optimize query by fetching active threads first to use efficient indexes
+        // 1. Find threads active in the time window for this account
+        const activeThreads = await prisma.messageThread.findMany({
           where: {
-            provider: connectedAccount.provider,
-            thread: {
-              connectedAccountId: connectedAccountId,
+            connectedAccountId: connectedAccountId,
+            lastMessageAt: {
+              gte: cutoffDate,
+            },
+          },
+          select: {
+            id: true,
+          },
+          // We take a bit more than maxItemsPerScope threads to ensure we have enough candidates
+          // but not too many to explode the IN clause.
+          orderBy: { lastMessageAt: 'desc' },
+          take: maxItemsPerScope * 2,
+        })
+
+        const threadIds = activeThreads.map(t => t.id)
+
+        // 2. Fetch messages from these threads
+        const messages = threadIds.length > 0 ? await prisma.message.findMany({
+          where: {
+            threadId: {
+              in: threadIds,
             },
             sentAt: {
               gte: cutoffDate,
@@ -94,7 +109,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
               },
             },
           },
-        })
+        }) : []
 
         return {
           type: 'messages',

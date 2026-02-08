@@ -102,7 +102,9 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
             id: msg.id,
             provider: msg.provider,
             sender: msg.sender,
-            content: msg.content,
+            // Bolt: Truncate content to 500 chars to avoid holding large email bodies in memory.
+            // summarizeContext only uses the first 100 chars.
+            content: msg.content.slice(0, 500),
             sentAt: msg.sentAt,
             subject: msg.thread.subject,
           }))

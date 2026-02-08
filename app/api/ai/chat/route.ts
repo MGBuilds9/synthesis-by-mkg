@@ -97,8 +97,9 @@ export async function POST(request: NextRequest) {
     if (useContext) {
       // Bolt: Context retrieval runs while user message is being saved.
       // We pass the pre-fetched contextScopes to avoid re-fetching the session.
+      // Bolt: Optimized maxItemsPerScope to 5 since summarizeContext only uses the top 5 items.
       const contextData = await retrieveAIContext(
-        { sessionId: chatSession.id },
+        { sessionId: chatSession.id, maxItemsPerScope: 5 },
         (chatSession as any).contextScopes
       )
       if (contextData) {

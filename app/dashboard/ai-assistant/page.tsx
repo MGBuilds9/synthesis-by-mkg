@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp } from 'lucide-react'
+import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
 
 export default function AIChatPage() {
@@ -80,6 +80,7 @@ export default function AIChatPage() {
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
+              aria-label="Select AI Model"
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"
             >
               <option value="OPENAI">OpenAI</option>
@@ -89,6 +90,9 @@ export default function AIChatPage() {
             
             <button
               onClick={() => setShowContextSettings(!showContextSettings)}
+              aria-expanded={showContextSettings}
+              aria-controls="context-settings-panel"
+              aria-label="Context settings"
               className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
             >
               <Settings className="h-4 w-4" />
@@ -100,7 +104,10 @@ export default function AIChatPage() {
         
         {/* Context Settings Panel */}
         {showContextSettings && (
-          <div className="max-w-4xl mx-auto mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div
+            id="context-settings-panel"
+            className="max-w-4xl mx-auto mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+          >
             <div className="mb-4">
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -181,14 +188,22 @@ export default function AIChatPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="Type your message..."
+            aria-label="Message input"
             className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Send
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Sending...</span>
+              </>
+            ) : (
+              'Send'
+            )}
           </button>
         </div>
       </div>

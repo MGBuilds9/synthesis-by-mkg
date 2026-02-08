@@ -19,8 +19,16 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/logger', () => ({
+  default: {
+    error: vi.fn(),
+  },
+  logProviderActivity: vi.fn(),
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import logger from '@/lib/logger'
 
 describe('GET /api/files/list', () => {
   beforeEach(() => {
@@ -338,9 +346,8 @@ describe('GET /api/files/list', () => {
       user: { id: 'user-123' },
     } as any)
 
-    vi.mocked(prisma.fileItem.findMany).mockRejectedValue(
-      new Error('Database connection failed')
-    )
+    const error = new Error('Database connection failed')
+    vi.mocked(prisma.fileItem.findMany).mockRejectedValue(error)
 
     const request = createRequest()
     const response = await GET(request)
@@ -348,6 +355,7 @@ describe('GET /api/files/list', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch files')
-    expect(data.details).toBe('Database connection failed')
+    expect(data.details).toBeUndefined()
+    expect(logger.error).toHaveBeenCalledWith('Failed to fetch files', { error })
   })
 })

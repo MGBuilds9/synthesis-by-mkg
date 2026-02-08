@@ -99,7 +99,7 @@ describe('Logger Module', () => {
       await logProviderActivity(
         'DISCORD',
         'SYNC_MESSAGES',
-        'WARNING',
+        'WARN',
         'Rate limit approaching',
         undefined,
         { channelId: '123' }
@@ -112,7 +112,7 @@ describe('Logger Module', () => {
         data: {
           provider: 'DISCORD',
           operation: 'SYNC_MESSAGES',
-          level: 'WARNING',
+          level: 'WARN',
           message: 'Rate limit approaching',
           errorDetails: undefined,
           metadata: { channelId: '123' }

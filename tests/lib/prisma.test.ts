@@ -13,6 +13,7 @@ vi.mock('@prisma/client', () => {
 describe('Prisma Singleton', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.unstubAllEnvs()
     // Clear the global singleton between tests
     const globalForPrisma = globalThis as any
     delete globalForPrisma.prisma
@@ -33,8 +34,7 @@ describe('Prisma Singleton', () => {
   })
 
   it('should reuse the same instance in non-production environment', async () => {
-    const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'development'
+    vi.stubEnv('NODE_ENV', 'development')
 
     // Force re-import by clearing module cache
     vi.resetModules()
@@ -44,12 +44,11 @@ describe('Prisma Singleton', () => {
 
     expect(prisma1).toBe(prisma2)
 
-    process.env.NODE_ENV = originalEnv
+    vi.unstubAllEnvs()
   })
 
   it('should cache prisma instance on globalThis in non-production', async () => {
-    const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'development'
+    vi.stubEnv('NODE_ENV', 'development')
 
     vi.resetModules()
 
@@ -61,12 +60,11 @@ describe('Prisma Singleton', () => {
     expect(globalForPrisma.prisma).toBeDefined()
     expect(globalForPrisma.prisma).toBe(prisma)
 
-    process.env.NODE_ENV = originalEnv
+    vi.unstubAllEnvs()
   })
 
   it('should not create multiple instances when imported multiple times in non-production', async () => {
-    const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'test'
+    vi.stubEnv('NODE_ENV', 'test')
 
     vi.resetModules()
 
@@ -79,6 +77,6 @@ describe('Prisma Singleton', () => {
     expect(p1).toBe(p2)
     expect(p2).toBe(p3)
 
-    process.env.NODE_ENV = originalEnv
+    vi.unstubAllEnvs()
   })
 })

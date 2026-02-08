@@ -346,4 +346,32 @@ describe('POST /api/ai/chat', () => {
     expect(data.error).toBe('Failed to process chat')
     expect(data.details).toBe('Database connection failed')
   })
+
+  it('returns 401 when accessing another user\'s session', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'attacker-123' },
+    } as any)
+
+    const mockSession = {
+      id: 'session-123',
+      userId: 'victim-456',
+      provider: 'OPENAI',
+      model: 'gpt-4',
+      messages: [],
+    }
+
+    vi.mocked(prisma.aiChatSession.findUnique).mockResolvedValue(mockSession as any)
+
+    const request = createRequest({
+      sessionId: 'session-123',
+      message: 'Steal data',
+      provider: 'OPENAI',
+    })
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(401)
+    expect(data.error).toBe('Unauthorized')
+  })
 })

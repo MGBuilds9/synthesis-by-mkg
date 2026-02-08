@@ -25,3 +25,7 @@
 ## 2026-05-22 - Memoization for High-Frequency State Updates
 **Learning:** In interactive components like chat interfaces, typing into an input field updates state on every keystroke, causing the entire component tree to re-render. If the component includes a long list (like chat history), this causes significant performance degradation.
 **Action:** Extract static or append-only lists (like message history) into separate components and wrap them in `React.memo` to prevent re-renders when only unrelated parent state (like input value) changes.
+
+## 2026-05-28 - Optimized Message Retrieval by Thread Prefetching
+**Learning:** Filtering `Message` records by `provider` (enum) forces a scan on a low-selectivity index, causing slow queries when joined with `MessageThread`.
+**Action:** Use the efficient `[connectedAccountId, lastMessageAt]` index on `MessageThread` to fetch relevant thread IDs first, then query `Message` using the highly selective `threadId` foreign key.

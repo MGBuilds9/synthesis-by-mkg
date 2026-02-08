@@ -344,6 +344,6 @@ describe('POST /api/ai/chat', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to process chat')
-    expect(data.details).toBe('Database connection failed')
+    expect(data.details).toBeUndefined()
   })
 })

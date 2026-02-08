@@ -66,6 +66,10 @@ export async function POST(request: NextRequest) {
 
     // Bolt: Reverse messages to restore chronological order (oldest -> newest) for the LLM
     if (chatSession) {
+      // Sentinel: Prevent IDOR - ensure session belongs to the authenticated user
+      if (chatSession.userId !== session.user.id) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      }
       chatSession.messages.reverse()
     }
 
@@ -139,7 +143,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('AI chat error:', error)
     return NextResponse.json(
-      { error: 'Failed to process chat', details: error.message },
+      { error: 'Failed to process chat' },
       { status: 500 }
     )
   }

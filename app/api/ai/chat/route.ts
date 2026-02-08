@@ -59,8 +59,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    let chatSession: any = await prisma.aiChatSession.findUnique({
-      where: { id: sessionId },
+    let chatSession: any = await prisma.aiChatSession.findFirst({
+      where: {
+        id: sessionId,
+        userId: session.user.id,
+      },
       include,
     })
 
@@ -139,7 +142,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('AI chat error:', error)
     return NextResponse.json(
-      { error: 'Failed to process chat', details: error.message },
+      { error: 'Failed to process chat' },
       { status: 500 }
     )
   }

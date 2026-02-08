@@ -13,6 +13,8 @@ export default function ChatsPage() {
   const showWorkspaceSelector = selectedPlatform === 'discord' || selectedPlatform === 'slack' || selectedPlatform === 'teams'
   const showChannelSelector = selectedPlatform === 'discord' || selectedPlatform === 'slack' || selectedPlatform === 'teams'
 
+  const canFilter = showWorkspaceSelector || showChannelSelector || selectedPlatform === 'telegram'
+
   return (
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -88,6 +90,7 @@ export default function ChatsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
               type="text"
+              aria-label="Search chats"
               placeholder="Search chats..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -95,16 +98,30 @@ export default function ChatsPage() {
             />
           </div>
 
-          <button 
+          <button
             onClick={() => setShowFilters(!showFilters)}
-            className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
+            disabled={!canFilter}
+            aria-label="Toggle filters"
+            aria-expanded={showFilters}
+            aria-controls="chat-filters"
+            title={!canFilter ? "Select a platform to enable filters" : "Toggle filters"}
+            className={`p-3 sm:p-2 bg-white border border-gray-300 rounded-lg transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center ${
+              !canFilter
+                ? 'opacity-50 cursor-not-allowed'
+                : 'hover:bg-gray-50 active:bg-gray-100'
+            }`}
           >
             <Filter className="h-5 w-5 text-gray-600" />
           </button>
         </div>
 
-        {showFilters && (showWorkspaceSelector || showChannelSelector || selectedPlatform === 'telegram') && (
-          <div className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
+        {showFilters && canFilter && (
+          <div
+            id="chat-filters"
+            role="region"
+            aria-label="Filter options"
+            className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg"
+          >
             {showWorkspaceSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
                 <label className="text-sm font-medium text-gray-700 whitespace-nowrap">

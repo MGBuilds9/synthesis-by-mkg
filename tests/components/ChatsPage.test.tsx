@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import ChatsPage from '@/app/dashboard/chats/page'
 
@@ -35,5 +35,33 @@ describe('ChatsPage', () => {
     const searchInput = screen.getByPlaceholderText('Search chats...')
     expect(searchInput).toBeInTheDocument()
     expect(searchInput).toHaveAttribute('type', 'text')
+  })
+
+  it('has accessible search input', () => {
+    render(<ChatsPage />)
+    expect(screen.getByLabelText('Search chats')).toBeInTheDocument()
+  })
+
+  it('handles filter button interactions', () => {
+    render(<ChatsPage />)
+
+    // Initially disabled (All selected)
+    const filterButton = screen.getByLabelText('Toggle filters')
+    expect(filterButton).toBeDisabled()
+    expect(filterButton).toHaveAttribute('aria-expanded', 'false')
+    expect(filterButton).toHaveAttribute('aria-controls', 'chat-filters')
+
+    // Select Discord (filters available)
+    fireEvent.click(screen.getByText('Discord'))
+    expect(filterButton).not.toBeDisabled()
+
+    // Toggle filters
+    fireEvent.click(filterButton)
+    expect(filterButton).toHaveAttribute('aria-expanded', 'true')
+
+    // Filter region should appear with correct role/label
+    const region = screen.getByRole('region', { name: 'Filter options' })
+    expect(region).toBeInTheDocument()
+    expect(region).toHaveAttribute('id', 'chat-filters')
   })
 })

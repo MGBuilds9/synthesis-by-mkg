@@ -64,6 +64,11 @@ export async function POST(request: NextRequest) {
       include,
     })
 
+    // Sentinel: Verify session ownership to prevent IDOR
+    if (chatSession && chatSession.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
     // Bolt: Reverse messages to restore chronological order (oldest -> newest) for the LLM
     if (chatSession) {
       chatSession.messages.reverse()

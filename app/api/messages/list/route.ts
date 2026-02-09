@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import logger from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,8 +65,9 @@ export async function GET(request: NextRequest) {
       offset,
     })
   } catch (error: any) {
+    logger.error('Failed to fetch messages', { error })
     return NextResponse.json(
-      { error: 'Failed to fetch messages', details: error.message },
+      { error: 'Failed to fetch messages' },
       { status: 500 }
     )
   }

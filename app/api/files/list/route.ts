@@ -17,14 +17,30 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
     const search = searchParams.get('search')
 
-    const whereClause: any = {
-      connectedAccount: {
-        userId: session.user.id,
-      },
+    // Bolt: Fetch connected accounts first to leverage indexes and avoid joins
+    // This allows filtering FileItem by connectedAccountId which is indexed
+    const accountWhere: any = {
+      userId: session.user.id,
     }
 
     if (provider) {
-      whereClause.provider = provider
+      accountWhere.provider = provider
+    }
+
+    const accounts = await prisma.connectedAccount.findMany({
+      where: accountWhere,
+      select: {
+        id: true,
+        accountLabel: true,
+        provider: true,
+      },
+    })
+
+    const accountIds = accounts.map((account) => account.id)
+    const accountMap = new Map(accounts.map((a) => [a.id, a]))
+
+    const whereClause: any = {
+      connectedAccountId: { in: accountIds },
     }
 
     if (search) {
@@ -38,7 +54,7 @@ export async function GET(request: NextRequest) {
     const [files, total] = await Promise.all([
       prisma.fileItem.findMany({
         where: whereClause,
-        // Bolt: Optimized to select only necessary fields to reduce payload size
+        // Bolt: Optimized to select only necessary fields and avoid nested relation fetch
         select: {
           id: true,
           name: true,
@@ -46,12 +62,7 @@ export async function GET(request: NextRequest) {
           size: true,
           modifiedTime: true,
           webViewLink: true,
-          connectedAccount: {
-            select: {
-              accountLabel: true,
-              provider: true,
-            },
-          },
+          connectedAccountId: true, // Needed for manual mapping
         },
         orderBy: { modifiedTime: 'desc' },
         take: limit,
@@ -60,8 +71,17 @@ export async function GET(request: NextRequest) {
       prisma.fileItem.count({ where: whereClause }),
     ])
 
+    // Bolt: Attach connected account details in memory to avoid N+1 DB joins
+    const enrichedFiles = files.map((file) => ({
+      ...file,
+      connectedAccount: {
+        accountLabel: accountMap.get(file.connectedAccountId)?.accountLabel,
+        provider: accountMap.get(file.connectedAccountId)?.provider,
+      },
+    }))
+
     return NextResponse.json({
-      files,
+      files: enrichedFiles,
       total,
       limit,
       offset,

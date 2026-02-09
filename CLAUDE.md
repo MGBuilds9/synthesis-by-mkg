@@ -48,9 +48,11 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 
 ## Session Log
 
-### Feb 9, 2026 — Repo hygiene: bcrypt password hashing
-- **Changes:** Merged PR #40 — bcrypt password hashing with plaintext migration path (auto-upgrades on login via `verifyUserCredentials()`)
-- **Tests:** 138/138 passing, build clean
+### Feb 9, 2026 — Repo hygiene pass #3: remaining PRs merged
+- **Changes:** Merged remaining PRs (#35 test conflict, #15 engine optimization). Fixed messages-list test (removed stale error details assertion). Removed server.log artifact.
+- **Tests:** 140/140 passing, build clean
+
+- Feb 9: Repo hygiene pass #2 — merged #40 (bcrypt hashing). 138/138 tests.
 
 ### Feb 6, 2026 — CVE fix, Vercel deploy, auth audit
 - **Changes:** Next.js 16.0.3 → 16.1.6 (CVE-2025-66478), Vercel deploy, auth audit

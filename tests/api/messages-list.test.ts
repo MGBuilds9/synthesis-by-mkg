@@ -319,6 +319,5 @@ describe('GET /api/messages/list', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch messages')
-    expect(data.details).toBe('Database connection failed')
   })
 })

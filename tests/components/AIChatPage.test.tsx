@@ -47,7 +47,7 @@ describe('AIChatPage', () => {
     render(<AIChatPage />)
 
     const input = screen.getByLabelText('Message input')
-    const button = screen.getByText('Send')
+    const button = screen.getByRole('button', { name: 'Send message' })
 
     // Button disabled initially (empty input)
     expect(button).toBeDisabled()

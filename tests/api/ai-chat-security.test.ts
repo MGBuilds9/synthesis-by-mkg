@@ -14,6 +14,7 @@ vi.mock('@/lib/prisma', () => ({
     },
     aiMessage: {
       create: vi.fn(),
+      count: vi.fn(),
     },
   },
 }))
@@ -38,6 +39,7 @@ import { getLLMProvider } from '@/lib/providers/llm'
 describe('POST /api/ai/chat - Security', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
   })
 
   function createRequest(body: any): NextRequest {
@@ -96,5 +98,66 @@ describe('POST /api/ai/chat - Security', () => {
     }
 
     expect([403, 404]).toContain(response.status)
+  })
+
+  it('enforces rate limiting: returns 429 when user exceeds message limit', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'spammer-123' },
+    } as any)
+
+    // Mock valid session ownership
+    vi.mocked(prisma.aiChatSession.findUnique).mockResolvedValue({
+      id: 'session-spam',
+      userId: 'spammer-123',
+      messages: [],
+    } as any)
+
+    // Mock count to be equal to or greater than limit (e.g. 10)
+    vi.mocked(prisma.aiMessage.count).mockResolvedValue(10)
+
+    const request = createRequest({
+      sessionId: 'session-spam',
+      message: 'Spam',
+      provider: 'OPENAI',
+      model: 'gpt-4',
+    })
+
+    const response = await POST(request)
+
+    // Should be 429
+    expect(response.status).toBe(429)
+
+    const data = await response.json()
+    expect(data.error).toBe('Too many requests')
+  })
+
+  it('validates input: returns 400 when message is too long', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'attacker-123' },
+    } as any)
+
+    // Mock valid session ownership
+    vi.mocked(prisma.aiChatSession.findUnique).mockResolvedValue({
+      id: 'session-overflow',
+      userId: 'attacker-123',
+      messages: [],
+    } as any)
+
+    const longMessage = 'a'.repeat(5001)
+
+    const request = createRequest({
+      sessionId: 'session-overflow',
+      message: longMessage,
+      provider: 'OPENAI',
+      model: 'gpt-4',
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(400)
+
+    const data = await response.json()
+    // Expect detailed validation error
+    expect(data.error).toBe('Invalid request')
   })
 })

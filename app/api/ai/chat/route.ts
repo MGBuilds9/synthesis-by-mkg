@@ -5,6 +5,20 @@ import { authOptions } from '@/lib/auth'
 import { getLLMProvider } from '@/lib/providers/llm'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 import { AiProvider } from '@prisma/client'
+import { z } from 'zod'
+
+// Sentinel: Validation schema
+const chatRequestSchema = z.object({
+  sessionId: z.string().min(1, 'Session ID is required'),
+  message: z.string().min(1, 'Message is required').max(5000, 'Message too long'),
+  provider: z.nativeEnum(AiProvider).or(z.string()),
+  model: z.string().optional(),
+  useContext: z.boolean().optional(),
+}).passthrough()
+
+// Sentinel: Rate limit configuration
+const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
+const MAX_MESSAGES_PER_MINUTE = 10
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,13 +28,41 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { sessionId, message, provider, model, useContext } = body
 
-    if (!sessionId || !message || !provider) {
+    // Sentinel: Validate request body
+    const validation = chatRequestSchema.safeParse(body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Invalid request', details: validation.error.format() },
         { status: 400 }
       )
+    }
+
+    const { sessionId, message, provider, model, useContext } = validation.data
+
+    // Sentinel: Rate Limiting
+    // Count user messages in the last minute
+    // We filter by user ID via session relation to ensure we count across all sessions for this user
+    try {
+      const recentMessageCount = await prisma.aiMessage.count({
+        where: {
+          session: { userId: session.user.id },
+          role: 'user',
+          createdAt: {
+            gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
+          }
+        }
+      })
+
+      if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
+        return NextResponse.json(
+          { error: 'Too many requests' },
+          { status: 429 }
+        )
+      }
+    } catch (error) {
+      // Log error but fail open to avoid blocking users if DB count fails
+      console.error('Rate limit check failed:', error)
     }
 
     // Get or create chat session

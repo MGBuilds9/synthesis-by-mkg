@@ -14,6 +14,7 @@ vi.mock('@/lib/prisma', () => ({
     },
     aiMessage: {
       create: vi.fn(),
+      count: vi.fn(),
     },
   },
 }))
@@ -39,6 +40,7 @@ import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 describe('POST /api/ai/chat', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
   })
 
   function createRequest(body: any): NextRequest {
@@ -81,7 +83,7 @@ describe('POST /api/ai/chat', () => {
     const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Missing required fields')
+    expect(data.error).toBe('Invalid request')
   })
 
   it('returns 400 when message is missing', async () => {
@@ -98,7 +100,7 @@ describe('POST /api/ai/chat', () => {
     const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Missing required fields')
+    expect(data.error).toBe('Invalid request')
   })
 
   it('returns 400 when provider is missing', async () => {
@@ -115,7 +117,7 @@ describe('POST /api/ai/chat', () => {
     const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Missing required fields')
+    expect(data.error).toBe('Invalid request')
   })
 
   it('successfully processes chat with existing session', async () => {

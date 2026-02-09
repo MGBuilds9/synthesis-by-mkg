@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react'
-import { memo } from 'react'
+import { memo, useRef, useEffect } from 'react'
 
 export interface Message {
   role: 'user' | 'assistant'
@@ -13,6 +13,12 @@ interface MessageListProps {
 }
 
 const MessageList = memo(function MessageList({ messages, loading }: MessageListProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, loading])
+
   // Bolt: Memoized component to prevent unnecessary re-renders when parent input changes
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6">
@@ -64,7 +70,8 @@ const MessageList = memo(function MessageList({ messages, loading }: MessageList
         )}
 
         {loading && (
-          <div className="flex justify-start">
+          <div className="flex justify-start" role="status" aria-live="polite">
+            <span className="sr-only">AI is thinking...</span>
             <div className="bg-white rounded-lg px-4 py-3 shadow">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
@@ -74,6 +81,7 @@ const MessageList = memo(function MessageList({ messages, loading }: MessageList
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
     </div>
   )

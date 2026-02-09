@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function SettingsPage() {
   const [accounts] = useState([
@@ -12,9 +13,9 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <a href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
             ← Back to Dashboard
-          </a>
+          </Link>
         </div>
 
         {/* Connected Accounts */}
@@ -33,7 +34,7 @@ export default function SettingsPage() {
                       <div className="font-medium text-gray-900">{account.provider}</div>
                       <div className="text-sm text-gray-500">{account.accountLabel}</div>
                     </div>
-                    <button className="text-red-600 hover:text-red-700 text-sm">
+                    <button className="text-red-600 hover:text-red-700 text-sm rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1">
                       Disconnect
                     </button>
                   </div>
@@ -77,20 +78,26 @@ export default function SettingsPage() {
           </div>
           <div className="p-6">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="ai-provider" className="block text-sm font-medium text-gray-700 mb-2">
                 Default AI Provider
               </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <select
+                id="ai-provider"
+                name="aiProvider"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              >
                 <option value="OPENAI">OpenAI</option>
                 <option value="GEMINI">Google Gemini</option>
                 <option value="CLAUDE">Anthropic Claude</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="ai-model" className="block text-sm font-medium text-gray-700 mb-2">
                 Default Model
               </label>
               <input
+                id="ai-model"
+                name="aiModel"
                 type="text"
                 placeholder="e.g., gpt-4o-mini"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"

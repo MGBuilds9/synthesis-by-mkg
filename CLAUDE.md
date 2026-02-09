@@ -48,10 +48,11 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 
 ## Session Log
 
-### Feb 9, 2026 — Repo hygiene pass #3: remaining PRs merged
-- **Changes:** Merged remaining PRs (#35 test conflict, #15 engine optimization). Fixed messages-list test (removed stale error details assertion). Removed server.log artifact.
-- **Tests:** 140/140 passing, build clean
+### Feb 9, 2026 — Repo hygiene pass #4: security PR merged
+- **Changes:** Merged #43 (Zod validation + DB-backed rate limiting for AI chat). Adds input validation schema (max 5000 chars) and 10 req/min per-user rate limit.
+- **Tests:** 142/142 passing, build clean. Not pushed (GitHub outage).
 
+- Feb 9: Repo hygiene pass #3 — merged #35 test conflict, #15 engine optimization. 140/140 tests.
 - Feb 9: Repo hygiene pass #2 — merged #40 (bcrypt hashing). 138/138 tests.
 
 ### Feb 6, 2026 — CVE fix, Vercel deploy, auth audit

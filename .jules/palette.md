@@ -5,3 +5,7 @@
 ## 2024-05-23 - Interaction Feedback
 **Learning:** Primary action buttons (like "Send") often lack visual feedback during async operations, leading to user uncertainty.
 **Action:** Standardize a "Loading" state pattern for all async action buttons using the `Loader2` icon and disabled state.
+
+## 2024-05-24 - Screen Reader Feedback
+**Learning:** Visual-only loading indicators (bouncing dots) leave screen reader users in the dark about async processes.
+**Action:** Always pair visual loading animations with `role="status"` and `sr-only` text description.

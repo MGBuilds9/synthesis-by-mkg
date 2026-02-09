@@ -48,11 +48,12 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 
 ## Session Log
 
-### Feb 6, 2026 — CVE fix, Vercel deploy, auth audit
-- **Changes:** Upgraded Next.js 16.0.3 → 16.1.6 to fix CVE-2025-66478 (React2Shell RCE). Deployed to Vercel successfully. Audited auth system — NextAuth v4 configured but sign-in form not wired, no middleware, missing env vars.
-- **Decisions:** Vercel now primary deploy target (was Coolify-only). Auth needs either quick-wire or full Phase 1 rebuild.
-- **Tests:** 123 passed, 0 failed, 0 new (dependency-only change)
-- **Next steps:** Decide: quick-wire existing auth OR jump to Phase 1 rebuild. Set Vercel env vars (NEXTAUTH_SECRET, DATABASE_URL, GOOGLE_CLIENT_ID/SECRET).
+### Feb 9, 2026 — Repo hygiene: bcrypt password hashing
+- **Changes:** Merged PR #40 — bcrypt password hashing with plaintext migration path (auto-upgrades on login via `verifyUserCredentials()`)
+- **Tests:** 138/138 passing, build clean
 
-### Feb 6, 2026 — Architecture blueprint, test suite bootstrap, ESM fix
-- Fixed CJS/ESM conflict, bootstrapped 123 tests, created AI-first architecture blueprint (123/123, 5a3ddd3)
+### Feb 6, 2026 — CVE fix, Vercel deploy, auth audit
+- **Changes:** Next.js 16.0.3 → 16.1.6 (CVE-2025-66478), Vercel deploy, auth audit
+- **Tests:** 123/123, next steps: wire auth or Phase 1 rebuild
+
+- Feb 6: Architecture blueprint, test suite bootstrap, ESM fix (123/123, 5a3ddd3)

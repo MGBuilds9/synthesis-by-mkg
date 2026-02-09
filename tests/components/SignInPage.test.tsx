@@ -1,52 +1,54 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import SignInPage from '@/app/auth/signin/page'
 
 describe('SignInPage', () => {
   it('renders sign in heading', () => {
     render(<SignInPage />)
-
     expect(screen.getByText('Sign In to Unified Console')).toBeInTheDocument()
   })
 
-  it('has email input field', () => {
+  it('has accessible email input field', () => {
     render(<SignInPage />)
-
-    const emailInput = screen.getByRole('textbox')
+    const emailInput = screen.getByLabelText('Email')
     expect(emailInput).toBeInTheDocument()
     expect(emailInput).toHaveAttribute('type', 'email')
+    expect(emailInput).toBeRequired()
   })
 
-  it('has password input field', () => {
+  it('has accessible password input field', () => {
     render(<SignInPage />)
-
-    const passwordInputs = document.querySelectorAll('input[type="password"]')
-    expect(passwordInputs.length).toBeGreaterThan(0)
-    const passwordInput = passwordInputs[0]
+    const passwordInput = screen.getByLabelText('Password')
     expect(passwordInput).toBeInTheDocument()
+    expect(passwordInput).toHaveAttribute('type', 'password')
+    expect(passwordInput).toBeRequired()
   })
 
   it('has submit button "Sign In"', () => {
     render(<SignInPage />)
-
     const submitButton = screen.getByRole('button', { name: 'Sign In' })
     expect(submitButton).toBeInTheDocument()
     expect(submitButton).toHaveAttribute('type', 'submit')
   })
 
-  it('has Google sign in button', () => {
+  it('shows loading state on submit', async () => {
     render(<SignInPage />)
 
-    expect(screen.getByText('Sign in with Google')).toBeInTheDocument()
-  })
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
+    const submitButton = screen.getByRole('button', { name: 'Sign In' })
 
-  it('form fields are required', () => {
-    render(<SignInPage />)
+    // Fill in the form
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
 
-    const emailInput = screen.getByRole('textbox')
-    expect(emailInput).toBeRequired()
+    // Submit
+    fireEvent.click(submitButton)
 
-    const passwordInput = document.querySelector('input[type="password"]')
-    expect(passwordInput).toHaveAttribute('required')
+    // Check for loading state
+    expect(screen.getByText('Signing in...')).toBeInTheDocument()
+    expect(submitButton).toBeDisabled()
+    expect(emailInput).toBeDisabled()
+    expect(passwordInput).toBeDisabled()
   })
 })

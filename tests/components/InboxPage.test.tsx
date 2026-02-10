@@ -13,17 +13,26 @@ describe('InboxPage', () => {
   it('renders provider filter buttons (All, Gmail, Outlook)', () => {
     render(<InboxPage />)
 
-    expect(screen.getByText('All')).toBeInTheDocument()
-    expect(screen.getByText('Gmail')).toBeInTheDocument()
-    expect(screen.getByText('Outlook')).toBeInTheDocument()
+    const group = screen.getByRole('group', { name: /filter by provider/i })
+    expect(group).toBeInTheDocument()
+
+    const allButton = screen.getByRole('button', { name: /all/i })
+    expect(allButton).toBeInTheDocument()
+    expect(allButton).toHaveAttribute('aria-pressed', 'true')
+
+    const gmailButton = screen.getByRole('button', { name: /gmail/i })
+    expect(gmailButton).toBeInTheDocument()
+    expect(gmailButton).toHaveAttribute('aria-pressed', 'false')
+
+    expect(screen.getByRole('button', { name: /outlook/i })).toBeInTheDocument()
   })
 
   it('renders search input', () => {
     render(<InboxPage />)
 
-    const searchInput = screen.getByPlaceholderText('Search emails...')
+    const searchInput = screen.getByRole('textbox', { name: /search emails/i })
     expect(searchInput).toBeInTheDocument()
-    expect(searchInput).toHaveAttribute('type', 'text')
+    expect(searchInput).toHaveAttribute('placeholder', 'Search emails...')
   })
 
   it('shows empty state with "No emails yet"', () => {
@@ -47,11 +56,13 @@ describe('InboxPage', () => {
 
     expect(screen.queryByText('Email Account:')).not.toBeInTheDocument()
 
-    const filterButton = screen.getByRole('button', { name: '' }).closest('button')
-    if (filterButton) {
-      await user.click(filterButton)
-    }
+    const filterButton = screen.getByRole('button', { name: /toggle filters/i })
+    expect(filterButton).toBeInTheDocument()
+    expect(filterButton).toHaveAttribute('aria-expanded', 'false')
 
+    await user.click(filterButton)
+
+    expect(filterButton).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByText('Email Account:')).toBeInTheDocument()
     expect(screen.getByText('Date Range:')).toBeInTheDocument()
   })

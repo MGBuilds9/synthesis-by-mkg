@@ -50,6 +50,11 @@ export default function AIChatPage() {
 
       const data = await response.json()
       
+      // Sentinel: Update session ID if a new one was created to prevent session bloat
+      if (data.sessionId) {
+        setSessionId(data.sessionId)
+      }
+
       if (data.response) {
         setMessages(prev => [...prev, { 
           role: 'assistant', 

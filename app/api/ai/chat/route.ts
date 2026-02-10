@@ -9,10 +9,10 @@ import { z } from 'zod'
 
 // Sentinel: Validation schema
 const chatRequestSchema = z.object({
-  sessionId: z.string().min(1, 'Session ID is required'),
+  sessionId: z.string().min(1, 'Session ID is required').max(128, 'Session ID too long'),
   message: z.string().min(1, 'Message is required').max(5000, 'Message too long'),
   provider: z.nativeEnum(AiProvider).or(z.string()),
-  model: z.string().optional(),
+  model: z.string().max(64, 'Model name too long').optional(),
   useContext: z.boolean().optional(),
 }).passthrough()
 

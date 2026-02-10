@@ -72,10 +72,10 @@ describe('retrieveAIContext Integration', () => {
     expect(result).not.toBeNull()
 
     // Verify optimization calls
-    // This part should FAIL now because the code is not yet optimized.
+    // Updated to check for IN clause due to batching optimization
     expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
-        connectedAccountId: connectedAccountId,
+        connectedAccountId: { in: expect.arrayContaining([connectedAccountId]) },
         lastMessageAt: expect.any(Object)
       })
     }))
@@ -85,6 +85,32 @@ describe('retrieveAIContext Integration', () => {
       where: expect.objectContaining({
         threadId: { in: ['thread-1', 'thread-2'] }
       })
+    }))
+  })
+
+  it('should batch queries for multiple connected accounts', async () => {
+    const sessionId = 'session-multi'
+    const account1 = 'acc-1'
+    const account2 = 'acc-2'
+
+    prismaMock.aiChatSession.findUnique.mockResolvedValue({
+        id: sessionId,
+        contextScopes: [
+            { syncScope: { connectedAccountId: account1, scopeType: 'GMAIL_LABEL' } },
+            { syncScope: { connectedAccountId: account2, scopeType: 'OUTLOOK_FOLDER' } }
+        ]
+    })
+
+    prismaMock.messageThread.findMany.mockResolvedValue([])
+
+    await retrieveAIContext({ sessionId })
+
+    // Should only call findMany once, not twice
+    expect(prismaMock.messageThread.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({
+            connectedAccountId: { in: expect.arrayContaining([account1, account2]) }
+        })
     }))
   })
 })

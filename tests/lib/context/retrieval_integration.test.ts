@@ -72,10 +72,9 @@ describe('retrieveAIContext Integration', () => {
     expect(result).not.toBeNull()
 
     // Verify optimization calls
-    // This part should FAIL now because the code is not yet optimized.
     expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
-        connectedAccountId: connectedAccountId,
+        connectedAccountId: { in: expect.arrayContaining([connectedAccountId]) },
         lastMessageAt: expect.any(Object)
       })
     }))

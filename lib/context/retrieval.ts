@@ -42,190 +42,139 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
     notionPages: [],
   }
 
-  // Bolt: Request batching to avoid redundant queries for the same account
-  const queryCache = new Map<string, Promise<any>>()
+  // Bolt: Group connectedAccountIds by category to batch queries
+  // This reduces N+1 query overhead by executing one query per category instead of per scope.
+  const scopeMap = {
+    messages: new Set<string>(),
+    files: new Set<string>(),
+    notion: new Set<string>(),
+  }
 
-  const scopePromises = contextScopes.map(async (contextScope: any) => {
-    if (!contextScope.syncScope) return null
+  contextScopes.forEach((contextScope: any) => {
+    if (!contextScope.syncScope) return
 
     const { connectedAccountId, scopeType } = contextScope.syncScope
-    let category = ''
-    if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) category = 'messages'
-    else if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) category = 'files'
-    else if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(scopeType)) category = 'notion'
 
-    if (!category) return null
-
-    const cacheKey = `${connectedAccountId}:${category}`
-
-    if (queryCache.has(cacheKey)) {
-      return queryCache.get(cacheKey)
+    if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) {
+      scopeMap.messages.add(connectedAccountId)
+    } else if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) {
+      scopeMap.files.add(connectedAccountId)
+    } else if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(scopeType)) {
+      scopeMap.notion.add(connectedAccountId)
     }
+  })
 
-    const queryPromise = (async () => {
-      // Fetch messages if this is a messaging scope
-      if (category === 'messages') {
-        // Bolt: Optimize query by fetching active threads first to use efficient indexes
-        // 1. Find threads active in the time window for this account
-        const activeThreads = await prisma.messageThread.findMany({
-          where: {
-            connectedAccountId: connectedAccountId,
-            lastMessageAt: {
-              gte: cutoffDate,
-            },
-          },
-          select: {
-            id: true,
-          },
-          // We take a bit more than maxItemsPerScope threads to ensure we have enough candidates
-          // but not too many to explode the IN clause.
-          orderBy: { lastMessageAt: 'desc' },
-          take: maxItemsPerScope * 2,
-        })
+  // Execute parallel queries for each category
+  const [messages, files, notionPages] = await Promise.all([
+    // Messages Query
+    (async () => {
+      const accountIds = Array.from(scopeMap.messages)
+      if (accountIds.length === 0) return []
 
-        const threadIds = activeThreads.map(t => t.id)
+      // 1. Find active threads across all accounts
+      const activeThreads = await prisma.messageThread.findMany({
+        where: {
+          connectedAccountId: { in: accountIds },
+          lastMessageAt: { gte: cutoffDate },
+        },
+        select: { id: true },
+        // Bolt: Fetch strictly the most recent threads across all accounts
+        orderBy: { lastMessageAt: 'desc' },
+        take: maxItemsPerScope * 2,
+      })
 
-        // 2. Fetch messages from these threads
-        const messages = threadIds.length > 0 ? await prisma.message.findMany({
-          where: {
-            threadId: {
-              in: threadIds,
-            },
-            sentAt: {
-              gte: cutoffDate,
-            },
-          },
-          orderBy: { sentAt: 'desc' },
-          take: maxItemsPerScope,
-          select: {
-            id: true, // Bolt: Added ID for deduplication
-            provider: true,
-            sender: true,
-            content: true,
-            sentAt: true,
-            thread: {
-              select: {
-                subject: true,
-              },
-            },
-          },
-        }) : []
+      const threadIds = activeThreads.map(t => t.id)
+      if (threadIds.length === 0) return []
 
-        return {
-          type: 'messages',
-          data: messages.map(msg => ({
-            id: msg.id,
-            provider: msg.provider,
-            sender: msg.sender,
-            content: msg.content,
-            sentAt: msg.sentAt,
-            subject: msg.thread.subject,
-          }))
+      // 2. Fetch messages
+      return prisma.message.findMany({
+        where: {
+            threadId: { in: threadIds },
+            sentAt: { gte: cutoffDate }
+        },
+        orderBy: { sentAt: 'desc' },
+        take: maxItemsPerScope,
+        select: {
+          id: true,
+          provider: true,
+          sender: true,
+          content: true,
+          sentAt: true,
+          thread: { select: { subject: true } }
         }
-      }
+      })
+    })(),
 
-      // Fetch files if this is a storage scope
-      if (category === 'files') {
-        const files = await prisma.fileItem.findMany({
-          where: {
-            connectedAccountId: connectedAccountId,
-            modifiedTime: {
-              gte: cutoffDate,
-            },
-          },
-          orderBy: { modifiedTime: 'desc' },
-          take: maxItemsPerScope,
-          select: {
-            id: true, // Bolt: Added ID for deduplication
-            provider: true,
-            name: true,
-            modifiedTime: true,
-            webViewLink: true,
-          },
-        })
+    // Files Query
+    (async () => {
+      const accountIds = Array.from(scopeMap.files)
+      if (accountIds.length === 0) return []
 
-        return {
-          type: 'files',
-          data: files.map(file => ({
-            id: file.id,
-            provider: file.provider,
-            name: file.name,
-            modifiedTime: file.modifiedTime,
-            webViewLink: file.webViewLink,
-          }))
+      return prisma.fileItem.findMany({
+        where: {
+          connectedAccountId: { in: accountIds },
+          modifiedTime: { gte: cutoffDate }
+        },
+        orderBy: { modifiedTime: 'desc' },
+        take: maxItemsPerScope,
+        select: {
+          id: true,
+          provider: true,
+          name: true,
+          modifiedTime: true,
+          webViewLink: true
         }
-      }
+      })
+    })(),
 
-      // Fetch Notion resources if this is a Notion scope
-      if (category === 'notion') {
-        const notionResources = await prisma.notionResource.findMany({
-          where: {
-            connectedAccountId: connectedAccountId,
-            lastEditedTime: {
-              gte: cutoffDate,
-            },
-          },
-          orderBy: { lastEditedTime: 'desc' },
-          take: maxItemsPerScope,
-          select: {
-            id: true, // Bolt: Added ID for deduplication
-            title: true,
-            resourceType: true,
-            lastEditedTime: true,
-            url: true,
-          },
-        })
+    // Notion Query
+    (async () => {
+       const accountIds = Array.from(scopeMap.notion)
+       if (accountIds.length === 0) return []
 
-        return {
-          type: 'notionPages',
-          data: notionResources.map(resource => ({
-            id: resource.id,
-            title: resource.title,
-            type: resource.resourceType,
-            lastEditedTime: resource.lastEditedTime,
-            url: resource.url,
-          }))
-        }
-      }
-
-      return null
+       return prisma.notionResource.findMany({
+         where: {
+           connectedAccountId: { in: accountIds },
+           lastEditedTime: { gte: cutoffDate }
+         },
+         orderBy: { lastEditedTime: 'desc' },
+         take: maxItemsPerScope,
+         select: {
+           id: true,
+           title: true,
+           resourceType: true,
+           lastEditedTime: true,
+           url: true
+         }
+       })
     })()
+  ])
 
-    queryCache.set(cacheKey, queryPromise)
-    return queryPromise
-  })
+  // Map results to contextData
+  contextData.messages = messages.map(msg => ({
+    id: msg.id,
+    provider: msg.provider,
+    sender: msg.sender,
+    content: msg.content,
+    sentAt: msg.sentAt,
+    subject: msg.thread.subject
+  }))
 
-  const results = await Promise.all(scopePromises)
-  const processedMessageIds = new Set<string>()
-  const processedFileIds = new Set<string>()
-  const processedNotionIds = new Set<string>()
+  contextData.files = files.map(file => ({
+    id: file.id,
+    provider: file.provider,
+    name: file.name,
+    modifiedTime: file.modifiedTime,
+    webViewLink: file.webViewLink
+  }))
 
-  results.forEach(result => {
-    if (!result) return
-
-    if (result.type === 'messages') {
-      result.data.forEach((item: any) => {
-        if (!processedMessageIds.has(item.id)) {
-          processedMessageIds.add(item.id)
-          contextData.messages.push(item)
-        }
-      })
-    } else if (result.type === 'files') {
-      result.data.forEach((item: any) => {
-        if (!processedFileIds.has(item.id)) {
-          processedFileIds.add(item.id)
-          contextData.files.push(item)
-        }
-      })
-    } else if (result.type === 'notionPages') {
-      result.data.forEach((item: any) => {
-        if (!processedNotionIds.has(item.id)) {
-          processedNotionIds.add(item.id)
-          contextData.notionPages.push(item)
-        }
-      })
-    }
-  })
+  contextData.notionPages = notionPages.map(page => ({
+    id: page.id,
+    title: page.title,
+    type: page.resourceType,
+    lastEditedTime: page.lastEditedTime,
+    url: page.url
+  }))
 
   return contextData
 }

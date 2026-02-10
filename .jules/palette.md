@@ -9,3 +9,7 @@
 ## 2024-05-24 - Screen Reader Feedback
 **Learning:** Visual-only loading indicators (bouncing dots) leave screen reader users in the dark about async processes.
 **Action:** Always pair visual loading animations with `role="status"` and `sr-only` text description.
+
+## 2024-05-24 - Sidebar Navigation Accessibility
+**Learning:** Navigation links often lack programmatic indication of the current page (`aria-current="page"`), forcing screen reader users to rely on visual cues they cannot see.
+**Action:** Always add `aria-current="page"` to the active link in navigation components.

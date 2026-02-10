@@ -58,17 +58,37 @@ describe('Sidebar', () => {
     expect(settingsLink).toHaveAttribute('href', '/dashboard/settings')
   })
 
-  it('active item has indigo styling', () => {
+  it('active item has indigo styling and aria-current attribute', () => {
     mockUsePathname.mockReturnValue('/dashboard/inbox')
 
     render(<Sidebar />)
 
     const inboxLink = screen.getByText('Inbox').closest('a')
     expect(inboxLink).toHaveClass('bg-indigo-50', 'text-indigo-600')
+    expect(inboxLink).toHaveAttribute('aria-current', 'page')
 
     const dashboardLink = screen.getByText('Dashboard').closest('a')
     expect(dashboardLink).not.toHaveClass('bg-indigo-50')
     expect(dashboardLink).toHaveClass('text-gray-600')
+    expect(dashboardLink).not.toHaveAttribute('aria-current')
+  })
+
+  it('links have focus-visible styles for accessibility', () => {
+    render(<Sidebar />)
+
+    const dashboardLink = screen.getByText('Dashboard').closest('a')
+    expect(dashboardLink).toHaveClass('focus-visible:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-indigo-500')
+  })
+
+  it('icons are hidden from screen readers', () => {
+    const { container } = render(<Sidebar />)
+
+    // Lucide icons render as svgs. We check if all svgs in the navigation have aria-hidden="true"
+    const icons = container.querySelectorAll('nav svg')
+    expect(icons.length).toBeGreaterThan(0)
+    icons.forEach(icon => {
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+    })
   })
 
   it('renders brand name "Unified Console"', () => {

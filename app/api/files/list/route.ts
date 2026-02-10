@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const provider = searchParams.get('provider')
-    const limit = parseInt(searchParams.get('limit') || '50')
+    const rawLimit = parseInt(searchParams.get('limit') || '50')
+    // Sentinel: Cap limit to 100 to prevent DoS
+    const limit = Math.max(1, Math.min(100, isNaN(rawLimit) ? 50 : rawLimit))
     const offset = parseInt(searchParams.get('offset') || '0')
     const search = searchParams.get('search')
 

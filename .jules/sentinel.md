@@ -7,3 +7,8 @@
 **Vulnerability:** The `POST /api/ai/chat` endpoint lacked rate limiting and input validation, allowing users to abuse expensive LLM resources and potentially cause Denial of Service via large payloads.
 **Learning:** High-cost operations (like LLM calls) must be protected by strict rate limits and input size constraints to prevent resource exhaustion. Database-backed rate limiting is a viable initial strategy for low-volume apps but may need scaling (e.g., Redis) later.
 **Prevention:** Implemented per-user rate limiting (10 req/min) and strict input validation (max 5000 chars) using Zod.
+
+## 2025-02-18 - Unbounded Pagination in List APIs
+**Vulnerability:** The `/api/messages/list` and `/api/files/list` endpoints allowed users to request an unlimited number of records via the `limit` parameter, posing a Denial of Service (DoS) risk through database resource exhaustion.
+**Learning:** Defaulting a query parameter (e.g., `limit || 50`) does not constrain the maximum value. User-controlled limits must always be clamped to a safe maximum on the server.
+**Prevention:** Always apply `Math.min(MAX_LIMIT, limit)` to pagination parameters to enforce a hard ceiling.

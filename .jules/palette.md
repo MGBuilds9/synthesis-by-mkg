@@ -13,3 +13,7 @@
 ## 2026-02-10 - Filter Group Accessibility
 **Learning:** Filter controls often use multiple buttons that act as a single choice group (like radio buttons) but lack `role="group"` and `aria-pressed` states, making the selection semantics unclear to screen readers.
 **Action:** Always wrap related filter buttons in a container with `role="group"` and an accessible label, and use `aria-pressed` to indicate the active state.
+
+## 2026-02-11 - Conversational Onboarding
+**Learning:** Empty chat states often leave users with "blank page syndrome". Suggestion chips (actionable prompts) significantly improve feature discoverability and reduce cognitive load.
+**Action:** Implement clickable suggestion chips in all conversational empty states to guide initial user interaction.

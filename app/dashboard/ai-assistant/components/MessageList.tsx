@@ -1,5 +1,12 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Sparkles } from 'lucide-react'
 import { memo, useRef, useEffect } from 'react'
+
+const SUGGESTIONS = [
+  "Summarize my recent emails",
+  "Find files about Q1 projects",
+  "Draft a follow-up email",
+  "What's on my agenda today?"
+]
 
 export interface Message {
   role: 'user' | 'assistant'
@@ -10,9 +17,10 @@ export interface Message {
 interface MessageListProps {
   messages: Message[]
   loading: boolean
+  onSuggestionClick?: (text: string) => void
 }
 
-const MessageList = memo(function MessageList({ messages, loading }: MessageListProps) {
+const MessageList = memo(function MessageList({ messages, loading, onSuggestionClick }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -26,7 +34,22 @@ const MessageList = memo(function MessageList({ messages, loading }: MessageList
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-12">
             <p className="text-lg font-medium mb-2">Start a conversation with AI</p>
-            <p className="text-sm">Ask questions about your emails, chats, files, and Notion pages</p>
+            <p className="text-sm mb-8">Ask questions about your emails, chats, files, and Notion pages</p>
+
+            {onSuggestionClick && (
+              <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {SUGGESTIONS.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => onSuggestionClick(suggestion)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-600 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition-all shadow-sm group focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-indigo-400 group-hover:text-indigo-600" />
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           messages.map((msg, i) => (

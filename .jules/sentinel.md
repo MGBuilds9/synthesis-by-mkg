@@ -1,14 +1,4 @@
-## 2025-02-18 - IDOR in AI Chat Session
-**Vulnerability:** A Critical IDOR vulnerability was found in `POST /api/ai/chat` where any user could access another user's chat session (and thus context) by guessing the `sessionId`. The API retrieved the session by ID without checking if it belonged to the authenticated user.
-**Learning:** `findUnique` in Prisma (and most ORMs) does not implicitly filter by ownership even if relations exist. Authentication checks at the beginning of the route are insufficient for object-level authorization.
-**Prevention:** Always verify `resource.userId === session.user.id` immediately after retrieving any resource by ID, or use `findFirst` with `{ where: { id: ..., userId: ... } }`.
-
-## 2025-02-18 - Missing Rate Limiting on LLM Endpoint
-**Vulnerability:** The `POST /api/ai/chat` endpoint lacked rate limiting and input validation, allowing users to abuse expensive LLM resources and potentially cause Denial of Service via large payloads.
-**Learning:** High-cost operations (like LLM calls) must be protected by strict rate limits and input size constraints to prevent resource exhaustion. Database-backed rate limiting is a viable initial strategy for low-volume apps but may need scaling (e.g., Redis) later.
-**Prevention:** Implemented per-user rate limiting (10 req/min) and strict input validation (max 5000 chars) using Zod.
-
-## 2025-02-18 - Unbounded Pagination in List APIs
-**Vulnerability:** The `/api/messages/list` and `/api/files/list` endpoints allowed users to request an unlimited number of records via the `limit` parameter, posing a Denial of Service (DoS) risk through database resource exhaustion.
-**Learning:** Defaulting a query parameter (e.g., `limit || 50`) does not constrain the maximum value. User-controlled limits must always be clamped to a safe maximum on the server.
-**Prevention:** Always apply `Math.min(MAX_LIMIT, limit)` to pagination parameters to enforce a hard ceiling.
+## 2024-05-22 - Fail Open Rate Limiting
+**Vulnerability:** The AI Chat endpoint (`/api/ai/chat`) had a rate limiting mechanism that "failed open" - if the database check for message count failed (e.g. timeout), the error was logged but the request was allowed to proceed.
+**Learning:** Security controls that depend on external services (like DB) must handle failures explicitly. "Failing open" (allowing access on error) defeats the purpose of the control during high-stress scenarios (DoS) or outages.
+**Prevention:** Always use `try...catch` blocks around security checks to catch errors and return a secure error response (Fail Closed), unless availability is strictly prioritized over security (rare for rate limits).

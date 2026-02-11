@@ -61,8 +61,12 @@ export async function POST(request: NextRequest) {
         )
       }
     } catch (error) {
-      // Log error but fail open to avoid blocking users if DB count fails
       console.error('Rate limit check failed:', error)
+      // Sentinel: Fail closed to protect resources
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      )
     }
 
     // Get or create chat session

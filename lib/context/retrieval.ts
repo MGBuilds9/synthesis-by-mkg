@@ -62,8 +62,8 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
     (async () => {
       if (messageAccountIds.size === 0) return []
 
-      // Bolt: Scale the limit based on number of accounts to preserve data volume relative to per-scope fetching
-      const limit = maxItemsPerScope * messageAccountIds.size
+      // Bolt: Use strict limit to avoid over-fetching across multiple accounts, since we only summarize the top few items anyway
+      const limit = maxItemsPerScope
 
       // Fetch threads first to filter by connected accounts efficiently
       const activeThreads = await prisma.messageThread.findMany({
@@ -121,7 +121,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
     // 2. Fetch Files
     (async () => {
       if (fileAccountIds.size === 0) return []
-      const limit = maxItemsPerScope * fileAccountIds.size
+      const limit = maxItemsPerScope
 
       const files = await prisma.fileItem.findMany({
         where: {
@@ -153,7 +153,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
     // 3. Fetch Notion Pages
     (async () => {
       if (notionAccountIds.size === 0) return []
-      const limit = maxItemsPerScope * notionAccountIds.size
+      const limit = maxItemsPerScope
 
       const resources = await prisma.notionResource.findMany({
         where: {

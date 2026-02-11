@@ -72,4 +72,39 @@ describe('AIChatPage', () => {
     // Button should be back to "Send"
     expect(screen.getByText('Send')).toBeInTheDocument()
   })
+
+  it('sends message on Enter key press', async () => {
+    render(<AIChatPage />)
+
+    const input = screen.getByLabelText('Message input')
+
+    // Type message
+    fireEvent.change(input, { target: { value: 'Hello AI' } })
+
+    // Press Enter
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
+
+    // Should show sending state
+    expect(screen.getByText('Sending...')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
+    })
+  })
+
+  it('does not send message on Shift+Enter', async () => {
+    render(<AIChatPage />)
+
+    const input = screen.getByLabelText('Message input')
+
+    // Type message
+    fireEvent.change(input, { target: { value: 'Hello AI' } })
+
+    // Press Shift+Enter
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter', shiftKey: true })
+
+    // Should NOT show sending state (button still says "Send")
+    expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
+    expect(screen.getByText('Send')).toBeInTheDocument()
+  })
 })

@@ -82,7 +82,7 @@ describe('POST /api/ai/chat - Security', () => {
       sessionId: 'session-victim',
       message: 'Steal data',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
     })
 
     const response = await POST(request)
@@ -119,7 +119,7 @@ describe('POST /api/ai/chat - Security', () => {
       sessionId: 'session-spam',
       message: 'Spam',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
     })
 
     const response = await POST(request)
@@ -149,7 +149,7 @@ describe('POST /api/ai/chat - Security', () => {
       sessionId: 'session-overflow',
       message: longMessage,
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
     })
 
     const response = await POST(request)

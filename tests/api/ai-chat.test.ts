@@ -129,7 +129,7 @@ describe('POST /api/ai/chat', () => {
       id: 'session-123',
       userId: 'user-123',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [
         { id: 'msg-1', role: 'user', content: 'Previous message' },
         { id: 'msg-2', role: 'assistant', content: 'Previous response' },
@@ -154,7 +154,7 @@ describe('POST /api/ai/chat', () => {
       sessionId: 'session-123',
       message: 'Hello',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
     })
 
     const response = await POST(request)
@@ -193,7 +193,7 @@ describe('POST /api/ai/chat', () => {
         { role: 'user', content: 'Previous message' },
         { role: 'user', content: 'Hello' },
       ],
-      'gpt-4',
+      'gpt-4o',
       undefined
     )
 
@@ -217,7 +217,7 @@ describe('POST /api/ai/chat', () => {
       id: 'new-session-456',
       userId: 'user-123',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [],
     }
 
@@ -239,7 +239,7 @@ describe('POST /api/ai/chat', () => {
       sessionId: 'session-not-found',
       message: 'Hello',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
     })
 
     const response = await POST(request)
@@ -253,7 +253,7 @@ describe('POST /api/ai/chat', () => {
       data: {
         userId: 'user-123',
         provider: 'OPENAI',
-        model: 'gpt-4',
+        model: 'gpt-4o',
       },
       include: expect.objectContaining({
         messages: expect.any(Object),
@@ -270,7 +270,7 @@ describe('POST /api/ai/chat', () => {
       id: 'session-123',
       userId: 'user-123',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [],
       contextScopes: [
         {
@@ -306,7 +306,7 @@ describe('POST /api/ai/chat', () => {
       sessionId: 'session-123',
       message: 'Hello',
       provider: 'OPENAI',
-      model: 'gpt-4',
+      model: 'gpt-4o',
       useContext: true,
     })
 
@@ -321,7 +321,7 @@ describe('POST /api/ai/chat', () => {
     expect(summarizeContext).toHaveBeenCalledWith(mockContextData)
     expect(mockLLMProvider.chat).toHaveBeenCalledWith(
       [{ role: 'user', content: 'Hello' }],
-      'gpt-4',
+      'gpt-4o',
       'You have access to the following context from the user\'s connected accounts:\n\nSummarized context data'
     )
   })

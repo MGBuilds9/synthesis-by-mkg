@@ -40,6 +40,7 @@ describe('GET /api/files/list - Security', () => {
   }
 
   it('caps the limit parameter to 100 when a larger value is requested', async () => {
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([])
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
     vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
 

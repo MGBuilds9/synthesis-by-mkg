@@ -75,11 +75,13 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         },
         select: {
           id: true,
+          subject: true,
         },
         orderBy: { lastMessageAt: 'desc' },
         take: limit, // Fetch enough threads to potentially satisfy the message limit
       })
 
+      const threadMap = new Map(activeThreads.map(t => [t.id, t.subject]))
       const threadIds = activeThreads.map(t => t.id)
       if (threadIds.length === 0) return []
 
@@ -100,11 +102,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
           sender: true,
           content: true,
           sentAt: true,
-          thread: {
-            select: {
-              subject: true,
-            },
-          },
+          threadId: true,
         },
       })
 
@@ -114,7 +112,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         sender: msg.sender,
         content: msg.content,
         sentAt: msg.sentAt,
-        subject: msg.thread.subject,
+        subject: threadMap.get(msg.threadId) || null,
       }))
     })(),
 

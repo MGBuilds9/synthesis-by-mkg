@@ -12,6 +12,9 @@ vi.mock('@/lib/prisma', () => ({
       findMany: vi.fn(),
       count: vi.fn(),
     },
+    connectedAccount: {
+      findMany: vi.fn(),
+    },
   },
 }))
 
@@ -33,6 +36,10 @@ import logger from '@/lib/logger'
 describe('GET /api/files/list', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Default mock for connected accounts
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
+      { id: 'acc-1' }
+    ] as any)
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {
@@ -101,11 +108,15 @@ describe('GET /api/files/list', () => {
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
+    // Verify connectedAccount fetch
+    expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
+      where: { userId: 'user-123' },
+      select: { id: true },
+    })
+
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1'] },
       },
       select: {
         id: true,
@@ -128,9 +139,7 @@ describe('GET /api/files/list', () => {
 
     expect(prisma.fileItem.count).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1'] },
       },
     })
   })
@@ -168,12 +177,18 @@ describe('GET /api/files/list', () => {
     expect(data.files[0].provider).toBe('GOOGLE_DRIVE')
     expect(data.total).toBe(1)
 
+    // Verify connectedAccount fetch with provider filter
+    expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-123',
+        provider: 'GOOGLE_DRIVE'
+      },
+      select: { id: true },
+    })
+
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
-        provider: 'GOOGLE_DRIVE',
+        connectedAccountId: { in: ['acc-1'] },
       },
       select: expect.any(Object),
       orderBy: { modifiedTime: 'desc' },
@@ -215,9 +230,7 @@ describe('GET /api/files/list', () => {
 
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1'] },
         name: {
           contains: 'important',
           mode: 'insensitive',
@@ -259,12 +272,18 @@ describe('GET /api/files/list', () => {
 
     expect(response.status).toBe(200)
 
+    // Verify connectedAccount fetch with provider filter
+    expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-123',
+        provider: 'GOOGLE_DRIVE'
+      },
+      select: { id: true },
+    })
+
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
-        provider: 'GOOGLE_DRIVE',
+        connectedAccountId: { in: ['acc-1'] },
         name: {
           contains: 'report',
           mode: 'insensitive',
@@ -313,9 +332,7 @@ describe('GET /api/files/list', () => {
 
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
       where: {
-        connectedAccount: {
-          userId: 'user-123',
-        },
+        connectedAccountId: { in: ['acc-1'] },
       },
       select: expect.any(Object),
       orderBy: { modifiedTime: 'desc' },

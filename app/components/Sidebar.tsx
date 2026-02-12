@@ -30,24 +30,33 @@ export default function Sidebar() {
       <div className="flex flex-col w-64">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
-            <h1 className="text-xl font-bold text-indigo-600">Unified Console</h1>
+            <Link
+              href="/dashboard"
+              className="focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-md"
+            >
+              <h1 className="text-xl font-bold text-indigo-600">Unified Console</h1>
+            </Link>
           </div>
           <div className="mt-8 flex-grow flex flex-col">
-            <nav className="flex-1 px-2 space-y-1">
+            <nav className="flex-1 px-2 space-y-1" aria-label="Sidebar">
               {navigation.map((item) => {
-                const isActive = pathname === item.href
+                const isActive = item.href === '/dashboard'
+                  ? pathname === '/dashboard'
+                  : pathname?.startsWith(item.href)
                 const Icon = item.icon
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
                     className={`${
                       isActive
                         ? 'bg-indigo-50 text-indigo-600'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    } group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors`}
+                    } group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                   >
                     <Icon
+                      aria-hidden="true"
                       className={`${
                         isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500'
                       } mr-3 flex-shrink-0 h-5 w-5`}

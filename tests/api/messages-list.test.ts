@@ -30,8 +30,8 @@ describe('GET /api/messages/list', () => {
     vi.clearAllMocks()
     // Default mock for connected accounts
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
-      { id: 'account-1' },
-      { id: 'account-2' },
+      { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },
+      { id: 'account-2', accountLabel: 'Work Outlook', provider: 'OUTLOOK' },
     ] as any)
   })
 
@@ -60,6 +60,7 @@ describe('GET /api/messages/list', () => {
     const mockThreads = [
       {
         id: 'thread-1',
+        connectedAccountId: 'account-1',
         subject: 'Project Update',
         provider: 'GMAIL',
         lastMessageAt: new Date('2024-01-15'),
@@ -73,13 +74,10 @@ describe('GET /api/messages/list', () => {
             providerMessageId: 'gmail-msg-1',
           },
         ],
-        connectedAccount: {
-          accountLabel: 'My Gmail',
-          provider: 'GMAIL',
-        },
       },
       {
         id: 'thread-2',
+        connectedAccountId: 'account-1',
         subject: 'Meeting Notes',
         provider: 'GMAIL',
         lastMessageAt: new Date('2024-01-14'),
@@ -93,10 +91,6 @@ describe('GET /api/messages/list', () => {
             providerMessageId: 'gmail-msg-2',
           },
         ],
-        connectedAccount: {
-          accountLabel: 'My Gmail',
-          provider: 'GMAIL',
-        },
       },
     ]
 
@@ -110,13 +104,21 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(200)
     expect(data.threads).toHaveLength(2)
     expect(data.threads[0].id).toBe('thread-1')
+    expect(data.threads[0].connectedAccount).toEqual({
+      accountLabel: 'My Gmail',
+      provider: 'GMAIL',
+    })
     expect(data.total).toBe(2)
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-123' },
-      select: { id: true },
+      select: {
+        id: true,
+        accountLabel: true,
+        provider: true,
+      },
     })
 
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
@@ -135,12 +137,6 @@ describe('GET /api/messages/list', () => {
           },
           orderBy: { sentAt: 'desc' },
           take: 1,
-        },
-        connectedAccount: {
-          select: {
-            accountLabel: true,
-            provider: true,
-          },
         },
       },
       orderBy: { lastMessageAt: 'desc' },
@@ -161,20 +157,17 @@ describe('GET /api/messages/list', () => {
     } as any)
 
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
-      { id: 'account-1' }
+      { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' }
     ] as any)
 
     const mockThreads = [
       {
         id: 'thread-1',
+        connectedAccountId: 'account-1',
         subject: 'Project Update',
         provider: 'GMAIL',
         lastMessageAt: new Date('2024-01-15'),
         messages: [],
-        connectedAccount: {
-          accountLabel: 'My Gmail',
-          provider: 'GMAIL',
-        },
       },
     ]
 
@@ -188,10 +181,15 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(200)
     expect(data.threads).toHaveLength(1)
     expect(data.threads[0].provider).toBe('GMAIL')
+    expect(data.threads[0].connectedAccount.accountLabel).toBe('My Gmail')
 
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-123', provider: 'GMAIL' },
-      select: { id: true },
+      select: {
+        id: true,
+        accountLabel: true,
+        provider: true,
+      },
     })
 
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
@@ -213,14 +211,11 @@ describe('GET /api/messages/list', () => {
     const mockThreads = [
       {
         id: 'thread-11',
+        connectedAccountId: 'account-1',
         subject: 'Thread 11',
         provider: 'GMAIL',
         lastMessageAt: new Date('2024-01-05'),
         messages: [],
-        connectedAccount: {
-          accountLabel: 'My Gmail',
-          provider: 'GMAIL',
-        },
       },
     ]
 
@@ -255,6 +250,7 @@ describe('GET /api/messages/list', () => {
     const mockThreads = [
       {
         id: 'thread-1',
+        connectedAccountId: 'account-1',
         subject: 'Conversation',
         provider: 'GMAIL',
         lastMessageAt: new Date('2024-01-15'),
@@ -268,10 +264,6 @@ describe('GET /api/messages/list', () => {
             providerMessageId: 'gmail-msg-latest',
           },
         ],
-        connectedAccount: {
-          accountLabel: 'My Gmail',
-          provider: 'GMAIL',
-        },
       },
     ]
 

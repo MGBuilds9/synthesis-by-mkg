@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getLLMProvider } from '@/lib/providers/llm'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
+import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
 import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 
@@ -39,6 +40,17 @@ export async function POST(request: NextRequest) {
     }
 
     const { sessionId, message, provider, model, useContext } = validation.data
+
+    // Sentinel: Validate model support for provider
+    if (model) {
+      const allowedModels = ALLOWED_MODELS[provider as AiProvider]
+      if (!allowedModels || !allowedModels.includes(model)) {
+        return NextResponse.json(
+          { error: 'Invalid request', details: `Model ${model} is not supported for provider ${provider}` },
+          { status: 400 }
+        )
+      }
+    }
 
     // Sentinel: Rate Limiting
     // Count user messages in the last minute

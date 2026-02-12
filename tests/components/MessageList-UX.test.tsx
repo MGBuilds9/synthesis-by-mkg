@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import MessageList, { Message } from '@/app/dashboard/ai-assistant/components/MessageList'
 
@@ -61,5 +61,33 @@ describe('MessageList UX', () => {
     // Set loading to true
     rerender(<MessageList messages={messages} loading={true} />)
     expect(scrollIntoViewMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('renders suggestion chips when message list is empty and onSuggestionClick is provided', () => {
+    const onSuggestionClick = vi.fn()
+    render(<MessageList messages={[]} loading={false} onSuggestionClick={onSuggestionClick} />)
+
+    // Check if chips are rendered
+    const chip = screen.getByText('Summarize my recent emails')
+    expect(chip).toBeInTheDocument()
+
+    // Check if it's a button
+    expect(chip.closest('button')).toBeInTheDocument()
+
+    // Click a chip
+    fireEvent.click(chip)
+    expect(onSuggestionClick).toHaveBeenCalledWith('Summarize my recent emails')
+  })
+
+  it('does not render suggestion chips when messages are present', () => {
+    const onSuggestionClick = vi.fn()
+    const messages: Message[] = [
+      { role: 'user', content: 'Hello' }
+    ]
+    render(<MessageList messages={messages} loading={false} onSuggestionClick={onSuggestionClick} />)
+
+    // Chips should not be visible
+    const chip = screen.queryByText('Summarize my recent emails')
+    expect(chip).not.toBeInTheDocument()
   })
 })

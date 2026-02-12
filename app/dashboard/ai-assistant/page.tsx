@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
 
@@ -28,10 +29,11 @@ export default function AIChatPage() {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  async function sendMessage() {
-    if (!input.trim()) return
+  async function sendMessage(textOverride?: string) {
+    const messageText = typeof textOverride === 'string' ? textOverride : input
+    if (!messageText.trim()) return
 
-    const userMessage: Message = { role: 'user', content: input }
+    const userMessage: Message = { role: 'user', content: messageText }
     setMessages(prev => [...prev, userMessage])
     setInput('')
     if (textareaRef.current) {
@@ -45,7 +47,7 @@ export default function AIChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId,
-          message: input,
+          message: messageText,
           provider,
           contextDomains,
           askBeforeSearchingContext: askBeforeSearching,
@@ -74,9 +76,9 @@ export default function AIChatPage() {
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
               ← Back
-            </a>
+            </Link>
             <h1 className="text-xl font-bold text-gray-900">AI Assistant</h1>
           </div>
           
@@ -181,7 +183,11 @@ export default function AIChatPage() {
 
       {/* Messages */}
       {/* Bolt: Optimized with memoized component to prevent re-renders on input changes */}
-      <MessageList messages={messages} loading={loading} />
+      <MessageList
+        messages={messages}
+        loading={loading}
+        onSuggestionClick={(text) => sendMessage(text)}
+      />
 
       {/* Input */}
       <div className="bg-white border-t border-gray-200 px-4 py-4">

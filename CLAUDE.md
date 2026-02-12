@@ -60,3 +60,5 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 - **Tests:** 123/123, next steps: wire auth or Phase 1 rebuild
 
 - Feb 6: Architecture blueprint, test suite bootstrap, ESM fix (123/123, 5a3ddd3)
+
+- Feb 10: Repo hygiene #7 — merged 3 PRs (security rate limiting, UX chat input, perf context retrieval). 151/151 tests. All branches cleaned.

@@ -30,10 +30,15 @@ export async function GET(request: NextRequest) {
 
     const accounts = await prisma.connectedAccount.findMany({
       where: accountWhere,
-      select: { id: true },
+      select: {
+        id: true,
+        accountLabel: true,
+        provider: true
+      },
     })
 
     const accountIds = accounts.map((account) => account.id)
+    const accountMap = new Map(accounts.map(a => [a.id, a]))
 
     const whereClause: any = {
       connectedAccountId: { in: accountIds },
@@ -57,12 +62,6 @@ export async function GET(request: NextRequest) {
             orderBy: { sentAt: 'desc' },
             take: 1,
           },
-          connectedAccount: {
-            select: {
-              accountLabel: true,
-              provider: true,
-            },
-          },
         },
         orderBy: { lastMessageAt: 'desc' },
         take: limit,
@@ -71,8 +70,20 @@ export async function GET(request: NextRequest) {
       prisma.messageThread.count({ where: whereClause }),
     ])
 
+    // Bolt: Map connected account details in memory to avoid N+1/JOIN query
+    const threadsWithAccount = threads.map(thread => {
+      const account = accountMap.get(thread.connectedAccountId)
+      return {
+        ...thread,
+        connectedAccount: {
+          accountLabel: account?.accountLabel || null,
+          provider: account?.provider || thread.provider,
+        },
+      }
+    })
+
     return NextResponse.json({
-      threads,
+      threads: threadsWithAccount,
       total,
       limit,
       offset,

@@ -213,7 +213,7 @@ export default function AIChatPage() {
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none min-h-[48px] max-h-[200px]"
             />
             <button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               aria-label={loading ? 'Sending message' : 'Send message'}
               className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-all min-w-[100px] h-[48px]"

@@ -6,10 +6,16 @@ export default function StoragePage() {
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedProvider, setSelectedProvider] = useState('ALL')
 
   useEffect(() => {
     fetchFiles()
   }, [])
+
+  const filteredFiles = files.filter((file: any) => {
+    if (selectedProvider === 'ALL') return true
+    return file.provider === selectedProvider
+  })
 
   async function fetchFiles(search?: string) {
     try {
@@ -48,21 +54,56 @@ export default function StoragePage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Search files..."
+              aria-label="Search files"
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
             />
             <button
               onClick={handleSearch}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors"
             >
               Search
             </button>
           </div>
-          <div className="flex gap-2 mt-3">
-            <button className="px-3 py-1 text-sm bg-indigo-600 text-white rounded">All</button>
-            <button className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Google Drive</button>
-            <button className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300">OneDrive</button>
+          <div
+            className="flex gap-2 mt-3"
+            role="group"
+            aria-label="Filter by provider"
+          >
+            <button
+              onClick={() => setSelectedProvider('ALL')}
+              aria-pressed={selectedProvider === 'ALL'}
+              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
+                selectedProvider === 'ALL'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setSelectedProvider('GDRIVE')}
+              aria-pressed={selectedProvider === 'GDRIVE'}
+              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
+                selectedProvider === 'GDRIVE'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Google Drive
+            </button>
+            <button
+              onClick={() => setSelectedProvider('ONEDRIVE')}
+              aria-pressed={selectedProvider === 'ONEDRIVE'}
+              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
+                selectedProvider === 'ONEDRIVE'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              OneDrive
+            </button>
           </div>
         </div>
 
@@ -70,9 +111,12 @@ export default function StoragePage() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-gray-500">Loading files...</div>
-          ) : files.length === 0 ? (
+          ) : filteredFiles.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              No files yet. Connect your storage accounts to start syncing.
+              {files.length === 0
+                ? "No files yet. Connect your storage accounts to start syncing."
+                : `No ${selectedProvider === 'GDRIVE' ? 'Google Drive' : 'OneDrive'} files found.`
+              }
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
@@ -96,7 +140,7 @@ export default function StoragePage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {files.map((file: any) => (
+                {filteredFiles.map((file: any) => (
                   <tr key={file.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{file.name}</div>

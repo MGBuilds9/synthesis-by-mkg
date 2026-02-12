@@ -31,6 +31,9 @@ describe('GET /api/files/list - Security', () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
+      { id: 'acc-1' }
+    ] as any)
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {

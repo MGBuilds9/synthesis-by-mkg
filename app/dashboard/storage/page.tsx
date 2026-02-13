@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Loader2, ExternalLink } from 'lucide-react'
 
 export default function StoragePage() {
   const [files, setFiles] = useState([])
@@ -43,9 +44,9 @@ export default function StoragePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Storage</h1>
-          <a href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
             ← Back to Dashboard
-          </a>
+          </Link>
         </div>
 
         {/* Search */}
@@ -172,9 +173,12 @@ export default function StoragePage() {
                           href={file.webViewLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-900 group"
+                          aria-label={`Open ${file.name} in new tab`}
+                          title={`Open ${file.name} in new tab`}
                         >
-                          Open
+                          <span>Open</span>
+                          <ExternalLink className="h-3 w-3 group-hover:underline" aria-hidden="true" />
                         </a>
                       )}
                     </td>

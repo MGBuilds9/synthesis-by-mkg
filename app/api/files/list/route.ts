@@ -31,10 +31,15 @@ export async function GET(request: NextRequest) {
 
     const accounts = await prisma.connectedAccount.findMany({
       where: accountWhere,
-      select: { id: true },
+      select: {
+        id: true,
+        accountLabel: true,
+        provider: true,
+      },
     })
 
     const accountIds = accounts.map((account) => account.id)
+    const accountMap = new Map(accounts.map((a) => [a.id, a]))
 
     const whereClause: any = {
       connectedAccountId: { in: accountIds },
@@ -52,6 +57,7 @@ export async function GET(request: NextRequest) {
       prisma.fileItem.findMany({
         where: whereClause,
         // Bolt: Optimized to select only necessary fields to reduce payload size
+        // Bolt: Removed connectedAccount join to improve performance, re-attached in memory
         select: {
           id: true,
           name: true,
@@ -59,12 +65,7 @@ export async function GET(request: NextRequest) {
           size: true,
           modifiedTime: true,
           webViewLink: true,
-          connectedAccount: {
-            select: {
-              accountLabel: true,
-              provider: true,
-            },
-          },
+          connectedAccountId: true,
         },
         orderBy: { modifiedTime: 'desc' },
         take: limit,
@@ -73,8 +74,20 @@ export async function GET(request: NextRequest) {
       prisma.fileItem.count({ where: whereClause }),
     ])
 
+    // Bolt: Attach connected account details in memory to avoid N+1/JOIN query overhead
+    const filesWithAccount = files.map((file) => {
+      const account = accountMap.get(file.connectedAccountId)
+      return {
+        ...file,
+        connectedAccount: {
+          accountLabel: account?.accountLabel || null,
+          provider: account?.provider || file.provider,
+        },
+      }
+    })
+
     return NextResponse.json({
-      files,
+      files: filesWithAccount,
       total,
       limit,
       offset,

@@ -62,3 +62,6 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 - Feb 6: Architecture blueprint, test suite bootstrap, ESM fix (123/123, 5a3ddd3)
 
 - Feb 10: Repo hygiene #7 — merged 3 PRs (security rate limiting, UX chat input, perf context retrieval). 151/151 tests. All branches cleaned.
+### Feb 13, 2026 — Repo Hygiene #12: Security + Perf + UX
+- **Changes:** Merged 4 PRs: #64 (Security: Timing Attack), #61 (Security: Model Validation), #62 (Perf: File List Query), #63 (UX: Storage Loading).
+- **Verification:** 155/155 tests passed. Build clean.

@@ -7,3 +7,8 @@
 **Vulnerability:** The AI Chat endpoint allowed arbitrary model strings, potentially enabling access to expensive or restricted models (Resource Exhaustion/Unauthorized Access).
 **Learning:** LLM providers often accept any model string. Application layer must enforce an allowlist of supported models to control costs and capabilities.
 **Prevention:** Maintain a strict allowlist of models per provider and validate all requests against it.
+
+## 2026-02-13 - Username Enumeration via Timing Attacks
+**Vulnerability:** The `verifyUserCredentials` function returned immediately if a user was not found, while performing a slow `bcrypt.compare` operation if the user existed.
+**Learning:** Authentication flows must have consistent response times regardless of the outcome (success, failure, user not found).
+**Prevention:** Always perform a computationally equivalent operation (e.g., comparing against a pre-calculated dummy hash) even when the user is not found to normalize response times.

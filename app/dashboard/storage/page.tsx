@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export default function StoragePage() {
   const [files, setFiles] = useState([])
@@ -61,9 +62,18 @@ export default function StoragePage() {
             />
             <button
               onClick={handleSearch}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors"
+              disabled={loading}
+              aria-busy={loading}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center min-w-[100px] justify-center"
             >
-              Search
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <span>Searching...</span>
+                </>
+              ) : (
+                'Search'
+              )}
             </button>
           </div>
           <div

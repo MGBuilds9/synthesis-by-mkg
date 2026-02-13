@@ -17,3 +17,7 @@
 ## 2026-02-11 - Conversational Onboarding
 **Learning:** Empty chat states often leave users with "blank page syndrome". Suggestion chips (actionable prompts) significantly improve feature discoverability and reduce cognitive load.
 **Action:** Implement clickable suggestion chips in all conversational empty states to guide initial user interaction.
+
+## 2026-02-12 - External Link Clarity
+**Learning:** Links that open in a new tab without visual indicators or accessible descriptions ("Open, link") create confusion and anxiety for users, especially those using screen readers who lose context.
+**Action:** Always pair external links with an `ExternalLink` icon and an `aria-label` that describes the destination and the behavior (e.g., "Open [filename] in new tab").

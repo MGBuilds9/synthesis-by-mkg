@@ -63,4 +63,41 @@ describe('StoragePage', () => {
     // Or aria-busy="false" depending on implementation, usually false if not present or explicitly false
     // React might render aria-busy="false" if passed false
   })
+
+  it('renders file list with accessible open link', async () => {
+    const mockFiles = [
+      {
+        id: '1',
+        name: 'Report.pdf',
+        provider: 'GDRIVE',
+        size: '1048576',
+        modifiedTime: '2023-01-01T12:00:00Z',
+        webViewLink: 'https://example.com/report.pdf',
+      },
+    ]
+
+    ;(global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({ files: mockFiles }),
+    })
+
+    render(<StoragePage />)
+
+    // Wait for loading to finish and files to be displayed
+    await waitFor(() => {
+      expect(screen.getByText('Report.pdf')).toBeInTheDocument()
+    })
+
+    // Check for the "Open" link
+    const openLink = screen.getByRole('link', { name: /Open Report.pdf in new tab/i })
+    expect(openLink).toBeInTheDocument()
+    expect(openLink).toHaveAttribute('href', 'https://example.com/report.pdf')
+    expect(openLink).toHaveAttribute('target', '_blank')
+    expect(openLink).toHaveAttribute('title', 'Open Report.pdf in new tab')
+
+    // Check for "Back to Dashboard" link
+    const backLink = screen.getByRole('link', { name: /Back to Dashboard/i })
+    expect(backLink).toBeInTheDocument()
+    expect(backLink).toHaveAttribute('href', '/dashboard')
+  })
 })

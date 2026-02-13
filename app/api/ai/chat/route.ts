@@ -15,6 +15,12 @@ const chatRequestSchema = z.object({
   provider: z.nativeEnum(AiProvider).or(z.string()),
   model: z.string().optional(),
   useContext: z.boolean().optional(),
+  contextDomains: z.object({
+    emails: z.boolean().optional(),
+    chats: z.boolean().optional(),
+    files: z.boolean().optional(),
+    notion: z.boolean().optional(),
+  }).optional(),
 }).passthrough()
 
 // Sentinel: Rate limit configuration
@@ -39,7 +45,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { sessionId, message, provider, model, useContext } = validation.data
+    const { sessionId, message, provider, model, useContext, contextDomains } = validation.data
 
     // Sentinel: Validate model support for provider
     if (model) {
@@ -152,12 +158,38 @@ export async function POST(request: NextRequest) {
     // Retrieve context if requested
     let systemPrompt: string | undefined
     if (useContext) {
+      // Sentinel: Filter context scopes based on user preference (contextDomains)
+      // This prevents data leakage of excluded domains (e.g. emails) to the LLM
+      let activeScopes = (chatSession as any).contextScopes || []
+
+      if (contextDomains) {
+        activeScopes = activeScopes.filter((scope: any) => {
+          if (!scope.syncScope) return false
+          const type = scope.syncScope.scopeType
+
+          // Map scope types to domains
+          if (['GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(type)) {
+            return contextDomains.emails !== false
+          }
+          if (['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'].includes(type)) {
+            return contextDomains.chats !== false
+          }
+          if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(type)) {
+            return contextDomains.files !== false
+          }
+          if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(type)) {
+            return contextDomains.notion !== false
+          }
+          return true
+        })
+      }
+
       // Bolt: Context retrieval runs while user message is being saved.
       // We pass the pre-fetched contextScopes to avoid re-fetching the session.
       // Bolt: Limit context items per scope to 5 (default 10) to reduce DB load, as we only summarize the top 5 anyway.
       const contextData = await retrieveAIContext(
         { sessionId: chatSession.id, maxItemsPerScope: 5 },
-        (chatSession as any).contextScopes
+        activeScopes
       )
       if (contextData) {
         systemPrompt = `You have access to the following context from the user's connected accounts:\n\n${summarizeContext(contextData)}`

@@ -38,7 +38,7 @@ describe('GET /api/files/list', () => {
     vi.clearAllMocks()
     // Default mock for connected accounts
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
-      { id: 'acc-1' }
+      { id: 'acc-1', accountLabel: 'My Google Drive', provider: 'GOOGLE_DRIVE' }
     ] as any)
   })
 
@@ -72,10 +72,7 @@ describe('GET /api/files/list', () => {
         size: 1024,
         modifiedTime: new Date('2024-01-15'),
         webViewLink: 'https://drive.google.com/file/123',
-        connectedAccount: {
-          accountLabel: 'My Google Drive',
-          provider: 'GOOGLE_DRIVE',
-        },
+        connectedAccountId: 'acc-1',
       },
       {
         id: 'file-2',
@@ -84,10 +81,7 @@ describe('GET /api/files/list', () => {
         size: 2048,
         modifiedTime: new Date('2024-01-14'),
         webViewLink: 'https://drive.google.com/file/456',
-        connectedAccount: {
-          accountLabel: 'My Google Drive',
-          provider: 'GOOGLE_DRIVE',
-        },
+        connectedAccountId: 'acc-1',
       },
     ]
 
@@ -102,6 +96,10 @@ describe('GET /api/files/list', () => {
     expect(data.files).toHaveLength(2)
     expect(data.files[0].id).toBe('file-1')
     expect(data.files[0].name).toBe('document.pdf')
+    expect(data.files[0].connectedAccount).toEqual({
+      accountLabel: 'My Google Drive',
+      provider: 'GOOGLE_DRIVE',
+    })
     expect(data.files[1].id).toBe('file-2')
     expect(data.files[1].name).toBe('spreadsheet.xlsx')
     expect(data.total).toBe(2)
@@ -111,7 +109,7 @@ describe('GET /api/files/list', () => {
     // Verify connectedAccount fetch
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-123' },
-      select: { id: true },
+      select: { id: true, accountLabel: true, provider: true },
     })
 
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
@@ -125,12 +123,7 @@ describe('GET /api/files/list', () => {
         size: true,
         modifiedTime: true,
         webViewLink: true,
-        connectedAccount: {
-          select: {
-            accountLabel: true,
-            provider: true,
-          },
-        },
+        connectedAccountId: true,
       },
       orderBy: { modifiedTime: 'desc' },
       take: 50,
@@ -157,10 +150,7 @@ describe('GET /api/files/list', () => {
         size: 1024,
         modifiedTime: new Date('2024-01-15'),
         webViewLink: 'https://drive.google.com/file/123',
-        connectedAccount: {
-          accountLabel: 'My Google Drive',
-          provider: 'GOOGLE_DRIVE',
-        },
+        connectedAccountId: 'acc-1',
       },
     ]
 
@@ -183,7 +173,7 @@ describe('GET /api/files/list', () => {
         userId: 'user-123',
         provider: 'GOOGLE_DRIVE'
       },
-      select: { id: true },
+      select: { id: true, accountLabel: true, provider: true },
     })
 
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
@@ -210,10 +200,7 @@ describe('GET /api/files/list', () => {
         size: 1024,
         modifiedTime: new Date('2024-01-15'),
         webViewLink: 'https://drive.google.com/file/123',
-        connectedAccount: {
-          accountLabel: 'My Google Drive',
-          provider: 'GOOGLE_DRIVE',
-        },
+        connectedAccountId: 'acc-1',
       },
     ]
 
@@ -256,10 +243,7 @@ describe('GET /api/files/list', () => {
         size: 1024,
         modifiedTime: new Date('2024-01-15'),
         webViewLink: 'https://drive.google.com/file/123',
-        connectedAccount: {
-          accountLabel: 'My Google Drive',
-          provider: 'GOOGLE_DRIVE',
-        },
+        connectedAccountId: 'acc-1',
       },
     ]
 
@@ -278,7 +262,7 @@ describe('GET /api/files/list', () => {
         userId: 'user-123',
         provider: 'GOOGLE_DRIVE'
       },
-      select: { id: true },
+      select: { id: true, accountLabel: true, provider: true },
     })
 
     expect(prisma.fileItem.findMany).toHaveBeenCalledWith({
@@ -309,10 +293,7 @@ describe('GET /api/files/list', () => {
         size: 1024,
         modifiedTime: new Date('2024-01-05'),
         webViewLink: 'https://drive.google.com/file/11',
-        connectedAccount: {
-          accountLabel: 'My Google Drive',
-          provider: 'GOOGLE_DRIVE',
-        },
+        connectedAccountId: 'acc-1',
       },
     ]
 

@@ -55,6 +55,9 @@ describe('retrieveAIContext Truncation Optimization', () => {
       truncateContentLength: 200
     })
 
+    expect(result).not.toBeNull()
+    if (!result) return
+
     expect(result.messages[0].content.length).toBe(200)
     expect(result.messages[0].content).toBe(longContent.slice(0, 200))
   })
@@ -63,6 +66,9 @@ describe('retrieveAIContext Truncation Optimization', () => {
     const result = await retrieveAIContext({
       sessionId: 'session-truncation'
     })
+
+    expect(result).not.toBeNull()
+    if (!result) return
 
     expect(result.messages[0].content.length).toBe(5000)
     expect(result.messages[0].content).toBe(longContent)

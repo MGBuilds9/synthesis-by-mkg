@@ -100,4 +100,44 @@ describe('StoragePage', () => {
     expect(backLink).toBeInTheDocument()
     expect(backLink).toHaveAttribute('href', '/dashboard')
   })
+
+  it('handles clear search functionality', async () => {
+    render(<StoragePage />)
+
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText('Search')).toBeInTheDocument()
+    })
+
+    const input = screen.getByLabelText('Search files')
+
+    // Initial state: clear button should not be visible
+    expect(screen.queryByLabelText('Clear search')).not.toBeInTheDocument()
+
+    // Type search query
+    fireEvent.change(input, { target: { value: 'test' } })
+
+    // Clear button should now be visible
+    const clearButton = screen.getByLabelText('Clear search')
+    expect(clearButton).toBeInTheDocument()
+
+    // Click clear
+    fireEvent.click(clearButton)
+
+    // Input should be empty
+    expect(input).toHaveValue('')
+
+    // Should trigger fetch with empty string (loading state)
+    expect(screen.getByText('Searching...')).toBeInTheDocument()
+    // The last fetch call should be without search param
+    expect(global.fetch).toHaveBeenLastCalledWith('/api/files/list')
+
+    // Wait for reload
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument()
+    })
+
+    // Clear button should disappear
+    expect(screen.queryByLabelText('Clear search')).not.toBeInTheDocument()
+  })
 })

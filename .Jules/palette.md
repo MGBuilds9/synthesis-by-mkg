@@ -21,3 +21,7 @@
 ## 2026-02-12 - External Link Clarity
 **Learning:** Links that open in a new tab without visual indicators or accessible descriptions ("Open, link") create confusion and anxiety for users, especially those using screen readers who lose context.
 **Action:** Always pair external links with an `ExternalLink` icon and an `aria-label` that describes the destination and the behavior (e.g., "Open [filename] in new tab").
+
+## 2026-02-13 - Search Interaction
+**Learning:** Users often need to reset search filters quickly. A "Clear" button inside the input that resets both the query and the data view significantly reduces friction compared to manually deleting text.
+**Action:** Implement "Clear" buttons (X icon) in search inputs that automatically reset the query and trigger a data refresh.

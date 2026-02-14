@@ -8,35 +8,50 @@ export default function StoragePage() {
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [appliedSearch, setAppliedSearch] = useState('')
   const [selectedProvider, setSelectedProvider] = useState('ALL')
 
+  // Bolt: Use single effect for data fetching to handle race conditions via AbortController
   useEffect(() => {
-    fetchFiles()
-  }, [])
+    const controller = new AbortController()
 
-  const filteredFiles = files.filter((file: any) => {
-    if (selectedProvider === 'ALL') return true
-    return file.provider === selectedProvider
-  })
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const params = new URLSearchParams()
+        if (appliedSearch) params.append('search', appliedSearch)
+        if (selectedProvider !== 'ALL') params.append('provider', selectedProvider)
 
-  async function fetchFiles(search?: string) {
-    try {
-      const url = search 
-        ? `/api/files/list?search=${encodeURIComponent(search)}`
-        : '/api/files/list'
-      const response = await fetch(url)
-      const data = await response.json()
-      setFiles(data.files || [])
-    } catch (error) {
-      console.error('Failed to fetch files:', error)
-    } finally {
-      setLoading(false)
+        const queryString = params.toString()
+        const url = queryString ? `/api/files/list?${queryString}` : '/api/files/list'
+
+        const response = await fetch(url, { signal: controller.signal })
+        if (!response.ok) throw new Error('Network response was not ok')
+
+        const data = await response.json()
+        if (!controller.signal.aborted) {
+          setFiles(data.files || [])
+        }
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error('Failed to fetch files:', error)
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      }
     }
-  }
+
+    fetchData()
+
+    return () => {
+      controller.abort()
+    }
+  }, [appliedSearch, selectedProvider])
 
   function handleSearch() {
-    setLoading(true)
-    fetchFiles(searchQuery)
+    setAppliedSearch(searchQuery)
   }
 
   return (
@@ -122,9 +137,9 @@ export default function StoragePage() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-gray-500">Loading files...</div>
-          ) : filteredFiles.length === 0 ? (
+          ) : files.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              {files.length === 0
+              {selectedProvider === 'ALL'
                 ? "No files yet. Connect your storage accounts to start syncing."
                 : `No ${selectedProvider === 'GDRIVE' ? 'Google Drive' : 'OneDrive'} files found.`
               }
@@ -151,7 +166,7 @@ export default function StoragePage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredFiles.map((file: any) => (
+                {files.map((file: any) => (
                   <tr key={file.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{file.name}</div>

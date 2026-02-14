@@ -100,4 +100,29 @@ describe('StoragePage', () => {
     expect(backLink).toBeInTheDocument()
     expect(backLink).toHaveAttribute('href', '/dashboard')
   })
+
+  it('fetches files with provider filter when selected', async () => {
+    render(<StoragePage />)
+
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText('Search')).toBeInTheDocument()
+    })
+
+    // Initial fetch should be called with no provider param (or empty)
+    expect(global.fetch).toHaveBeenCalledWith('/api/files/list', expect.anything())
+
+    // Find and click "Google Drive" filter button
+    const gdriveButton = screen.getByRole('button', { name: 'Google Drive' })
+    fireEvent.click(gdriveButton)
+
+    // Wait for the fetch call
+    await waitFor(() => {
+      // It should call with ?provider=GDRIVE
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('provider=GDRIVE'),
+        expect.anything()
+      )
+    })
+  })
 })

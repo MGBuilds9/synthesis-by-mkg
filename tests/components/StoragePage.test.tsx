@@ -100,4 +100,42 @@ describe('StoragePage', () => {
     expect(backLink).toBeInTheDocument()
     expect(backLink).toHaveAttribute('href', '/dashboard')
   })
+
+  it('clears search input when clear button is clicked', async () => {
+    render(<StoragePage />)
+
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText('Search')).toBeInTheDocument()
+    })
+
+    const input = screen.getByLabelText('Search files')
+
+    // Type search query
+    fireEvent.change(input, { target: { value: 'report' } })
+
+    // Verify clear button appears
+    const clearButton = screen.getByRole('button', { name: 'Clear search' })
+    expect(clearButton).toBeInTheDocument()
+
+    // Click clear button
+    fireEvent.click(clearButton)
+
+    // Verify input is empty
+    expect(input).toHaveValue('')
+
+    // Verify clear button is gone
+    expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
+
+    // Verify fetch was called with empty search (or initial fetch)
+    // fetchFiles('') -> /api/files/list
+    expect(global.fetch).toHaveBeenCalledWith('/api/files/list')
+
+    // Wait for any state updates to complete to avoid "act" warnings
+    await waitFor(() => {
+      // We can wait for the loading state to be settled (even if it was already false, the async function touches it)
+      // Or just wait for the loop to clear
+      expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
+    })
+  })
 })

@@ -5,10 +5,11 @@ export interface ContextOptions {
   sessionId: string
   timeWindowDays?: number
   maxItemsPerScope?: number
+  truncateContentLength?: number
 }
 
 export async function retrieveAIContext(options: ContextOptions, preFetchedScopes?: any[]) {
-  const { sessionId, timeWindowDays = 30, maxItemsPerScope = 10 } = options
+  const { sessionId, timeWindowDays = 30, maxItemsPerScope = 10, truncateContentLength } = options
   let contextScopes = preFetchedScopes
 
   if (!contextScopes) {
@@ -110,7 +111,8 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         id: msg.id,
         provider: msg.provider,
         sender: msg.sender,
-        content: msg.content,
+        // Bolt: Truncate content to truncateContentLength (if provided) to save memory.
+        content: truncateContentLength ? msg.content.slice(0, truncateContentLength) : msg.content,
         sentAt: msg.sentAt,
         subject: threadMap.get(msg.threadId) || null,
       }))

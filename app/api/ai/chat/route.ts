@@ -187,8 +187,9 @@ export async function POST(request: NextRequest) {
       // Bolt: Context retrieval runs while user message is being saved.
       // We pass the pre-fetched contextScopes to avoid re-fetching the session.
       // Bolt: Limit context items per scope to 5 (default 10) to reduce DB load, as we only summarize the top 5 anyway.
+      // Bolt: Truncate content to 200 chars to save memory, as summarizeContext only uses the first 100 chars.
       const contextData = await retrieveAIContext(
-        { sessionId: chatSession.id, maxItemsPerScope: 5 },
+        { sessionId: chatSession.id, maxItemsPerScope: 5, truncateContentLength: 200 },
         activeScopes
       )
       if (contextData) {

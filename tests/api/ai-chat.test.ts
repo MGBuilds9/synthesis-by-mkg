@@ -315,7 +315,7 @@ describe('POST /api/ai/chat', () => {
 
     expect(response.status).toBe(200)
     expect(retrieveAIContext).toHaveBeenCalledWith(
-      { sessionId: 'session-123', maxItemsPerScope: 5 },
+      { sessionId: 'session-123', maxItemsPerScope: 5, truncateContentLength: 200 },
       mockSession.contextScopes
     )
     expect(summarizeContext).toHaveBeenCalledWith(mockContextData)

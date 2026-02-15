@@ -1,42 +1,63 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { Loader2, ExternalLink, X } from 'lucide-react'
+import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
+import { Loader2, ExternalLink, X } from "lucide-react";
 
 export default function StoragePage() {
-  const [files, setFiles] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedProvider, setSelectedProvider] = useState('ALL')
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState("ALL");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [shortcutSymbol, setShortcutSymbol] = useState("Ctrl");
 
   useEffect(() => {
-    fetchFiles()
-  }, [])
+    if (
+      typeof navigator !== "undefined" &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+    ) {
+      setShortcutSymbol("⌘");
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    fetchFiles();
+  }, []);
 
   const filteredFiles = files.filter((file: any) => {
-    if (selectedProvider === 'ALL') return true
-    return file.provider === selectedProvider
-  })
+    if (selectedProvider === "ALL") return true;
+    return file.provider === selectedProvider;
+  });
 
   async function fetchFiles(search?: string) {
     try {
-      const url = search 
+      const url = search
         ? `/api/files/list?search=${encodeURIComponent(search)}`
-        : '/api/files/list'
-      const response = await fetch(url)
-      const data = await response.json()
-      setFiles(data.files || [])
+        : "/api/files/list";
+      const response = await fetch(url);
+      const data = await response.json();
+      setFiles(data.files || []);
     } catch (error) {
-      console.error('Failed to fetch files:', error)
+      console.error("Failed to fetch files:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   function handleSearch() {
-    setLoading(true)
-    fetchFiles(searchQuery)
+    setLoading(true);
+    fetchFiles(searchQuery);
   }
 
   return (
@@ -44,7 +65,10 @@ export default function StoragePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Storage</h1>
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+          <Link
+            href="/dashboard"
+            className="text-indigo-600 hover:text-indigo-700"
+          >
             ← Back to Dashboard
           </Link>
         </div>
@@ -54,19 +78,26 @@ export default function StoragePage() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <input
+                ref={searchInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 placeholder="Search files..."
                 aria-label="Search files"
-                className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
+              {!searchQuery && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-xs text-gray-400 border border-gray-200 rounded px-1.5 py-0.5 bg-gray-50">
+                  {shortcutSymbol}K
+                </div>
+              )}
               {searchQuery && (
                 <button
                   onClick={() => {
-                    setSearchQuery('')
-                    fetchFiles('')
+                    setSearchQuery("");
+                    fetchFiles("");
+                    searchInputRef.current?.focus();
                   }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
                   aria-label="Clear search"
@@ -87,7 +118,7 @@ export default function StoragePage() {
                   <span>Searching...</span>
                 </>
               ) : (
-                'Search'
+                "Search"
               )}
             </button>
           </div>
@@ -97,34 +128,34 @@ export default function StoragePage() {
             aria-label="Filter by provider"
           >
             <button
-              onClick={() => setSelectedProvider('ALL')}
-              aria-pressed={selectedProvider === 'ALL'}
+              onClick={() => setSelectedProvider("ALL")}
+              aria-pressed={selectedProvider === "ALL"}
               className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-                selectedProvider === 'ALL'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                selectedProvider === "ALL"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               All
             </button>
             <button
-              onClick={() => setSelectedProvider('GDRIVE')}
-              aria-pressed={selectedProvider === 'GDRIVE'}
+              onClick={() => setSelectedProvider("GDRIVE")}
+              aria-pressed={selectedProvider === "GDRIVE"}
               className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-                selectedProvider === 'GDRIVE'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                selectedProvider === "GDRIVE"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               Google Drive
             </button>
             <button
-              onClick={() => setSelectedProvider('ONEDRIVE')}
-              aria-pressed={selectedProvider === 'ONEDRIVE'}
+              onClick={() => setSelectedProvider("ONEDRIVE")}
+              aria-pressed={selectedProvider === "ONEDRIVE"}
               className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-                selectedProvider === 'ONEDRIVE'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                selectedProvider === "ONEDRIVE"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               OneDrive
@@ -135,13 +166,14 @@ export default function StoragePage() {
         {/* Files List */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading files...</div>
+            <div className="p-8 text-center text-gray-500">
+              Loading files...
+            </div>
           ) : filteredFiles.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               {files.length === 0
                 ? "No files yet. Connect your storage accounts to start syncing."
-                : `No ${selectedProvider === 'GDRIVE' ? 'Google Drive' : 'OneDrive'} files found.`
-              }
+                : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
@@ -168,7 +200,9 @@ export default function StoragePage() {
                 {filteredFiles.map((file: any) => (
                   <tr key={file.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{file.name}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {file.name}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-xs font-medium text-gray-500 uppercase">
@@ -176,7 +210,9 @@ export default function StoragePage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {file.size ? `${(Number(file.size) / 1024 / 1024).toFixed(2)} MB` : 'N/A'}
+                      {file.size
+                        ? `${(Number(file.size) / 1024 / 1024).toFixed(2)} MB`
+                        : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(file.modifiedTime).toLocaleDateString()}
@@ -192,7 +228,10 @@ export default function StoragePage() {
                           title={`Open ${file.name} in new tab`}
                         >
                           <span>Open</span>
-                          <ExternalLink className="h-3 w-3 group-hover:underline" aria-hidden="true" />
+                          <ExternalLink
+                            className="h-3 w-3 group-hover:underline"
+                            aria-hidden="true"
+                          />
                         </a>
                       )}
                     </td>
@@ -204,5 +243,5 @@ export default function StoragePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

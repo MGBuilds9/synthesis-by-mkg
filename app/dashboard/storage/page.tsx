@@ -1,238 +1,285 @@
-'use client'
+"use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react'
-import Link from 'next/link'
-import { Loader2, ExternalLink, X } from 'lucide-react'
+import { useEffect, useState, useRef, useCallback } from "react";
+import Link from "next/link";
+import { Loader2, ExternalLink, X } from "lucide-react";
 
 export default function StoragePage() {
-  const [files, setFiles] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedProvider, setSelectedProvider] = useState('ALL')
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState("ALL");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [shortcutSymbol, setShortcutSymbol] = useState("Ctrl");
 
   // Bolt: Use refs to manage request cancellation and avoid stale closures in effects
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const searchQueryRef = useRef(searchQuery)
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const searchQueryRef = useRef(searchQuery);
 
   // Bolt: Sync searchQuery ref to access latest value in useEffect without triggering re-fetch
   useEffect(() => {
-    searchQueryRef.current = searchQuery
-  }, [searchQuery])
+    searchQueryRef.current = searchQuery;
+  }, [searchQuery]);
+
+  // Palette: Detect platform for keyboard shortcut symbol
+  useEffect(() => {
+    if (
+      typeof navigator !== "undefined" &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+    ) {
+      setShortcutSymbol("⌘");
+    }
+
+    // Palette: Add CMD/Ctrl+K shortcut for search focus
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Bolt: Memoized fetch function to handle request cancellation and params
   const fetchFiles = useCallback(async (provider: string, search?: string) => {
     // Cancel any in-flight request to prevent race conditions
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
+      abortControllerRef.current.abort();
     }
 
-    const controller = new AbortController()
-    abortControllerRef.current = controller
-    setLoading(true)
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    setLoading(true);
 
     try {
-      const params = new URLSearchParams()
-      if (search) params.append('search', search)
-      if (provider !== 'ALL') params.append('provider', provider)
+      const params = new URLSearchParams();
+      if (search) params.append("search", search);
+      if (provider !== "ALL") params.append("provider", provider);
 
-      const queryString = params.toString()
+      const queryString = params.toString();
       const url = queryString
         ? `/api/files/list?${queryString}`
-        : '/api/files/list'
+        : "/api/files/list";
 
-      const response = await fetch(url, { signal: controller.signal })
+      const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) {
-        throw new Error('Failed to fetch')
+        throw new Error("Failed to fetch");
       }
 
-      const data = await response.json()
-      setFiles(data.files || [])
+      const data = await response.json();
+      setFiles(data.files || []);
     } catch (error: any) {
-      if (error.name === 'AbortError') return
-      console.error('Failed to fetch files:', error)
-      setFiles([])
+      if (error.name === "AbortError") return;
+      console.error("Failed to fetch files:", error);
+      setFiles([]);
     } finally {
       // Only reset loading state if this request wasn't aborted/superseded
       if (abortControllerRef.current === controller) {
-        setLoading(false)
-        abortControllerRef.current = null
+        setLoading(false);
+        abortControllerRef.current = null;
       }
     }
-  }, [])
+  }, []);
 
   // Bolt: Fetch whenever provider changes, using current search query
   useEffect(() => {
-    fetchFiles(selectedProvider, searchQueryRef.current)
-  }, [selectedProvider, fetchFiles])
+    fetchFiles(selectedProvider, searchQueryRef.current);
+  }, [selectedProvider, fetchFiles]);
 
   function handleSearch() {
-    fetchFiles(selectedProvider, searchQuery)
+    fetchFiles(selectedProvider, searchQuery);
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Storage</h1>
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
-            ← Back to Dashboard
-          </Link>
-        </div>
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Storage</h1>
+        <p className="text-gray-600">View and manage all your synced files from Google Drive and OneDrive.</p>
+      </div>
 
-        {/* Search */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Search files..."
-                aria-label="Search files"
-                className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('')
-                    fetchFiles(selectedProvider, '')
-                  }}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+      {/* Storage Accounts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Link
+          href="/dashboard/integrations"
+          className="border rounded-lg p-6 hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>
+              </svg>
             </div>
-            <button
-              onClick={handleSearch}
-              disabled={loading}
-              aria-busy={loading}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center min-w-[100px] justify-center"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  <span>Searching...</span>
-                </>
-              ) : (
-                'Search'
-              )}
-            </button>
+            <div>
+              <h3 className="font-semibold text-gray-900">Google Drive</h3>
+              <p className="text-sm text-gray-600">Connect your Google Drive</p>
+            </div>
           </div>
-          <div
-            className="flex gap-2 mt-3"
-            role="group"
-            aria-label="Filter by provider"
+        </Link>
+
+        <Link
+          href="/dashboard/integrations"
+          className="border rounded-lg p-6 hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0a12 12 0 0 0-4.8 23.04l1.44-1.2a10.08 10.08 0 1 1 6.72 0l1.44 1.2A12 12 0 0 0 12 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">OneDrive</h3>
+              <p className="text-sm text-gray-600">Connect your OneDrive</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Search and Filter */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder={`Search files... (${shortcutSymbol}+K)`}
+              className="w-full px-4 py-2 border rounded-lg pr-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  fetchFiles(selectedProvider, "");
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={handleSearch}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            <button
-              onClick={() => setSelectedProvider('ALL')}
-              aria-pressed={selectedProvider === 'ALL'}
-              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-                selectedProvider === 'ALL'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setSelectedProvider('GDRIVE')}
-              aria-pressed={selectedProvider === 'GDRIVE'}
-              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-                selectedProvider === 'GDRIVE'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Google Drive
-            </button>
-            <button
-              onClick={() => setSelectedProvider('ONEDRIVE')}
-              aria-pressed={selectedProvider === 'ONEDRIVE'}
-              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${
-                selectedProvider === 'ONEDRIVE'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              OneDrive
-            </button>
-          </div>
+            Search
+          </button>
         </div>
 
-        {/* Files List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading files...</div>
-          ) : files.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              {files.length === 0 && selectedProvider === 'ALL'
-                ? "No files yet. Connect your storage accounts to start syncing."
-                : `No ${selectedProvider === 'GDRIVE' ? 'Google Drive' : selectedProvider === 'ONEDRIVE' ? 'OneDrive' : 'files'} found.`
-              }
-            </div>
-          ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Provider
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Size
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Modified
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {files.map((file: any) => (
-                  <tr key={file.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{file.name}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-xs font-medium text-gray-500 uppercase">
-                        {file.provider}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {file.size ? `${(Number(file.size) / 1024 / 1024).toFixed(2)} MB` : 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(file.modifiedTime).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {file.webViewLink && (
-                        <a
-                          href={file.webViewLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-900 group"
-                          aria-label={`Open ${file.name} in new tab`}
-                          title={`Open ${file.name} in new tab`}
-                        >
-                          <span>Open</span>
-                          <ExternalLink className="h-3 w-3 group-hover:underline" aria-hidden="true" />
-                        </a>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+        {/* Provider Filter */}
+        <div className="mt-4 flex gap-2">
+          <button
+            onClick={() => setSelectedProvider("ALL")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              selectedProvider === "ALL"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            All Files
+          </button>
+          <button
+            onClick={() => setSelectedProvider("GDRIVE")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              selectedProvider === "GDRIVE"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            Google Drive
+          </button>
+          <button
+            onClick={() => setSelectedProvider("ONEDRIVE")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              selectedProvider === "ONEDRIVE"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            OneDrive
+          </button>
         </div>
       </div>
+
+      {/* Files List */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">
+            Loading files...
+          </div>
+        ) : files.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            {selectedProvider === "ALL"
+              ? "No files yet. Connect your storage accounts to start syncing."
+              : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Provider
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Last Modified
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {files.map((file: any) => (
+                <tr key={file.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      {file.name}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-xs font-medium text-gray-500 uppercase">
+                      {file.provider === "GDRIVE" ? "Google Drive" : "OneDrive"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(file.modifiedTime).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <a
+                      href={file.webViewLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                    >
+                      Open <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
-  )
+  );
 }

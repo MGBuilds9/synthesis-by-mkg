@@ -86,7 +86,6 @@ describe('GET /api/files/list', () => {
     ]
 
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
-    vi.mocked(prisma.fileItem.count).mockResolvedValue(2)
 
     const request = createRequest()
     const response = await GET(request)
@@ -102,7 +101,6 @@ describe('GET /api/files/list', () => {
     })
     expect(data.files[1].id).toBe('file-2')
     expect(data.files[1].name).toBe('spreadsheet.xlsx')
-    expect(data.total).toBe(2)
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
@@ -129,12 +127,6 @@ describe('GET /api/files/list', () => {
       take: 50,
       skip: 0,
     })
-
-    expect(prisma.fileItem.count).toHaveBeenCalledWith({
-      where: {
-        connectedAccountId: { in: ['acc-1'] },
-      },
-    })
   })
 
   it('filters by provider when specified', async () => {
@@ -155,7 +147,6 @@ describe('GET /api/files/list', () => {
     ]
 
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
-    vi.mocked(prisma.fileItem.count).mockResolvedValue(1)
 
     const request = createRequest({ provider: 'GOOGLE_DRIVE' })
     const response = await GET(request)
@@ -165,7 +156,6 @@ describe('GET /api/files/list', () => {
     expect(data.files).toHaveLength(1)
     expect(data.files[0].id).toBe('file-1')
     expect(data.files[0].provider).toBe('GOOGLE_DRIVE')
-    expect(data.total).toBe(1)
 
     // Verify connectedAccount fetch with provider filter
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
@@ -205,7 +195,6 @@ describe('GET /api/files/list', () => {
     ]
 
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
-    vi.mocked(prisma.fileItem.count).mockResolvedValue(1)
 
     const request = createRequest({ search: 'important' })
     const response = await GET(request)
@@ -248,7 +237,6 @@ describe('GET /api/files/list', () => {
     ]
 
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
-    vi.mocked(prisma.fileItem.count).mockResolvedValue(1)
 
     const request = createRequest({ provider: 'GOOGLE_DRIVE', search: 'report' })
     const response = await GET(request)
@@ -298,7 +286,6 @@ describe('GET /api/files/list', () => {
     ]
 
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
-    vi.mocked(prisma.fileItem.count).mockResolvedValue(25)
 
     const request = createRequest({ limit: '10', offset: '10' })
     const response = await GET(request)
@@ -307,7 +294,6 @@ describe('GET /api/files/list', () => {
     expect(response.status).toBe(200)
     expect(data.files).toHaveLength(1)
     expect(data.files[0].id).toBe('file-11')
-    expect(data.total).toBe(25)
     expect(data.limit).toBe(10)
     expect(data.offset).toBe(10)
 
@@ -328,7 +314,6 @@ describe('GET /api/files/list', () => {
     } as any)
 
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
-    vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
 
     const request = createRequest()
     const response = await GET(request)
@@ -336,7 +321,6 @@ describe('GET /api/files/list', () => {
 
     expect(response.status).toBe(200)
     expect(data.files).toEqual([])
-    expect(data.total).toBe(0)
   })
 
   it('returns 500 on internal error', async () => {

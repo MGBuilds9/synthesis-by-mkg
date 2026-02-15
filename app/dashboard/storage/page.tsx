@@ -95,6 +95,9 @@ export default function StoragePage() {
   return (
     <div className="p-8">
       <div className="mb-8">
+        <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          &larr; Back to Dashboard
+        </Link>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Storage</h1>
         <p className="text-gray-600">View and manage all your synced files from Google Drive and OneDrive.</p>
       </div>
@@ -143,6 +146,7 @@ export default function StoragePage() {
             <input
               ref={searchInputRef}
               type="text"
+              aria-label="Search files"
               placeholder={`Search files... (${shortcutSymbol}+K)`}
               className="w-full px-4 py-2 border rounded-lg pr-8"
               value={searchQuery}
@@ -165,9 +169,18 @@ export default function StoragePage() {
           </div>
           <button
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            disabled={loading}
+            aria-busy={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
           >
-            Search
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Searching...
+              </>
+            ) : (
+              "Search"
+            )}
           </button>
         </div>
 
@@ -270,6 +283,8 @@ export default function StoragePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                      aria-label={`Open ${file.name} in new tab`}
+                      title={`Open ${file.name} in new tab`}
                     >
                       Open <ExternalLink className="w-3 h-3" />
                     </a>

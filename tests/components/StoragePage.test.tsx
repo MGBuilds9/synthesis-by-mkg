@@ -157,7 +157,7 @@ describe('StoragePage', () => {
     })
 
     // Click All filter
-    const allButton = screen.getByRole('button', { name: 'All' })
+    const allButton = screen.getByRole('button', { name: 'All Files' })
     fireEvent.click(allButton)
 
     // Verify fetch was called with no provider (or provider=ALL logic, which is just base URL)

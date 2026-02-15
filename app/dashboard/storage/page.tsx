@@ -144,6 +144,7 @@ export default function StoragePage() {
               ref={searchInputRef}
               type="text"
               placeholder={`Search files... (${shortcutSymbol}+K)`}
+              aria-label="Search files"
               className="w-full px-4 py-2 border rounded-lg pr-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -172,9 +173,14 @@ export default function StoragePage() {
         </div>
 
         {/* Provider Filter */}
-        <div className="mt-4 flex gap-2">
+        <div
+          className="mt-4 flex gap-2"
+          role="group"
+          aria-label="Filter by provider"
+        >
           <button
             onClick={() => setSelectedProvider("ALL")}
+            aria-pressed={selectedProvider === "ALL"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "ALL"
                 ? "bg-blue-600 text-white"
@@ -185,6 +191,7 @@ export default function StoragePage() {
           </button>
           <button
             onClick={() => setSelectedProvider("GDRIVE")}
+            aria-pressed={selectedProvider === "GDRIVE"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "GDRIVE"
                 ? "bg-blue-600 text-white"
@@ -195,6 +202,7 @@ export default function StoragePage() {
           </button>
           <button
             onClick={() => setSelectedProvider("ONEDRIVE")}
+            aria-pressed={selectedProvider === "ONEDRIVE"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "ONEDRIVE"
                 ? "bg-blue-600 text-white"
@@ -209,8 +217,9 @@ export default function StoragePage() {
       {/* Files List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Loading files...
+          <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-2" />
+            <p>Loading files...</p>
           </div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">

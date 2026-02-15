@@ -25,3 +25,7 @@
 ## 2026-02-13 - Search Interaction
 **Learning:** Search inputs without a quick way to clear the query force users to manually delete text, creating friction in exploratory tasks.
 **Action:** Implement a clear button (X icon) inside search inputs that appears when text is present, allowing one-click reset of the query and results.
+
+## 2026-05-24 - Input Placeholders
+**Learning:** Attempting to dynamically hide placeholder text (e.g. shortcuts) when typing is redundant, as browsers automatically hide placeholders when input has value.
+**Action:** Keep placeholder logic simple and static; rely on native browser behavior for visibility toggling.

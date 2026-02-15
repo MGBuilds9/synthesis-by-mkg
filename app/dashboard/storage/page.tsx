@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { Loader2, ExternalLink, X } from 'lucide-react'
 
@@ -10,33 +10,63 @@ export default function StoragePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProvider, setSelectedProvider] = useState('ALL')
 
+  // Bolt: Use refs to manage request cancellation and avoid stale closures in effects
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const searchQueryRef = useRef(searchQuery)
+
+  // Bolt: Sync searchQuery ref to access latest value in useEffect without triggering re-fetch
   useEffect(() => {
-    fetchFiles()
-  }, [])
+    searchQueryRef.current = searchQuery
+  }, [searchQuery])
 
-  const filteredFiles = files.filter((file: any) => {
-    if (selectedProvider === 'ALL') return true
-    return file.provider === selectedProvider
-  })
+  // Bolt: Memoized fetch function to handle request cancellation and params
+  const fetchFiles = useCallback(async (provider: string, search?: string) => {
+    // Cancel any in-flight request to prevent race conditions
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
 
-  async function fetchFiles(search?: string) {
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+    setLoading(true)
+
     try {
-      const url = search 
-        ? `/api/files/list?search=${encodeURIComponent(search)}`
+      const params = new URLSearchParams()
+      if (search) params.append('search', search)
+      if (provider !== 'ALL') params.append('provider', provider)
+
+      const queryString = params.toString()
+      const url = queryString
+        ? `/api/files/list?${queryString}`
         : '/api/files/list'
-      const response = await fetch(url)
+
+      const response = await fetch(url, { signal: controller.signal })
+      if (!response.ok) {
+        throw new Error('Failed to fetch')
+      }
+
       const data = await response.json()
       setFiles(data.files || [])
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'AbortError') return
       console.error('Failed to fetch files:', error)
+      setFiles([])
     } finally {
-      setLoading(false)
+      // Only reset loading state if this request wasn't aborted/superseded
+      if (abortControllerRef.current === controller) {
+        setLoading(false)
+        abortControllerRef.current = null
+      }
     }
-  }
+  }, [])
+
+  // Bolt: Fetch whenever provider changes, using current search query
+  useEffect(() => {
+    fetchFiles(selectedProvider, searchQueryRef.current)
+  }, [selectedProvider, fetchFiles])
 
   function handleSearch() {
-    setLoading(true)
-    fetchFiles(searchQuery)
+    fetchFiles(selectedProvider, searchQuery)
   }
 
   return (
@@ -66,7 +96,7 @@ export default function StoragePage() {
                 <button
                   onClick={() => {
                     setSearchQuery('')
-                    fetchFiles('')
+                    fetchFiles(selectedProvider, '')
                   }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
                   aria-label="Clear search"
@@ -136,11 +166,11 @@ export default function StoragePage() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-gray-500">Loading files...</div>
-          ) : filteredFiles.length === 0 ? (
+          ) : files.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              {files.length === 0
+              {files.length === 0 && selectedProvider === 'ALL'
                 ? "No files yet. Connect your storage accounts to start syncing."
-                : `No ${selectedProvider === 'GDRIVE' ? 'Google Drive' : 'OneDrive'} files found.`
+                : `No ${selectedProvider === 'GDRIVE' ? 'Google Drive' : selectedProvider === 'ONEDRIVE' ? 'OneDrive' : 'files'} found.`
               }
             </div>
           ) : (
@@ -165,7 +195,7 @@ export default function StoragePage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredFiles.map((file: any) => (
+                {files.map((file: any) => (
                   <tr key={file.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{file.name}</div>

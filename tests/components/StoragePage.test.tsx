@@ -129,13 +129,40 @@ describe('StoragePage', () => {
 
     // Verify fetch was called with empty search (or initial fetch)
     // fetchFiles('') -> /api/files/list
-    expect(global.fetch).toHaveBeenCalledWith('/api/files/list')
+    expect(global.fetch).toHaveBeenCalledWith('/api/files/list', expect.anything())
 
     // Wait for any state updates to complete to avoid "act" warnings
     await waitFor(() => {
       // We can wait for the loading state to be settled (even if it was already false, the async function touches it)
       // Or just wait for the loop to clear
       expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
+    })
+  })
+
+  it('fetches files with provider filter when provider is selected', async () => {
+    render(<StoragePage />)
+
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText('Search')).toBeInTheDocument()
+    })
+
+    // Click Google Drive filter
+    const gdriveButton = screen.getByRole('button', { name: 'Google Drive' })
+    fireEvent.click(gdriveButton)
+
+    // Verify fetch was called with provider=GDRIVE
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/files/list?provider=GDRIVE', expect.anything())
+    })
+
+    // Click All filter
+    const allButton = screen.getByRole('button', { name: 'All' })
+    fireEvent.click(allButton)
+
+    // Verify fetch was called with no provider (or provider=ALL logic, which is just base URL)
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/files/list', expect.anything())
     })
   })
 })

@@ -77,8 +77,16 @@ export async function GET(request: NextRequest) {
     // Bolt: Attach connected account details in memory to avoid N+1/JOIN query overhead
     const filesWithAccount = files.map((file) => {
       const account = accountMap.get(file.connectedAccountId)
+
+      // Sentinel: Sanitize webViewLink to prevent XSS
+      let safeWebViewLink = file.webViewLink
+      if (safeWebViewLink && !safeWebViewLink.startsWith('http://') && !safeWebViewLink.startsWith('https://')) {
+        safeWebViewLink = null
+      }
+
       return {
         ...file,
+        webViewLink: safeWebViewLink,
         connectedAccount: {
           accountLabel: account?.accountLabel || null,
           provider: account?.provider || file.provider,

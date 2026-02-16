@@ -45,8 +45,6 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 - Current codebase will be largely replaced in Phase 1 (strip sync engine, browsing pages)
 - Tests exist for current code but will need rewriting as architecture changes
 - Auth (NextAuth v4) is configured but sign-in form is a placeholder — not wired to `signIn()`. Dashboard pages have no session protection. Env vars (NEXTAUTH_SECRET, DATABASE_URL, GOOGLE_CLIENT_ID/SECRET) not set on Vercel.
-- Run /pre-push-gate before any push/PR.
-- End sessions with /log-and-exit (tests + log).
 
 ## Session Log
 
@@ -67,6 +65,3 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 ### Feb 13, 2026 — Repo Hygiene #12: Security + Perf + UX
 - **Changes:** Merged 4 PRs: #64 (Security: Timing Attack), #61 (Security: Model Validation), #62 (Perf: File List Query), #63 (UX: Storage Loading).
 - **Verification:** 155/155 tests passed. Build clean.
-
-### February 15, 2026 - Repo Hygiene #12
-- Merged 3 PRs (#84 XSS fix, #85 storage optimization, #86 search UX). Resolved merge conflict combining bolt+palette. Build clean. 3 branches deleted.

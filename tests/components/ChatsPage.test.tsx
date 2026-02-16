@@ -39,7 +39,7 @@ describe('ChatsPage', () => {
   it('renders search input', () => {
     render(<ChatsPage />)
 
-    const searchInput = screen.getByPlaceholderText(/Search chats.../)
+    const searchInput = screen.getByPlaceholderText('Search chats...')
     expect(searchInput).toBeInTheDocument()
     expect(searchInput).toHaveAttribute('type', 'text')
   })
@@ -47,7 +47,7 @@ describe('ChatsPage', () => {
   describe('Accessibility', () => {
     it('search input has accessible label', () => {
       render(<ChatsPage />)
-      const searchInput = screen.getByPlaceholderText(/Search chats.../)
+      const searchInput = screen.getByPlaceholderText('Search chats...')
       expect(searchInput).toHaveAttribute('aria-label', 'Search chats')
     })
 

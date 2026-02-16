@@ -70,3 +70,5 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 
 ### February 15, 2026 - Repo Hygiene #12
 - Merged 3 PRs (#84 XSS fix, #85 storage optimization, #86 search UX). Resolved merge conflict combining bolt+palette. Build clean. 3 branches deleted.
+
+- Feb 16: Repo hygiene #14 — merged 4 PRs (rate limiting, file optimization, search UX, storage a11y), closed 2 duplicates. 155 tests. Branches deleted.

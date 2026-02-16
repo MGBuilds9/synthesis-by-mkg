@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
+import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2, Plus } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
 
 export default function AIChatPage() {
@@ -13,6 +13,16 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState(`session-${Date.now()}`)
   const [showContextSettings, setShowContextSettings] = useState(false)
+
+  function handleNewChat() {
+    setMessages([])
+    setSessionId(`session-${Date.now()}`)
+    setInput('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.focus()
+    }
+  }
   
   // Context domain toggles
   const [contextDomains, setContextDomains] = useState({
@@ -94,6 +104,17 @@ export default function AIChatPage() {
               <option value="CLAUDE">Claude</option>
             </select>
             
+            {messages.length > 0 && (
+              <button
+                onClick={handleNewChat}
+                aria-label="Start new chat"
+                className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">New Chat</span>
+              </button>
+            )}
+
             <button
               onClick={() => setShowContextSettings(!showContextSettings)}
               aria-expanded={showContextSettings}

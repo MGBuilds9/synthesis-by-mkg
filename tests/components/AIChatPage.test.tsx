@@ -107,4 +107,31 @@ describe('AIChatPage', () => {
     expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
     expect(screen.getByText('Send')).toBeInTheDocument()
   })
+
+  it('shows and handles "New Chat" button', async () => {
+    render(<AIChatPage />)
+
+    // Button should not be visible initially
+    expect(screen.queryByLabelText('Start new chat')).not.toBeInTheDocument()
+
+    const input = screen.getByLabelText('Message input')
+    const sendButton = screen.getByRole('button', { name: 'Send message' })
+
+    // Type message and send
+    fireEvent.change(input, { target: { value: 'Hello AI' } })
+    fireEvent.click(sendButton)
+
+    // Button should be visible now
+    const newChatButton = screen.getByLabelText('Start new chat')
+    expect(newChatButton).toBeInTheDocument()
+
+    // Click new chat
+    fireEvent.click(newChatButton)
+
+    // Button should disappear
+    expect(screen.queryByLabelText('Start new chat')).not.toBeInTheDocument()
+
+    // Input should be cleared
+    expect(input).toHaveValue('')
+  })
 })

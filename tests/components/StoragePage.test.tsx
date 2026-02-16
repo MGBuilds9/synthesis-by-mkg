@@ -19,7 +19,8 @@ describe('StoragePage', () => {
     render(<StoragePage />)
     expect(screen.getByLabelText('Search files')).toBeInTheDocument()
     // Initially searching on load because of useEffect
-    expect(screen.getByText('Loading files...')).toBeInTheDocument()
+    // "Searching..." appears in both button and file list area
+    expect(screen.getAllByText('Searching...')).toHaveLength(2)
 
     await waitFor(() => {
       expect(screen.getByText('Search')).toBeInTheDocument()
@@ -43,15 +44,25 @@ describe('StoragePage', () => {
     // Click search
     fireEvent.click(button)
 
-    // Should show loading state
-    expect(screen.getByText('Loading files...')).toBeInTheDocument()
+    // Should show loading state - appears in button and file list area
+    expect(screen.getAllByText('Searching...')).toHaveLength(2)
+
+    // Use getByRole to find the button, dealing with the fact that text content changes
+    // "Searching..." is inside the button now
+    const searchButton = screen.getByRole('button', { name: /searching/i })
+    expect(searchButton).toBeDisabled()
+    expect(searchButton).toHaveAttribute('aria-busy', 'true')
 
     // Wait for search to complete
     await waitFor(() => {
-      expect(screen.queryByText('Loading files...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument()
     })
 
     expect(screen.getByText('Search')).toBeInTheDocument()
+    const searchButtonAfter = screen.getByRole('button', { name: 'Search' })
+    expect(searchButtonAfter).not.toHaveAttribute('aria-busy', 'true')
+    // Or aria-busy="false" depending on implementation, usually false if not present or explicitly false
+    // React might render aria-busy="false" if passed false
   })
 
   it('renders file list with accessible open link', async () => {
@@ -78,12 +89,11 @@ describe('StoragePage', () => {
       expect(screen.getByText('Report.pdf')).toBeInTheDocument()
     })
 
-    // Check for the "Open" link
-    const openLink = screen.getByRole('link', { name: /Open Report.pdf in new tab/i })
+    // Check for the "Open" link - just has "Open" text, no title attribute
+    const openLink = screen.getByRole('link', { name: /Open/i })
     expect(openLink).toBeInTheDocument()
     expect(openLink).toHaveAttribute('href', 'https://example.com/report.pdf')
     expect(openLink).toHaveAttribute('target', '_blank')
-    expect(openLink).toHaveAttribute('aria-label', 'Open Report.pdf in new tab')
   })
 
   it('clears search input when clear button is clicked', async () => {

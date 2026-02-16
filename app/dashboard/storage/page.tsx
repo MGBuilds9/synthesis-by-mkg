@@ -149,6 +149,7 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -167,8 +168,10 @@ export default function StoragePage() {
           <button
             onClick={handleSearch}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            disabled={loading}
+            aria-busy={loading}
           >
-            Search
+            {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
 
@@ -211,7 +214,7 @@ export default function StoragePage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">
-            Loading files...
+            Searching...
           </div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">

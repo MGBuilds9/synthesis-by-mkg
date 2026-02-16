@@ -32,15 +32,27 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  chatRateLimiter: {
+    check: vi.fn(),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { getLLMProvider } from '@/lib/providers/llm'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
+import { chatRateLimiter } from '@/lib/ratelimit'
 
 describe('POST /api/ai/chat', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
+    vi.mocked(chatRateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 10,
+      remaining: 9,
+      reset: Date.now() + 60000
+    })
   })
 
   function createRequest(body: any): NextRequest {
@@ -164,6 +176,8 @@ describe('POST /api/ai/chat', () => {
     expect(data.response).toBe('Hi there!')
     expect(data.sessionId).toBe('session-123')
 
+    expect(chatRateLimiter.check).toHaveBeenCalledWith('user-123')
+
     expect(prisma.aiChatSession.findUnique).toHaveBeenCalledWith({
       where: { id: 'session-123' },
       include: expect.objectContaining({
@@ -249,6 +263,8 @@ describe('POST /api/ai/chat', () => {
     expect(data.response).toBe('Hi there!')
     expect(data.sessionId).toBe('new-session-456')
 
+    expect(chatRateLimiter.check).toHaveBeenCalledWith('user-123')
+
     expect(prisma.aiChatSession.create).toHaveBeenCalledWith({
       data: {
         userId: 'user-123',
@@ -314,6 +330,7 @@ describe('POST /api/ai/chat', () => {
     const data = await response.json()
 
     expect(response.status).toBe(200)
+    expect(chatRateLimiter.check).toHaveBeenCalledWith('user-123')
     expect(retrieveAIContext).toHaveBeenCalledWith(
       { sessionId: 'session-123', maxItemsPerScope: 5, truncateContentLength: 200 },
       mockSession.contextScopes

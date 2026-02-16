@@ -143,6 +143,7 @@ export default function StoragePage() {
             <input
               ref={searchInputRef}
               type="text"
+              aria-label="Search files"
               placeholder={`Search files... (${shortcutSymbol}+K)`}
               className="w-full px-4 py-2 border rounded-lg pr-8"
               value={searchQuery}
@@ -165,9 +166,18 @@ export default function StoragePage() {
           </div>
           <button
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            disabled={loading}
+            aria-busy={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Search
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Searching...
+              </>
+            ) : (
+              "Search"
+            )}
           </button>
         </div>
 
@@ -269,6 +279,8 @@ export default function StoragePage() {
                       href={file.webViewLink}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`Open ${file.name} in new tab`}
+                      title={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
                     >
                       Open <ExternalLink className="w-3 h-3" />

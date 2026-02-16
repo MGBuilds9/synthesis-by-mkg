@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.max(1, Math.min(100, isNaN(rawLimit) ? 50 : rawLimit))
     const offset = parseInt(searchParams.get('offset') || '0')
     const search = searchParams.get('search')
+    const includeCount = searchParams.get('includeCount') === 'true'
 
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering FileItem by connectedAccountId which is indexed
@@ -69,7 +70,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Bolt: Optimized to run findMany and count in parallel to reduce latency
+    // Bolt: Optimized to run findMany and optional count in parallel to reduce latency
+    // Bolt: Only count if explicitly requested to avoid expensive aggregation on every request
     const [files, total] = await Promise.all([
       prisma.fileItem.findMany({
         where: whereClause,
@@ -88,7 +90,7 @@ export async function GET(request: NextRequest) {
         take: limit,
         skip: offset,
       }),
-      prisma.fileItem.count({ where: whereClause }),
+      includeCount ? prisma.fileItem.count({ where: whereClause }) : Promise.resolve(-1),
     ])
 
     // Bolt: Attach connected account details in memory to avoid N+1/JOIN query overhead

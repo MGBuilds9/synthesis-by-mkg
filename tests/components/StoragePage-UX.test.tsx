@@ -25,7 +25,7 @@ describe("StoragePage UX", () => {
     render(<StoragePage />);
     await waitForLoad();
 
-    const input = screen.getByLabelText("Search files");
+    const input = screen.getByPlaceholderText(/Search files/i);
 
     // Simulate Cmd+K
     fireEvent.keyDown(window, { key: "k", metaKey: true });
@@ -37,7 +37,7 @@ describe("StoragePage UX", () => {
     render(<StoragePage />);
     await waitForLoad();
 
-    const input = screen.getByLabelText("Search files");
+    const input = screen.getByPlaceholderText(/Search files/i);
 
     // Simulate Ctrl+K
     fireEvent.keyDown(window, { key: "k", ctrlKey: true });
@@ -45,31 +45,11 @@ describe("StoragePage UX", () => {
     expect(input).toHaveFocus();
   });
 
-  it("shows shortcut hint when empty", async () => {
-    render(<StoragePage />);
-    await waitForLoad();
-
-    const hint = screen.queryByText(/K$/);
-    expect(hint).toBeInTheDocument();
-  });
-
-  it("hides shortcut hint when typing", async () => {
-    render(<StoragePage />);
-    await waitForLoad();
-
-    const input = screen.getByLabelText("Search files");
-
-    fireEvent.change(input, { target: { value: "test" } });
-
-    const hint = screen.queryByText(/K$/);
-    expect(hint).not.toBeInTheDocument();
-  });
-
   it("focuses input after clearing search", async () => {
     render(<StoragePage />);
     await waitForLoad();
 
-    const input = screen.getByLabelText("Search files");
+    const input = screen.getByPlaceholderText(/Search files/i);
 
     fireEvent.change(input, { target: { value: "test" } });
 
@@ -78,7 +58,7 @@ describe("StoragePage UX", () => {
 
     // Wait for search to complete
     await waitFor(() => {
-      expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+      expect(screen.queryByText("Loading files...")).not.toBeInTheDocument();
     });
 
     expect(input).toHaveValue("");

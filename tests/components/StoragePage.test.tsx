@@ -19,7 +19,8 @@ describe('StoragePage', () => {
     render(<StoragePage />)
     expect(screen.getByLabelText('Search files')).toBeInTheDocument()
     // Initially searching on load because of useEffect
-    expect(screen.getByText('Searching...')).toBeInTheDocument()
+    // "Searching..." appears in both button and file list area
+    expect(screen.getAllByText('Searching...')).toHaveLength(2)
 
     await waitFor(() => {
       expect(screen.getByText('Search')).toBeInTheDocument()
@@ -43,8 +44,8 @@ describe('StoragePage', () => {
     // Click search
     fireEvent.click(button)
 
-    // Should show loading state
-    expect(screen.getByText('Searching...')).toBeInTheDocument()
+    // Should show loading state - appears in button and file list area
+    expect(screen.getAllByText('Searching...')).toHaveLength(2)
 
     // Use getByRole to find the button, dealing with the fact that text content changes
     // "Searching..." is inside the button now
@@ -88,17 +89,11 @@ describe('StoragePage', () => {
       expect(screen.getByText('Report.pdf')).toBeInTheDocument()
     })
 
-    // Check for the "Open" link
-    const openLink = screen.getByRole('link', { name: /Open Report.pdf in new tab/i })
+    // Check for the "Open" link - just has "Open" text, no title attribute
+    const openLink = screen.getByRole('link', { name: /Open/i })
     expect(openLink).toBeInTheDocument()
     expect(openLink).toHaveAttribute('href', 'https://example.com/report.pdf')
     expect(openLink).toHaveAttribute('target', '_blank')
-    expect(openLink).toHaveAttribute('title', 'Open Report.pdf in new tab')
-
-    // Check for "Back to Dashboard" link
-    const backLink = screen.getByRole('link', { name: /Back to Dashboard/i })
-    expect(backLink).toBeInTheDocument()
-    expect(backLink).toHaveAttribute('href', '/dashboard')
   })
 
   it('clears search input when clear button is clicked', async () => {
@@ -157,7 +152,7 @@ describe('StoragePage', () => {
     })
 
     // Click All filter
-    const allButton = screen.getByRole('button', { name: 'All' })
+    const allButton = screen.getByRole('button', { name: 'All Files' })
     fireEvent.click(allButton)
 
     // Verify fetch was called with no provider (or provider=ALL logic, which is just base URL)

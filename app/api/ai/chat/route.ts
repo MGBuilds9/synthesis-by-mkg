@@ -7,6 +7,7 @@ import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
 import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
+import { chatRateLimiter } from '@/lib/ratelimit'
 
 // Sentinel: Validation schema
 const chatRequestSchema = z.object({
@@ -22,10 +23,6 @@ const chatRequestSchema = z.object({
     notion: z.boolean().optional(),
   }).optional(),
 }).passthrough()
-
-// Sentinel: Rate limit configuration
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
-const MAX_MESSAGES_PER_MINUTE = 10
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,31 +56,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Sentinel: Rate Limiting
-    // Count user messages in the last minute
-    // We filter by user ID via session relation to ensure we count across all sessions for this user
-    try {
-      const recentMessageCount = await prisma.aiMessage.count({
-        where: {
-          session: { userId: session.user.id },
-          role: 'user',
-          createdAt: {
-            gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
-          }
-        }
-      })
-
-      if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
-        return NextResponse.json(
-          { error: 'Too many requests' },
-          { status: 429 }
-        )
-      }
-    } catch (error) {
-      console.error('Rate limit check failed:', error)
-      // Sentinel: Fail closed to protect resources
+    // Bolt: Use in-memory rate limiter instead of DB query to improve performance and reduce DB load
+    // This avoids an expensive JOIN on every request and scales better
+    const rateLimit = chatRateLimiter.check(session.user.id)
+    if (!rateLimit.success) {
       return NextResponse.json(
-        { error: 'Service temporarily unavailable' },
-        { status: 503 }
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
+          },
+        }
       )
     }
 

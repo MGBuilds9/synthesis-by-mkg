@@ -79,3 +79,6 @@ export class RateLimiter {
 
 // Default instance: 60 requests per minute
 export const rateLimiter = new RateLimiter(60 * 1000, 60)
+
+// Chat specific instance: 10 requests per minute
+export const chatRateLimiter = new RateLimiter(60 * 1000, 10)

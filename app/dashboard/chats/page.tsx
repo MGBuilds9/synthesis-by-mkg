@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { MessageSquare, Search, Filter, ChevronDown, Hash } from 'lucide-react'
+import { MessageSquare, Search, Filter, ChevronDown, Hash, X } from 'lucide-react'
 
 export default function ChatsPage() {
   const [selectedPlatform, setSelectedPlatform] = useState('all')
@@ -10,6 +10,27 @@ export default function ChatsPage() {
   const [selectedChannel, setSelectedChannel] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [shortcutSymbol, setShortcutSymbol] = useState("Ctrl")
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (
+      typeof navigator !== "undefined" &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+    ) {
+      setShortcutSymbol("⌘")
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   const showWorkspaceSelector = selectedPlatform === 'discord' || selectedPlatform === 'slack' || selectedPlatform === 'teams'
   const showChannelSelector = selectedPlatform === 'discord' || selectedPlatform === 'slack' || selectedPlatform === 'teams'
@@ -94,13 +115,26 @@ export default function ChatsPage() {
           <div className="flex-1 min-w-full sm:min-w-[300px] sm:max-w-md relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" aria-hidden="true" />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Search chats..."
+              placeholder={`Search chats... (${shortcutSymbol}+K)`}
               aria-label="Search chats"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
+              className="w-full pl-10 pr-10 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
             />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("")
+                  searchInputRef.current?.focus()
+                }}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           <button 

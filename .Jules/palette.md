@@ -25,3 +25,7 @@
 ## 2026-02-13 - Search Interaction
 **Learning:** Search inputs without a quick way to clear the query force users to manually delete text, creating friction in exploratory tasks.
 **Action:** Implement a clear button (X icon) inside search inputs that appears when text is present, allowing one-click reset of the query and results.
+
+## 2026-02-14 - Keyboard Shortcut Pattern
+**Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
+**Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.

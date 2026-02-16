@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Loader2, ExternalLink, X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -143,11 +143,13 @@ export default function StoragePage() {
             <input
               ref={searchInputRef}
               type="text"
+              aria-label="Search files"
               placeholder={`Search files... (${shortcutSymbol}+K)`}
               className="w-full px-4 py-2 border rounded-lg pr-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -166,8 +168,10 @@ export default function StoragePage() {
           <button
             onClick={handleSearch}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            disabled={loading}
+            aria-busy={loading}
           >
-            Search
+            {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
 
@@ -210,7 +214,7 @@ export default function StoragePage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">
-            Loading files...
+            Searching...
           </div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
@@ -269,6 +273,7 @@ export default function StoragePage() {
                       href={file.webViewLink}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
                       aria-label={`Open ${file.name} in new tab`}
                     >

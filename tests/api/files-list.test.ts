@@ -102,7 +102,7 @@ describe('GET /api/files/list', () => {
     })
     expect(data.files[1].id).toBe('file-2')
     expect(data.files[1].name).toBe('spreadsheet.xlsx')
-    expect(data.total).toBe(2)
+    expect(data.total).toBe(-1)
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
@@ -129,6 +129,37 @@ describe('GET /api/files/list', () => {
       take: 50,
       skip: 0,
     })
+
+    expect(prisma.fileItem.count).not.toHaveBeenCalled()
+  })
+
+  it('returns total count when requested', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockFiles = [
+      {
+        id: 'file-1',
+        name: 'document.pdf',
+        provider: 'GOOGLE_DRIVE',
+        size: 1024,
+        modifiedTime: new Date('2024-01-15'),
+        webViewLink: 'https://drive.google.com/file/123',
+        connectedAccountId: 'acc-1',
+      },
+    ]
+
+    vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
+    vi.mocked(prisma.fileItem.count).mockResolvedValue(5)
+
+    const request = createRequest({ includeCount: 'true' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.files).toHaveLength(1)
+    expect(data.total).toBe(5)
 
     expect(prisma.fileItem.count).toHaveBeenCalledWith({
       where: {
@@ -165,7 +196,7 @@ describe('GET /api/files/list', () => {
     expect(data.files).toHaveLength(1)
     expect(data.files[0].id).toBe('file-1')
     expect(data.files[0].provider).toBe('GOOGLE_DRIVE')
-    expect(data.total).toBe(1)
+    expect(data.total).toBe(-1)
 
     // Verify connectedAccount fetch with provider filter
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
@@ -307,7 +338,7 @@ describe('GET /api/files/list', () => {
     expect(response.status).toBe(200)
     expect(data.files).toHaveLength(1)
     expect(data.files[0].id).toBe('file-11')
-    expect(data.total).toBe(25)
+    expect(data.total).toBe(-1)
     expect(data.limit).toBe(10)
     expect(data.offset).toBe(10)
 
@@ -336,7 +367,7 @@ describe('GET /api/files/list', () => {
 
     expect(response.status).toBe(200)
     expect(data.files).toEqual([])
-    expect(data.total).toBe(0)
+    expect(data.total).toBe(-1)
   })
 
   it('returns 500 on internal error', async () => {

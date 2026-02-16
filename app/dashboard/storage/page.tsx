@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Loader2, ExternalLink, X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -149,6 +149,7 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -166,18 +167,11 @@ export default function StoragePage() {
           </div>
           <button
             onClick={handleSearch}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             disabled={loading}
             aria-busy={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Searching...
-              </>
-            ) : (
-              "Search"
-            )}
+            {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
 
@@ -220,7 +214,7 @@ export default function StoragePage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">
-            Loading files...
+            Searching...
           </div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
@@ -280,8 +274,8 @@ export default function StoragePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Open ${file.name} in new tab`}
-                      title={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                      aria-label={`Open ${file.name} in new tab`}
                     >
                       Open <ExternalLink className="w-3 h-3" />
                     </a>

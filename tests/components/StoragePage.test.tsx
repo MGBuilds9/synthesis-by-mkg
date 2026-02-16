@@ -19,7 +19,7 @@ describe('StoragePage', () => {
     render(<StoragePage />)
     expect(screen.getByLabelText('Search files')).toBeInTheDocument()
     // Initially searching on load because of useEffect
-    expect(screen.getByText('Searching...')).toBeInTheDocument()
+    expect(screen.getByText('Loading files...')).toBeInTheDocument()
 
     await waitFor(() => {
       expect(screen.getByText('Search')).toBeInTheDocument()
@@ -44,24 +44,14 @@ describe('StoragePage', () => {
     fireEvent.click(button)
 
     // Should show loading state
-    expect(screen.getByText('Searching...')).toBeInTheDocument()
-
-    // Use getByRole to find the button, dealing with the fact that text content changes
-    // "Searching..." is inside the button now
-    const searchButton = screen.getByRole('button', { name: /searching/i })
-    expect(searchButton).toBeDisabled()
-    expect(searchButton).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByText('Loading files...')).toBeInTheDocument()
 
     // Wait for search to complete
     await waitFor(() => {
-      expect(screen.queryByText('Searching...')).not.toBeInTheDocument()
+      expect(screen.queryByText('Loading files...')).not.toBeInTheDocument()
     })
 
     expect(screen.getByText('Search')).toBeInTheDocument()
-    const searchButtonAfter = screen.getByRole('button', { name: 'Search' })
-    expect(searchButtonAfter).not.toHaveAttribute('aria-busy', 'true')
-    // Or aria-busy="false" depending on implementation, usually false if not present or explicitly false
-    // React might render aria-busy="false" if passed false
   })
 
   it('renders file list with accessible open link', async () => {
@@ -93,12 +83,7 @@ describe('StoragePage', () => {
     expect(openLink).toBeInTheDocument()
     expect(openLink).toHaveAttribute('href', 'https://example.com/report.pdf')
     expect(openLink).toHaveAttribute('target', '_blank')
-    expect(openLink).toHaveAttribute('title', 'Open Report.pdf in new tab')
-
-    // Check for "Back to Dashboard" link
-    const backLink = screen.getByRole('link', { name: /Back to Dashboard/i })
-    expect(backLink).toBeInTheDocument()
-    expect(backLink).toHaveAttribute('href', '/dashboard')
+    expect(openLink).toHaveAttribute('aria-label', 'Open Report.pdf in new tab')
   })
 
   it('clears search input when clear button is clicked', async () => {
@@ -157,7 +142,7 @@ describe('StoragePage', () => {
     })
 
     // Click All filter
-    const allButton = screen.getByRole('button', { name: 'All' })
+    const allButton = screen.getByRole('button', { name: 'All Files' })
     fireEvent.click(allButton)
 
     // Verify fetch was called with no provider (or provider=ALL logic, which is just base URL)

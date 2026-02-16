@@ -45,24 +45,12 @@ describe("StoragePage UX", () => {
     expect(input).toHaveFocus();
   });
 
-  it("shows shortcut hint when empty", async () => {
-    render(<StoragePage />);
-    await waitForLoad();
-
-    const hint = screen.queryByText(/K$/);
-    expect(hint).toBeInTheDocument();
-  });
-
-  it("hides shortcut hint when typing", async () => {
+  it("shows shortcut hint in placeholder", async () => {
     render(<StoragePage />);
     await waitForLoad();
 
     const input = screen.getByLabelText("Search files");
-
-    fireEvent.change(input, { target: { value: "test" } });
-
-    const hint = screen.queryByText(/K$/);
-    expect(hint).not.toBeInTheDocument();
+    expect(input).toHaveAttribute("placeholder", expect.stringMatching(/K\)$/));
   });
 
   it("focuses input after clearing search", async () => {

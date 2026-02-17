@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-02-14 - Reusable Search Component
+**Learning:** The "Search with Clear Button & Shortcut" pattern is duplicated across multiple pages (Chats, Storage, Inbox), leading to inconsistent implementation (e.g., duplicate aria-labels, missing features).
+**Action:** In the future, refactor these into a single `SearchInput` component that encapsulates the platform detection, clear button logic, and accessibility attributes to ensure consistency and reduce maintenance.

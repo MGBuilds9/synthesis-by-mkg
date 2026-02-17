@@ -62,4 +62,33 @@ describe('RateLimiter', () => {
 
     vi.useRealTimers()
   })
+
+  it('probabilistically prunes old keys', () => {
+    // 1. Setup
+    const rateLimiter = new RateLimiter(100, 60)
+    const map = (rateLimiter as any).requests as Map<string, number[]>
+
+    // 2. Add a key
+    rateLimiter.check('user1')
+    expect(map.has('user1')).toBe(true)
+
+    // 3. Wait for window to pass so 'user1' becomes prunable
+    vi.useFakeTimers()
+    vi.advanceTimersByTime(200)
+
+    // 4. Mock Math.random to force prune (return 0, which is < 0.01)
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    // 5. Trigger check with a new key
+    rateLimiter.check('user2')
+
+    // 6. Verification
+    // 'user1' should be gone because prune() was called
+    expect(map.has('user1')).toBe(false)
+    // 'user2' should be present
+    expect(map.has('user2')).toBe(true)
+
+    vi.useRealTimers()
+    randomSpy.mockRestore()
+  })
 })

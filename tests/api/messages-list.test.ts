@@ -52,7 +52,7 @@ describe('GET /api/messages/list', () => {
     expect(data.error).toBe('Unauthorized')
   })
 
-  it('returns threads with default pagination', async () => {
+  it('returns threads with default pagination (no total count)', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
@@ -108,7 +108,7 @@ describe('GET /api/messages/list', () => {
       accountLabel: 'My Gmail',
       provider: 'GMAIL',
     })
-    expect(data.total).toBe(2)
+    expect(data.total).toBe(-1) // Default skips count
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
@@ -125,7 +125,17 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
       },
-      include: {
+      select: {
+        id: true,
+        connectedAccountId: true,
+        provider: true,
+        providerThreadId: true,
+        subject: true,
+        participants: true,
+        lastMessageAt: true,
+        isUnread: true,
+        createdAt: true,
+        updatedAt: true,
         messages: {
           select: {
             id: true,
@@ -144,11 +154,24 @@ describe('GET /api/messages/list', () => {
       skip: 0,
     })
 
-    expect(prisma.messageThread.count).toHaveBeenCalledWith({
-      where: {
-        connectedAccountId: { in: ['account-1', 'account-2'] },
-      },
-    })
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
+  it('returns total count when includeCount is true', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(5)
+
+    const request = createRequest({ includeCount: 'true' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.total).toBe(5)
+    expect(prisma.messageThread.count).toHaveBeenCalled()
   })
 
   it('filters by provider when specified', async () => {
@@ -196,7 +219,7 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1'] },
       },
-      include: expect.any(Object),
+      select: expect.any(Object), // We already verified the exact shape in previous test
       orderBy: { lastMessageAt: 'desc' },
       take: 50,
       skip: 0,
@@ -220,14 +243,13 @@ describe('GET /api/messages/list', () => {
     ]
 
     vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
-    vi.mocked(prisma.messageThread.count).mockResolvedValue(25)
 
     const request = createRequest({ limit: '10', offset: '10' })
     const response = await GET(request)
     const data = await response.json()
 
     expect(response.status).toBe(200)
-    expect(data.total).toBe(25)
+    expect(data.total).toBe(-1)
     expect(data.limit).toBe(10)
     expect(data.offset).toBe(10)
 
@@ -235,7 +257,7 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
       },
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { lastMessageAt: 'desc' },
       take: 10,
       skip: 10,
@@ -268,7 +290,6 @@ describe('GET /api/messages/list', () => {
     ]
 
     vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
-    vi.mocked(prisma.messageThread.count).mockResolvedValue(1)
 
     const request = createRequest()
     const response = await GET(request)
@@ -285,7 +306,6 @@ describe('GET /api/messages/list', () => {
     } as any)
 
     vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
-    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
 
     const request = createRequest()
     const response = await GET(request)
@@ -293,7 +313,7 @@ describe('GET /api/messages/list', () => {
 
     expect(response.status).toBe(200)
     expect(data.threads).toEqual([])
-    expect(data.total).toBe(0)
+    expect(data.total).toBe(-1)
   })
 
   it('returns 500 on internal error', async () => {

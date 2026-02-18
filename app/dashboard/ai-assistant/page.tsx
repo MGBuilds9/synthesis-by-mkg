@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
+import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2, Plus } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
 
 export default function AIChatPage() {
@@ -27,6 +27,16 @@ export default function AIChatPage() {
 
   function toggleContextDomain(domain: keyof typeof contextDomains) {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
+  }
+
+  function handleNewChat() {
+    setMessages([])
+    setSessionId(`session-${Date.now()}`)
+    setInput('')
+    if (textareaRef.current) {
+      textareaRef.current.focus()
+      textareaRef.current.style.height = 'auto'
+    }
   }
 
   async function sendMessage(textOverride?: string) {
@@ -83,6 +93,15 @@ export default function AIChatPage() {
           </div>
           
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleNewChat}
+              className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors border border-transparent hover:border-indigo-100"
+              aria-label="Start new chat"
+              title="Start new chat"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
+
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value)}

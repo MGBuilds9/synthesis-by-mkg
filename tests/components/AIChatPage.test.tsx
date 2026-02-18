@@ -4,9 +4,9 @@ import AIChatPage from '@/app/dashboard/ai-assistant/page'
 
 // Mock MessageList to simplify testing
 vi.mock('@/app/dashboard/ai-assistant/components/MessageList', () => ({
-  default: ({ loading }: { loading: boolean }) => (
+  default: ({ messages, loading }: { messages: any[], loading: boolean }) => (
     <div data-testid="message-list">
-      {loading ? 'Loading...' : 'Messages'}
+      {loading ? 'Loading...' : `Messages: ${messages.length}`}
     </div>
   ),
 }))
@@ -28,6 +28,7 @@ describe('AIChatPage', () => {
     render(<AIChatPage />)
 
     expect(screen.getByLabelText('Message input')).toBeInTheDocument()
+    expect(screen.getByLabelText('Start new chat')).toBeInTheDocument()
     expect(screen.getByLabelText('Select AI Model')).toBeInTheDocument()
     expect(screen.getByLabelText('Context settings')).toBeInTheDocument()
   })
@@ -106,5 +107,29 @@ describe('AIChatPage', () => {
     // Should NOT show sending state (button still says "Send")
     expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
     expect(screen.getByText('Send')).toBeInTheDocument()
+  })
+
+  it('clears conversation on New Chat click', async () => {
+    render(<AIChatPage />)
+
+    const input = screen.getByLabelText('Message input')
+    const sendButton = screen.getByRole('button', { name: 'Send message' })
+
+    // Send a message
+    fireEvent.change(input, { target: { value: 'Hello' } })
+    fireEvent.click(sendButton)
+
+    // Wait for response (mocked)
+    await waitFor(() => {
+      // 1 user message + 1 assistant message
+      expect(screen.getByText('Messages: 2')).toBeInTheDocument()
+    })
+
+    // Click New Chat
+    const newChatButton = screen.getByLabelText('Start new chat')
+    fireEvent.click(newChatButton)
+
+    // Should be reset to 0
+    expect(screen.getByText('Messages: 0')).toBeInTheDocument()
   })
 })

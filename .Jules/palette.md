@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-02-18 - Search Focus Management
+**Learning:** When clearing a search input via a button, users expect to immediately type a new query. Losing focus disrupts this flow.
+**Action:** Always programmatically `focus()` the input after the clear action is triggered.

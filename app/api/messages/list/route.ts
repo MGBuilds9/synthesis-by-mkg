@@ -48,7 +48,18 @@ export async function GET(request: NextRequest) {
     const [threads, total] = await Promise.all([
       prisma.messageThread.findMany({
         where: whereClause,
-        include: {
+        // Bolt: Use select instead of include to exclude heavy fields like metadata
+        select: {
+          id: true,
+          connectedAccountId: true,
+          provider: true,
+          providerThreadId: true,
+          subject: true,
+          participants: true,
+          lastMessageAt: true,
+          isUnread: true,
+          createdAt: true,
+          updatedAt: true,
           messages: {
             // Bolt: Select only necessary fields to reduce payload size (excludes htmlContent)
             select: {

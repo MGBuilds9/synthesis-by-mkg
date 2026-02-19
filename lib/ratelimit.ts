@@ -50,6 +50,11 @@ export class RateLimiter {
     const oldestTimestamp = timestamps.length > 0 ? timestamps[0] : now
     const reset = oldestTimestamp + this.windowMs
 
+    // Sentinel: Probabilistic pruning to prevent memory leaks (1% chance)
+    if (Math.random() < 0.01) {
+      this.prune()
+    }
+
     return {
       success,
       limit: this.limit,

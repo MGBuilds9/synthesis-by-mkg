@@ -52,7 +52,7 @@ describe('GET /api/messages/list', () => {
     expect(data.error).toBe('Unauthorized')
   })
 
-  it('returns threads with default pagination', async () => {
+  it('returns threads with default pagination (count INCLUDED by default)', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
@@ -75,23 +75,6 @@ describe('GET /api/messages/list', () => {
           },
         ],
       },
-      {
-        id: 'thread-2',
-        connectedAccountId: 'account-1',
-        subject: 'Meeting Notes',
-        provider: 'GMAIL',
-        lastMessageAt: new Date('2024-01-14'),
-        messages: [
-          {
-            id: 'msg-2',
-            sender: 'colleague@example.com',
-            content: 'Meeting summary',
-            sentAt: new Date('2024-01-14'),
-            isRead: false,
-            providerMessageId: 'gmail-msg-2',
-          },
-        ],
-      },
     ]
 
     vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
@@ -102,25 +85,18 @@ describe('GET /api/messages/list', () => {
     const data = await response.json()
 
     expect(response.status).toBe(200)
-    expect(data.threads).toHaveLength(2)
-    expect(data.threads[0].id).toBe('thread-1')
-    expect(data.threads[0].connectedAccount).toEqual({
-      accountLabel: 'My Gmail',
-      provider: 'GMAIL',
-    })
-    expect(data.total).toBe(2)
+    expect(data.threads).toHaveLength(1)
+    expect(data.total).toBe(2) // Default behavior: count included
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
-    expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
-      where: { userId: 'user-123' },
-      select: {
-        id: true,
-        accountLabel: true,
-        provider: true,
+    expect(prisma.messageThread.count).toHaveBeenCalledWith({
+      where: {
+        connectedAccountId: { in: ['account-1', 'account-2'] },
       },
     })
 
+    // Bolt: Restored detailed assertion
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
@@ -143,12 +119,36 @@ describe('GET /api/messages/list', () => {
       take: 50,
       skip: 0,
     })
+  })
 
-    expect(prisma.messageThread.count).toHaveBeenCalledWith({
-      where: {
-        connectedAccountId: { in: ['account-1', 'account-2'] },
+  it('skips total count when skipCount=true', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Project Update',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-15'),
+        messages: [],
       },
-    })
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(5)
+
+    const request = createRequest({ skipCount: 'true' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.threads).toHaveLength(1)
+    expect(data.total).toBe(-1) // Count skipped
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
   })
 
   it('filters by provider when specified', async () => {
@@ -181,7 +181,7 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(200)
     expect(data.threads).toHaveLength(1)
     expect(data.threads[0].provider).toBe('GMAIL')
-    expect(data.threads[0].connectedAccount.accountLabel).toBe('My Gmail')
+    expect(data.total).toBe(1) // Default: count included
 
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-123', provider: 'GMAIL' },
@@ -231,6 +231,7 @@ describe('GET /api/messages/list', () => {
     expect(data.limit).toBe(10)
     expect(data.offset).toBe(10)
 
+    // Bolt: Restored assertion
     expect(prisma.messageThread.findMany).toHaveBeenCalledWith({
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },

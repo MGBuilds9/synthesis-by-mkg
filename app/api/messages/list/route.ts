@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     // Sentinel: Cap limit to 100 to prevent DoS
     const limit = Math.max(1, Math.min(100, isNaN(rawLimit) ? 50 : rawLimit))
     const offset = parseInt(searchParams.get('offset') || '0')
+    const includeCount = searchParams.get('includeCount') !== 'false'
 
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering MessageThread by connectedAccountId which is indexed
@@ -44,7 +45,8 @@ export async function GET(request: NextRequest) {
       connectedAccountId: { in: accountIds },
     }
 
-    // Bolt: Optimized to run findMany and count in parallel to reduce latency
+    // Bolt: Optimized to run findMany and optional count in parallel to reduce latency
+    // Bolt: Only count if explicitly requested to avoid expensive aggregation on every request
     const [threads, total] = await Promise.all([
       prisma.messageThread.findMany({
         where: whereClause,
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
         take: limit,
         skip: offset,
       }),
-      prisma.messageThread.count({ where: whereClause }),
+      includeCount ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(-1),
     ])
 
     // Bolt: Map connected account details in memory to avoid N+1/JOIN query

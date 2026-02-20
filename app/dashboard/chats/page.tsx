@@ -14,11 +14,12 @@ export default function ChatsPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
-      setShortcutSymbol("⌘")
+    // Only check navigator on client side
+    if (typeof navigator !== "undefined") {
+      const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+      if (isMac) {
+        setShortcutSymbol("⌘")
+      }
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {

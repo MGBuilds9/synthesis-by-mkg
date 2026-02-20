@@ -19,3 +19,4 @@ https://nextjs.org/telemetry
 ○ Compiling /dashboard/inbox ...
  GET /dashboard/inbox 200 in 4.6s (compile: 4.0s, proxy.ts: 112ms, render: 527ms)
  GET /dashboard/inbox 200 in 111ms (compile: 6ms, proxy.ts: 10ms, render: 95ms)
+ GET /dashboard/inbox 200 in 678ms (compile: 156ms, proxy.ts: 128ms, render: 395ms)

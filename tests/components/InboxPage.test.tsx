@@ -27,12 +27,47 @@ describe('InboxPage', () => {
     expect(screen.getByRole('button', { name: /outlook/i })).toBeInTheDocument()
   })
 
-  it('renders search input', () => {
+  it('renders search input with shortcut hint', () => {
     render(<InboxPage />)
 
     const searchInput = screen.getByRole('textbox', { name: /search emails/i })
     expect(searchInput).toBeInTheDocument()
-    expect(searchInput).toHaveAttribute('placeholder', 'Search emails...')
+    expect(searchInput.getAttribute('placeholder')).toMatch(/Search emails... \((Ctrl|⌘)\+K\)/)
+  })
+
+  it('shows clear button when typing and clears input on click', async () => {
+    const user = userEvent.setup()
+    render(<InboxPage />)
+
+    const searchInput = screen.getByRole('textbox', { name: /search emails/i })
+
+    // Type something
+    await user.type(searchInput, 'test query')
+    expect(searchInput).toHaveValue('test query')
+
+    // Check for clear button
+    const clearButton = screen.getByRole('button', { name: /clear search/i })
+    expect(clearButton).toBeInTheDocument()
+
+    // Click clear button
+    await user.click(clearButton)
+
+    // Check input is cleared and focused
+    expect(searchInput).toHaveValue('')
+    expect(searchInput).toHaveFocus()
+    expect(clearButton).not.toBeInTheDocument()
+  })
+
+  it('focuses search input on shortcut key', async () => {
+    const user = userEvent.setup()
+    render(<InboxPage />)
+
+    const searchInput = screen.getByRole('textbox', { name: /search emails/i })
+    expect(searchInput).not.toHaveFocus()
+
+    // Press Ctrl+K
+    await user.keyboard('{Control>}k{/Control}')
+    expect(searchInput).toHaveFocus()
   })
 
   it('shows empty state with "No emails yet"', () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -13,6 +13,26 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState(`session-${Date.now()}`)
   const [showContextSettings, setShowContextSettings] = useState(false)
+  const [shortcutSymbol, setShortcutSymbol] = useState("Ctrl")
+
+  useEffect(() => {
+    if (
+      typeof navigator !== "undefined" &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+    ) {
+      setShortcutSymbol("⌘")
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault()
+        textareaRef.current?.focus()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
   
   // Context domain toggles
   const [contextDomains, setContextDomains] = useState({
@@ -207,7 +227,7 @@ export default function AIChatPage() {
                   sendMessage()
                 }
               }}
-              placeholder="Type your message..."
+              placeholder={`Type your message... (${shortcutSymbol}+K)`}
               aria-label="Message input"
               rows={1}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none min-h-[48px] max-h-[200px]"

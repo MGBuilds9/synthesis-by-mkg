@@ -22,8 +22,15 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn(),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list - Security', () => {
   beforeEach(() => {
@@ -31,6 +38,12 @@ describe('GET /api/messages/list - Security', () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: Date.now() + 60000,
+    })
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
       { id: 'account-1' },
     ] as any)
@@ -68,5 +81,44 @@ describe('GET /api/messages/list - Security', () => {
         take: 1, // Expect min value
       })
     )
+  })
+
+  it('enforces rate limits', async () => {
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: false,
+      limit: 60,
+      remaining: 0,
+      reset: 1234567890,
+    })
+
+    const request = createRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(429)
+    const json = await response.json()
+    expect(json.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('1234567890')
+  })
+
+  it('includes rate limit headers on success', async () => {
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 50,
+      reset: 1234567890,
+    })
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('50')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('1234567890')
   })
 })

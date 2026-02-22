@@ -3,12 +3,29 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import logger from '@/lib/logger'
+import { rateLimiter } from '@/lib/ratelimit'
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Sentinel: Rate limit check
+    const { success, limit: rateLimit, remaining, reset } = rateLimiter.check(session.user.id)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.toString(),
+            'X-RateLimit-Remaining': remaining.toString(),
+            'X-RateLimit-Reset': reset.toString()
+          }
+        }
+      )
     }
 
     const { searchParams } = new URL(request.url)
@@ -82,12 +99,21 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({
-      threads: threadsWithAccount,
-      total,
-      limit,
-      offset,
-    })
+    return NextResponse.json(
+      {
+        threads: threadsWithAccount,
+        total,
+        limit,
+        offset,
+      },
+      {
+        headers: {
+          'X-RateLimit-Limit': rateLimit.toString(),
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': reset.toString(),
+        },
+      }
+    )
   } catch (error: any) {
     logger.error('Failed to fetch messages', { error })
     return NextResponse.json(

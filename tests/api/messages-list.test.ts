@@ -52,7 +52,7 @@ describe('GET /api/messages/list', () => {
     expect(data.error).toBe('Unauthorized')
   })
 
-  it('returns threads with default pagination', async () => {
+  it('returns threads and total count with default pagination', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
@@ -108,7 +108,7 @@ describe('GET /api/messages/list', () => {
       accountLabel: 'My Gmail',
       provider: 'GMAIL',
     })
-    expect(data.total).toBe(2)
+    expect(data.total).toBe(2) // Default includes count
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
@@ -151,6 +151,36 @@ describe('GET /api/messages/list', () => {
     })
   })
 
+  it('skips total count when includeCount=false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Project Update',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-15'),
+        messages: [],
+      },
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(5)
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.threads).toHaveLength(1)
+    expect(data.total).toBe(-1) // Should be -1 when skipped
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
   it('filters by provider when specified', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
@@ -182,6 +212,7 @@ describe('GET /api/messages/list', () => {
     expect(data.threads).toHaveLength(1)
     expect(data.threads[0].provider).toBe('GMAIL')
     expect(data.threads[0].connectedAccount.accountLabel).toBe('My Gmail')
+    expect(data.total).toBe(1) // Default includes count
 
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-123', provider: 'GMAIL' },

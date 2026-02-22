@@ -25,3 +25,11 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-02-22 - Non-Blocking Lint Errors in CI
+**Learning:** The CI pipeline treats specific lint warnings (like `react/jsx-no-duplicate-props`) as fatal errors, blocking builds even if they are pre-existing.
+**Action:** When working on a task, run `npm run lint` early and fix blocking lint errors even in unrelated files if they prevent submission, ensuring to keep the fix correct (e.g. not removing required attributes).
+
+## 2026-02-22 - Backward Compatibility in API Optimization
+**Learning:** Changing an API default behavior (e.g., stopping the return of `total` count) is a breaking change for existing clients expecting that field.
+**Action:** When introducing performance toggles like `includeCount`, default them to the legacy behavior (opt-out, e.g., `includeCount=true`) unless a breaking change is explicitly intended and coordinated.

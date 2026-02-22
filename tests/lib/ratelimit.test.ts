@@ -62,4 +62,37 @@ describe('RateLimiter', () => {
 
     vi.useRealTimers()
   })
+
+  it('prunes expired keys probabilistically', () => {
+    // Force prune to happen (Math.random() < 0.01)
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.005)
+
+    // Create limiter with small window
+    const shortWindowLimiter = new RateLimiter(100, 10)
+
+    // Use fake timers
+    vi.useFakeTimers()
+    const now = Date.now()
+    vi.setSystemTime(now)
+
+    // Add request for user1
+    shortWindowLimiter.check('user1')
+
+    // Verify user1 is in map
+    expect((shortWindowLimiter as any).requests.has('user1')).toBe(true)
+
+    // Advance time past window
+    vi.setSystemTime(now + 150)
+
+    // Add request for user2, which should trigger prune
+    shortWindowLimiter.check('user2')
+
+    // user1 should be pruned (expired)
+    expect((shortWindowLimiter as any).requests.has('user1')).toBe(false)
+    // user2 should be present
+    expect((shortWindowLimiter as any).requests.has('user2')).toBe(true)
+
+    vi.useRealTimers()
+    randomSpy.mockRestore()
+  })
 })

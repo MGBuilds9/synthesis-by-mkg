@@ -86,4 +86,34 @@ describe("StoragePage UX", () => {
     expect(input).toHaveValue("");
     expect(input).toHaveFocus();
   });
+
+  it("updates aria-pressed state on filter buttons", async () => {
+    render(<StoragePage />);
+    await waitForLoad();
+
+    const allButton = screen.getByRole("button", { name: "All Files" });
+    const gdriveButton = screen.getByRole("button", { name: "Google Drive" });
+    const onedriveButton = screen.getByRole("button", { name: "OneDrive" });
+
+    // Initial state
+    expect(allButton).toHaveAttribute("aria-pressed", "true");
+    expect(gdriveButton).toHaveAttribute("aria-pressed", "false");
+    expect(onedriveButton).toHaveAttribute("aria-pressed", "false");
+
+    // Click Google Drive
+    fireEvent.click(gdriveButton);
+    await waitFor(() => {
+      expect(gdriveButton).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(allButton).toHaveAttribute("aria-pressed", "false");
+    expect(onedriveButton).toHaveAttribute("aria-pressed", "false");
+
+    // Click OneDrive
+    fireEvent.click(onedriveButton);
+    await waitFor(() => {
+      expect(onedriveButton).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(allButton).toHaveAttribute("aria-pressed", "false");
+    expect(gdriveButton).toHaveAttribute("aria-pressed", "false");
+  });
 });

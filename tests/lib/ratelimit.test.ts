@@ -62,4 +62,35 @@ describe('RateLimiter', () => {
 
     vi.useRealTimers()
   })
+
+  it('prunes old entries probabilistically', () => {
+    // Force Math.random to trigger prune (return 0)
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    // Create a limiter with a short window
+    const windowMs = 1000
+    rateLimiter = new RateLimiter(windowMs, 60)
+
+    // Access private map for testing setup
+    const requestsMap = (rateLimiter as any).requests
+
+    // Add a stale entry (older than window)
+    const staleTime = Date.now() - windowMs - 100
+    requestsMap.set('staleKey', [staleTime])
+
+    // Add an active entry
+    const activeTime = Date.now()
+    requestsMap.set('activeKey', [activeTime])
+
+    // Perform a check (any key) to trigger prune
+    rateLimiter.check('newKey')
+
+    // Verify stale key is removed
+    expect(requestsMap.has('staleKey')).toBe(false)
+
+    // Verify active key remains
+    expect(requestsMap.has('activeKey')).toBe(true)
+
+    randomSpy.mockRestore()
+  })
 })

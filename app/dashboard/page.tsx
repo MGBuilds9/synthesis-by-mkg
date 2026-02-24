@@ -24,13 +24,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Fetch today's stats
-    setTodayStats({
+    const stats = {
       newEmails: 5,
       newChats: 12,
       recentFiles: 8,
       recentNotionPages: 3,
-    })
-  }, [])
+    };
+    setTodayStats(stats);
+  }, []);
 
   return (
     <div className="p-4 sm:p-6">

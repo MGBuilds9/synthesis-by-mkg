@@ -11,11 +11,13 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private lastPrune: number
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+    this.lastPrune = Date.now()
   }
 
   /**
@@ -24,6 +26,13 @@ export class RateLimiter {
    */
   check(key: string): { success: boolean; limit: number; remaining: number; reset: number } {
     const now = Date.now()
+
+    // Sentinel: Auto-prune old entries every 5 minutes to prevent memory leaks
+    if (now - this.lastPrune > 5 * 60 * 1000) {
+      this.prune()
+      this.lastPrune = now
+    }
+
     const windowStart = now - this.windowMs
 
     let timestamps = this.requests.get(key) || []

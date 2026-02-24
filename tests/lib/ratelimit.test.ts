@@ -62,4 +62,36 @@ describe('RateLimiter', () => {
 
     vi.useRealTimers()
   })
+
+  it('automatically prunes expired keys', () => {
+    const windowMs = 1000
+    // Re-initialize with small window
+    rateLimiter = new RateLimiter(windowMs, 10)
+
+    vi.useFakeTimers()
+    const now = Date.now()
+    vi.setSystemTime(now)
+
+    // Add some keys
+    rateLimiter.check('key1')
+    rateLimiter.check('key2')
+
+    // Verify keys exist (using internal access via casting)
+    // We need to cast to any to access private property 'requests'
+    expect((rateLimiter as any).requests.has('key1')).toBe(true)
+    expect((rateLimiter as any).requests.has('key2')).toBe(true)
+
+    // Advance time past window
+    vi.setSystemTime(now + windowMs + 100)
+
+    // Check with a NEW key to trigger prune (once implemented)
+    rateLimiter.check('key3')
+
+    // Verify old keys are gone
+    expect((rateLimiter as any).requests.has('key1')).toBe(false)
+    expect((rateLimiter as any).requests.has('key2')).toBe(false)
+    expect((rateLimiter as any).requests.has('key3')).toBe(true)
+
+    vi.useRealTimers()
+  })
 })

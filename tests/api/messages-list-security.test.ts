@@ -22,8 +22,16 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+// Sentinel: Mock the rate limiter to control its behavior
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn(),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list - Security', () => {
   beforeEach(() => {
@@ -34,6 +42,13 @@ describe('GET /api/messages/list - Security', () => {
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
       { id: 'account-1' },
     ] as any)
+    // Default success for rate limiter unless overridden
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: Date.now() + 60000,
+    })
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {
@@ -68,5 +83,23 @@ describe('GET /api/messages/list - Security', () => {
         take: 1, // Expect min value
       })
     )
+  })
+
+  it('returns 429 when rate limit is exceeded', async () => {
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: false,
+      limit: 60,
+      remaining: 0,
+      reset: Date.now() + 60000,
+    })
+
+    const request = createRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(429)
+    const json = await response.json()
+    expect(json.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
   })
 })

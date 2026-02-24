@@ -11,11 +11,13 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private lastPrune: number
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+    this.lastPrune = Date.now()
   }
 
   /**
@@ -24,6 +26,13 @@ export class RateLimiter {
    */
   check(key: string): { success: boolean; limit: number; remaining: number; reset: number } {
     const now = Date.now()
+
+    // Bolt: Optimized to lazily prune old keys to prevent memory leaks
+    if (now - this.lastPrune > this.windowMs) {
+      this.prune()
+      this.lastPrune = now
+    }
+
     const windowStart = now - this.windowMs
 
     let timestamps = this.requests.get(key) || []
@@ -79,3 +88,6 @@ export class RateLimiter {
 
 // Default instance: 60 requests per minute
 export const rateLimiter = new RateLimiter(60 * 1000, 60)
+
+// Bolt: Specific limiter for AI Chat to prevent abuse and reduce DB load (10 requests per minute)
+export const chatRateLimiter = new RateLimiter(60 * 1000, 10)

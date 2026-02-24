@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { RateLimiter } from '../../lib/ratelimit'
+import { RateLimiter, chatRateLimiter } from '../../lib/ratelimit'
 
 describe('RateLimiter', () => {
   let rateLimiter: RateLimiter
@@ -61,5 +61,31 @@ describe('RateLimiter', () => {
     expect(result.remaining).toBe(1)
 
     vi.useRealTimers()
+  })
+
+  it('auto-prunes old entries after window expires', () => {
+    vi.useFakeTimers()
+    const limiter = new RateLimiter(1000, 10)
+    // Spy on prune method
+    const pruneSpy = vi.spyOn(limiter, 'prune')
+
+    // 1. First check
+    limiter.check('user1')
+    expect(pruneSpy).not.toHaveBeenCalled()
+
+    // 2. Advance time by > window (1001ms)
+    vi.advanceTimersByTime(1001)
+
+    // 3. Second check - should trigger prune
+    limiter.check('user2')
+    expect(pruneSpy).toHaveBeenCalled()
+
+    vi.useRealTimers()
+  })
+
+  it('chatRateLimiter is configured correctly', () => {
+    const result = chatRateLimiter.check('test-config')
+    // Limit should be 10
+    expect(result.limit).toBe(10)
   })
 })

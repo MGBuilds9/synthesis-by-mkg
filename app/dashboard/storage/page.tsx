@@ -149,7 +149,6 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -176,9 +175,10 @@ export default function StoragePage() {
         </div>
 
         {/* Provider Filter */}
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2" role="group" aria-label="Filter by provider">
           <button
             onClick={() => setSelectedProvider("ALL")}
+            aria-pressed={selectedProvider === "ALL"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "ALL"
                 ? "bg-blue-600 text-white"
@@ -189,6 +189,7 @@ export default function StoragePage() {
           </button>
           <button
             onClick={() => setSelectedProvider("GDRIVE")}
+            aria-pressed={selectedProvider === "GDRIVE"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "GDRIVE"
                 ? "bg-blue-600 text-white"
@@ -199,6 +200,7 @@ export default function StoragePage() {
           </button>
           <button
             onClick={() => setSelectedProvider("ONEDRIVE")}
+            aria-pressed={selectedProvider === "ONEDRIVE"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "ONEDRIVE"
                 ? "bg-blue-600 text-white"
@@ -275,7 +277,6 @@ export default function StoragePage() {
                       rel="noopener noreferrer"
                       aria-label={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                      aria-label={`Open ${file.name} in new tab`}
                     >
                       Open <ExternalLink className="w-3 h-3" />
                     </a>

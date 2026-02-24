@@ -41,6 +41,11 @@ export class RateLimiter {
     // Update the map with the cleaned (and potentially updated) timestamps
     this.requests.set(key, timestamps)
 
+    // Sentinel: Probabilistically prune old keys to prevent memory leaks (1% chance)
+    if (Math.random() < 0.01) {
+      this.prune()
+    }
+
     // Calculate remaining requests
     const remaining = Math.max(0, this.limit - timestamps.length)
 

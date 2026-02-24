@@ -62,4 +62,49 @@ describe('RateLimiter', () => {
 
     vi.useRealTimers()
   })
+
+  it('prunes expired keys', () => {
+    const key = 'user4'
+    const windowMs = 1000
+    rateLimiter = new RateLimiter(windowMs, 2)
+
+    vi.useFakeTimers()
+    const now = Date.now()
+    vi.setSystemTime(now)
+
+    // Add a request
+    rateLimiter.check(key)
+
+    // Verify key is in map
+    expect((rateLimiter as any).requests.has(key)).toBe(true)
+
+    // Advance time
+    vi.setSystemTime(now + windowMs + 1)
+
+    rateLimiter.prune()
+
+    expect((rateLimiter as any).requests.has(key)).toBe(false)
+    vi.useRealTimers()
+  })
+
+  it('probabilistically prunes on check', () => {
+    const key = 'user5'
+    // Spy on prune
+    const pruneSpy = vi.spyOn(rateLimiter, 'prune')
+
+    // Mock Math.random to return 0 (always prune)
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    rateLimiter.check(key)
+    expect(pruneSpy).toHaveBeenCalled()
+
+    // Mock Math.random to return 0.5 (don't prune)
+    randomSpy.mockReturnValue(0.5)
+    pruneSpy.mockClear()
+
+    rateLimiter.check(key)
+    expect(pruneSpy).not.toHaveBeenCalled()
+
+    vi.restoreAllMocks()
+  })
 })

@@ -62,4 +62,32 @@ describe('RateLimiter', () => {
 
     vi.useRealTimers()
   })
+
+  it('prunes old entries to prevent memory leak', () => {
+    const windowMs = 1000
+    rateLimiter = new RateLimiter(windowMs, 2)
+
+    // Access private requests map via casting
+    const requestsMap = (rateLimiter as any).requests as Map<string, number[]>
+
+    vi.useFakeTimers()
+    const now = Date.now()
+    vi.setSystemTime(now)
+
+    // Add entries for user1
+    rateLimiter.check('user1')
+    expect(requestsMap.has('user1')).toBe(true)
+
+    // Advance time past window to trigger prune on next check
+    vi.setSystemTime(now + windowMs + 10)
+
+    // Check for user2 (this should trigger prune for user1)
+    rateLimiter.check('user2')
+
+    // user1 should be removed because its timestamp is older than window
+    expect(requestsMap.has('user1')).toBe(false)
+    expect(requestsMap.has('user2')).toBe(true)
+
+    vi.useRealTimers()
+  })
 })

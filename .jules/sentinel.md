@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## 2026-02-13 - Unbounded In-Memory State
+**Vulnerability:** The `RateLimiter` class stored request timestamps indefinitely for all visited keys, causing memory to grow with the number of unique users (Memory Leak/DoS).
+**Learning:** In-memory security controls (like rate limiters or caches) must implement self-cleanup mechanisms. Relying on manual maintenance is error-prone.
+**Prevention:** Implement lazy pruning strategies (cleaning up old entries during new checks) or use data structures with built-in expiration (like LRU caches or Redis).

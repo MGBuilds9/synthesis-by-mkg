@@ -42,21 +42,12 @@ describe('retrieveAIContext Limit Optimization', () => {
       })),
     })
 
-    prismaMock.messageThread.findMany.mockResolvedValue([{ id: 't1' }])
     prismaMock.message.findMany.mockResolvedValue([])
 
     await retrieveAIContext({ sessionId, maxItemsPerScope })
 
     // Check what 'take' was called with.
-    // Currently, it multiplies by account count (5 * 3 = 15).
     // The optimization goal is to make it exactly maxItemsPerScope (5).
-
-    // Check messageThread query
-    expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        take: 5
-      })
-    )
 
     // Check message query
     expect(prismaMock.message.findMany).toHaveBeenCalledWith(
@@ -64,6 +55,9 @@ describe('retrieveAIContext Limit Optimization', () => {
         take: 5
       })
     )
+
+    // Ensure we don't call the old method
+    expect(prismaMock.messageThread.findMany).not.toHaveBeenCalled()
   })
 
   it('should apply optimization to files and notion pages too', async () => {

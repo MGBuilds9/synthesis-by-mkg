@@ -38,14 +38,19 @@ describe('retrieveAIContext Truncation Optimization', () => {
       }],
     })
 
-    prismaMock.messageThread.findMany.mockResolvedValue([{ id: 't1', subject: 'Test Thread' }])
+    // messageThread.findMany is no longer used for retrieval
+
     prismaMock.message.findMany.mockResolvedValue([{
       id: 'm1',
       provider: 'GMAIL',
       sender: 'test@example.com',
       content: longContent,
       sentAt: new Date(),
-      threadId: 't1'
+      threadId: 't1',
+      // Mock the thread relation for the new optimized query
+      thread: {
+        subject: 'Test Thread'
+      }
     }])
   })
 

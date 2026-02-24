@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -9,6 +9,7 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [shortcutSymbol, setShortcutSymbol] = useState("Ctrl");
   const [provider, setProvider] = useState('OPENAI')
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState(`session-${Date.now()}`)
@@ -24,6 +25,27 @@ export default function AIChatPage() {
   
   // Ask before searching context
   const [askBeforeSearching, setAskBeforeSearching] = useState(true)
+
+  // Palette: Detect platform for keyboard shortcut symbol
+  useEffect(() => {
+    if (
+      typeof navigator !== "undefined" &&
+      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+    ) {
+      setShortcutSymbol("⌘");
+    }
+
+    // Palette: Add CMD/Ctrl+K shortcut for message focus
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        textareaRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   function toggleContextDomain(domain: keyof typeof contextDomains) {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
@@ -207,7 +229,7 @@ export default function AIChatPage() {
                   sendMessage()
                 }
               }}
-              placeholder="Type your message..."
+              placeholder={`Type your message... (${shortcutSymbol}+K)`}
               aria-label="Message input"
               rows={1}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none min-h-[48px] max-h-[200px]"

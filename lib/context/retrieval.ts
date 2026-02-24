@@ -66,30 +66,17 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
       // Bolt: Use strict limit to avoid over-fetching across multiple accounts, since we only summarize the top few items anyway
       const limit = maxItemsPerScope
 
-      // Fetch threads first to filter by connected accounts efficiently
-      const activeThreads = await prisma.messageThread.findMany({
-        where: {
-          connectedAccountId: { in: Array.from(messageAccountIds) },
-          lastMessageAt: {
-            gte: cutoffDate,
-          },
-        },
-        select: {
-          id: true,
-          subject: true,
-        },
-        orderBy: { lastMessageAt: 'desc' },
-        take: limit, // Fetch enough threads to potentially satisfy the message limit
-      })
-
-      const threadMap = new Map(activeThreads.map(t => [t.id, t.subject]))
-      const threadIds = activeThreads.map(t => t.id)
-      if (threadIds.length === 0) return []
-
+      // Bolt: Optimized to fetch messages directly with thread relation filter
+      // This reduces DB round trips from 2 to 1 and simplifies logic.
+      // We rely on the database to join and filter efficiently using indexes.
       const msgs = await prisma.message.findMany({
         where: {
-          threadId: {
-            in: threadIds,
+          thread: {
+            connectedAccountId: { in: Array.from(messageAccountIds) },
+            // Also filter threads by lastMessageAt to use the index on MessageThread if possible
+            lastMessageAt: {
+              gte: cutoffDate,
+            },
           },
           sentAt: {
             gte: cutoffDate,
@@ -104,6 +91,11 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
           content: true,
           sentAt: true,
           threadId: true,
+          thread: {
+            select: {
+              subject: true,
+            },
+          },
         },
       })
 
@@ -114,7 +106,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         // Bolt: Truncate content to truncateContentLength (if provided) to save memory.
         content: truncateContentLength ? msg.content.slice(0, truncateContentLength) : msg.content,
         sentAt: msg.sentAt,
-        subject: threadMap.get(msg.threadId) || null,
+        subject: msg.thread?.subject || null,
       }))
     })(),
 

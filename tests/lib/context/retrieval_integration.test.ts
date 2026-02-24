@@ -6,6 +6,7 @@ const prismaMock = vi.hoisted(() => ({
   message: {
     findMany: vi.fn(),
   },
+  // messageThread.findMany is no longer called in the optimized path
   messageThread: {
     findMany: vi.fn(),
   },
@@ -29,7 +30,7 @@ describe('retrieveAIContext Integration', () => {
     vi.clearAllMocks()
   })
 
-  it('should retrieve messages using the optimized two-step query', async () => {
+  it('should retrieve messages using the optimized single query', async () => {
     const sessionId = 'session-123'
     const connectedAccountId = 'account-123'
     // cutoffDate is internal to the function, but we can infer it.
@@ -50,10 +51,6 @@ describe('retrieveAIContext Integration', () => {
       ],
     })
 
-    // Mock return values for findMany
-    const mockThreads = [{ id: 'thread-1' }, { id: 'thread-2' }]
-    prismaMock.messageThread.findMany.mockResolvedValue(mockThreads)
-
     const mockMessages = [
       {
         id: 'msg-1',
@@ -61,6 +58,7 @@ describe('retrieveAIContext Integration', () => {
         sender: 'alice@example.com',
         content: 'Hello',
         sentAt: new Date(),
+        threadId: 'thread-1',
         thread: { subject: 'Hi' },
       },
     ]
@@ -70,22 +68,28 @@ describe('retrieveAIContext Integration', () => {
 
     // Check results
     expect(result).not.toBeNull()
+    expect(result?.messages).toHaveLength(1)
+    expect(result?.messages[0].subject).toBe('Hi')
 
     // Verify optimization calls
-    // Updated to check for IN clause due to batching optimization
-    expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(expect.objectContaining({
+    // Expect message.findMany with nested thread relation filter
+    expect(prismaMock.message.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
-        connectedAccountId: { in: expect.arrayContaining([connectedAccountId]) },
-        lastMessageAt: expect.any(Object)
+        thread: expect.objectContaining({
+          connectedAccountId: { in: expect.arrayContaining([connectedAccountId]) }
+        })
+      }),
+      select: expect.objectContaining({
+        thread: {
+          select: {
+            subject: true
+          }
+        }
       })
     }))
 
-    // And message.findMany should use threadId IN [...]
-    expect(prismaMock.message.findMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({
-        threadId: { in: ['thread-1', 'thread-2'] }
-      })
-    }))
+    // Ensure messageThread.findMany is NOT called
+    expect(prismaMock.messageThread.findMany).not.toHaveBeenCalled()
   })
 
   it('should batch queries for multiple connected accounts', async () => {
@@ -101,15 +105,17 @@ describe('retrieveAIContext Integration', () => {
         ]
     })
 
-    prismaMock.messageThread.findMany.mockResolvedValue([])
+    prismaMock.message.findMany.mockResolvedValue([])
 
     await retrieveAIContext({ sessionId })
 
-    // Should only call findMany once, not twice
-    expect(prismaMock.messageThread.findMany).toHaveBeenCalledTimes(1)
-    expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(expect.objectContaining({
+    // Should only call findMany once
+    expect(prismaMock.message.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.message.findMany).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({
-            connectedAccountId: { in: expect.arrayContaining([account1, account2]) }
+            thread: expect.objectContaining({
+                connectedAccountId: { in: expect.arrayContaining([account1, account2]) }
+            })
         })
     }))
   })

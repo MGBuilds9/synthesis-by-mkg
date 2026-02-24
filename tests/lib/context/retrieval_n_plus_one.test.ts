@@ -29,7 +29,7 @@ describe('retrieveAIContext N+1 Optimization', () => {
     vi.clearAllMocks()
   })
 
-  it('should optimize message retrieval by avoiding N+1 join on thread', async () => {
+  it('should optimize message retrieval by using single query with relation filtering', async () => {
     const sessionId = 'session-opt'
     const accountId = 'acc-1'
 
@@ -41,12 +41,7 @@ describe('retrieveAIContext N+1 Optimization', () => {
       ],
     })
 
-    // Mock threads (return both id and subject to satisfy new implementation requirements if any)
-    prismaMock.messageThread.findMany.mockResolvedValue([
-      { id: 'thread-1', subject: 'Thread Subject 1' }
-    ])
-
-    // Mock messages (return both nested thread and threadId to satisfy both implementations)
+    // Mock messages
     prismaMock.message.findMany.mockResolvedValue([
       {
         id: 'msg-1',
@@ -63,20 +58,16 @@ describe('retrieveAIContext N+1 Optimization', () => {
 
     // ASSERTION FOR OPTIMIZED BEHAVIOR:
 
-    // 1. messageThread.findMany should Select 'subject'
-    expect(prismaMock.messageThread.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        select: expect.objectContaining({
-          id: true,
-          subject: true, // This is the new requirement
-        })
-      })
-    )
+    // 1. messageThread.findMany should NOT be called
+    expect(prismaMock.messageThread.findMany).not.toHaveBeenCalled()
 
-    // 2. message.findMany should Select 'threadId' but NOT 'thread' (relation)
+    // 2. message.findMany should Select 'thread.subject' via nested selection
     const messageCallArgs = prismaMock.message.findMany.mock.calls[0][0] as any
     expect(messageCallArgs.select).toBeDefined()
-    expect(messageCallArgs.select.threadId).toBe(true)
-    expect(messageCallArgs.select.thread).toBeUndefined() // Should NOT join thread
+    expect(messageCallArgs.select.thread).toEqual({
+      select: {
+        subject: true
+      }
+    })
   })
 })

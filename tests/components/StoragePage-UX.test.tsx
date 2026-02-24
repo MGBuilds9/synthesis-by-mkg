@@ -86,4 +86,29 @@ describe("StoragePage UX", () => {
     expect(input).toHaveValue("");
     expect(input).toHaveFocus();
   });
+
+  it("uses accessible filter group for provider selection", async () => {
+    render(<StoragePage />);
+    await waitForLoad();
+
+    // Verify group role and label
+    const group = screen.getByRole("group", { name: /filter by provider/i });
+    expect(group).toBeInTheDocument();
+
+    // Verify buttons and initial state
+    const allButton = screen.getByRole("button", { name: /all files/i });
+    const gdriveButton = screen.getByRole("button", { name: /google drive/i });
+    const onedriveButton = screen.getByRole("button", { name: /onedrive/i });
+
+    expect(allButton).toHaveAttribute("aria-pressed", "true");
+    expect(gdriveButton).toHaveAttribute("aria-pressed", "false");
+    expect(onedriveButton).toHaveAttribute("aria-pressed", "false");
+
+    // Click Google Drive
+    fireEvent.click(gdriveButton);
+
+    expect(allButton).toHaveAttribute("aria-pressed", "false");
+    expect(gdriveButton).toHaveAttribute("aria-pressed", "true");
+    expect(onedriveButton).toHaveAttribute("aria-pressed", "false");
+  });
 });

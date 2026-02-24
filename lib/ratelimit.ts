@@ -11,11 +11,13 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private lastPrune: number
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+    this.lastPrune = Date.now()
   }
 
   /**
@@ -25,6 +27,13 @@ export class RateLimiter {
   check(key: string): { success: boolean; limit: number; remaining: number; reset: number } {
     const now = Date.now()
     const windowStart = now - this.windowMs
+
+    // Bolt: Auto-prune old keys if the window has passed since last prune
+    // This prevents memory leaks from inactive users
+    if (now - this.lastPrune > this.windowMs) {
+      this.prune()
+      this.lastPrune = now
+    }
 
     let timestamps = this.requests.get(key) || []
 

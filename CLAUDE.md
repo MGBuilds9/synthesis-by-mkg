@@ -72,3 +72,9 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 - Merged 3 PRs (#84 XSS fix, #85 storage optimization, #86 search UX). Resolved merge conflict combining bolt+palette. Build clean. 3 branches deleted.
 
 - Feb 16: Repo hygiene #14 — merged 4 PRs (rate limiting, file optimization, search UX, storage a11y), closed 2 duplicates. 155 tests. Branches deleted.
+
+### February 16, 2026 - Fix Stale Tests + Accessibility
+- **Changes:** Fixed 10 failing tests caused by concurrent PR merges (#84-86). Added `aria-label`, `aria-busy`, `disabled` to storage search UI. Updated stale test expectations.
+- **Decisions:** Updated component (accessibility improvements) rather than just fixing tests. No API mismatch existed — server handled all params correctly.
+- **Tests:** 180/180 passed. Build clean.
+- **Pushed:** Commit ab8e58e to main.

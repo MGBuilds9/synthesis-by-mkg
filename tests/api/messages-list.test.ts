@@ -125,7 +125,17 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
       },
-      include: {
+      select: {
+        id: true,
+        connectedAccountId: true,
+        provider: true,
+        providerThreadId: true,
+        subject: true,
+        participants: true,
+        lastMessageAt: true,
+        isUnread: true,
+        createdAt: true,
+        updatedAt: true,
         messages: {
           select: {
             id: true,
@@ -196,7 +206,7 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1'] },
       },
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { lastMessageAt: 'desc' },
       take: 50,
       skip: 0,
@@ -235,7 +245,7 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
       },
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { lastMessageAt: 'desc' },
       take: 10,
       skip: 10,
@@ -294,6 +304,24 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(200)
     expect(data.threads).toEqual([])
     expect(data.total).toBe(0)
+  })
+
+  it('skips count query when includeCount is false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.total).toBe(-1)
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
   })
 
   it('returns 500 on internal error', async () => {

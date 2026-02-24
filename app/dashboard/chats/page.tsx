@@ -14,10 +14,9 @@ export default function ChatsPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
+    // Only check navigator on client mount to avoid hydration mismatch
+    const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if (isMac) {
       setShortcutSymbol("⌘")
     }
 

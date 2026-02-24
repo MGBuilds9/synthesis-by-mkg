@@ -107,4 +107,24 @@ describe('AIChatPage', () => {
     expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
     expect(screen.getByText('Send')).toBeInTheDocument()
   })
+
+  it('focuses input on Ctrl+K/Cmd+K', () => {
+    render(<AIChatPage />)
+    const input = screen.getByLabelText('Message input')
+
+    // Initial check: not focused
+    expect(input).not.toHaveFocus()
+
+    // Press Ctrl+K
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
+    expect(input).toHaveFocus()
+
+    // Blur
+    input.blur()
+    expect(input).not.toHaveFocus()
+
+    // Press Cmd+K (Meta+K)
+    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    expect(input).toHaveFocus()
+  })
 })

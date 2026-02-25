@@ -125,7 +125,16 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
       },
-      include: {
+      select: {
+        id: true,
+        connectedAccountId: true,
+        provider: true,
+        subject: true,
+        participants: true,
+        lastMessageAt: true,
+        isUnread: true,
+        createdAt: true,
+        updatedAt: true,
         messages: {
           select: {
             id: true,
@@ -196,7 +205,7 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1'] },
       },
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { lastMessageAt: 'desc' },
       take: 50,
       skip: 0,
@@ -235,7 +244,7 @@ describe('GET /api/messages/list', () => {
       where: {
         connectedAccountId: { in: ['account-1', 'account-2'] },
       },
-      include: expect.any(Object),
+      select: expect.any(Object),
       orderBy: { lastMessageAt: 'desc' },
       take: 10,
       skip: 10,

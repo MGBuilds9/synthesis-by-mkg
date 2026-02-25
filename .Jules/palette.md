@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-02-25 - ARIA Label Override
+**Learning:** Explicit `aria-label` on inputs overrides `placeholder` text, which can be problematic if the placeholder contains critical keyboard shortcut hints (e.g., "Search... (Ctrl+K)").
+**Action:** When using `aria-label`, ensure it includes all necessary context from the placeholder, or rely on `placeholder` and `aria-description` if the visual label is sufficient.

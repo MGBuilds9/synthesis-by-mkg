@@ -11,7 +11,7 @@ export default function AIChatPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [provider, setProvider] = useState('OPENAI')
   const [loading, setLoading] = useState(false)
-  const [sessionId, setSessionId] = useState(`session-${Date.now()}`)
+  const [sessionId] = useState(`session-${Date.now()}`)
   const [showContextSettings, setShowContextSettings] = useState(false)
   
   // Context domain toggles

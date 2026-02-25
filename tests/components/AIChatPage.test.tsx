@@ -2,14 +2,30 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import AIChatPage from '@/app/dashboard/ai-assistant/page'
 
-// Mock MessageList to simplify testing
-vi.mock('@/app/dashboard/ai-assistant/components/MessageList', () => ({
-  default: ({ loading }: { loading: boolean }) => (
-    <div data-testid="message-list">
-      {loading ? 'Loading...' : 'Messages'}
-    </div>
-  ),
+// Create a spy to track MessageList renders
+const { messageListRenderSpy } = vi.hoisted(() => ({
+  messageListRenderSpy: vi.fn(),
 }))
+
+// Mock MessageList to simplify testing and verify memoization
+vi.mock('@/app/dashboard/ai-assistant/components/MessageList', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react')>()
+  const React = await import('react')
+
+  const MockMessageList = (props: any) => {
+    messageListRenderSpy(props)
+    return (
+      <div data-testid="message-list">
+        {props.loading ? 'Loading...' : 'Messages'}
+      </div>
+    )
+  }
+
+  // Return memoized component to test optimization
+  return {
+    default: React.memo(MockMessageList),
+  }
+})
 
 // Mock fetch
 global.fetch = vi.fn()
@@ -17,6 +33,7 @@ global.fetch = vi.fn()
 describe('AIChatPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    messageListRenderSpy.mockClear()
     // Default mock implementation
     ;(global.fetch as any).mockResolvedValue({
       ok: true,
@@ -106,5 +123,22 @@ describe('AIChatPage', () => {
     // Should NOT show sending state (button still says "Send")
     expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
     expect(screen.getByText('Send')).toBeInTheDocument()
+  })
+
+  it('does not re-render MessageList on every keystroke', () => {
+    render(<AIChatPage />)
+
+    const input = screen.getByLabelText('Message input')
+
+    // Initial render
+    expect(messageListRenderSpy).toHaveBeenCalledTimes(1)
+
+    // Type into input
+    fireEvent.change(input, { target: { value: 'H' } })
+    fireEvent.change(input, { target: { value: 'He' } })
+    fireEvent.change(input, { target: { value: 'Hel' } })
+
+    // Should stay at 1 render if optimization works
+    expect(messageListRenderSpy).toHaveBeenCalledTimes(1)
   })
 })

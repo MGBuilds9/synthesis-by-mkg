@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { GET } from '@/app/api/messages/list/route'
 import { rateLimiter } from '@/lib/ratelimit'
+import { getServerSession } from 'next-auth'
+import { prisma } from '@/lib/prisma'
 
 vi.mock('next-auth', () => ({
   getServerSession: vi.fn(),
@@ -25,9 +27,6 @@ vi.mock('@/lib/ratelimit', () => ({
     prune: vi.fn(),
   },
 }))
-
-import { getServerSession } from 'next-auth'
-import { prisma } from '@/lib/prisma'
 
 describe('GET /api/messages/list - Rate Limiting', () => {
   beforeEach(() => {

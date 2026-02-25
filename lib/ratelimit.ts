@@ -31,6 +31,11 @@ export class RateLimiter {
     // Filter out timestamps older than the window
     timestamps = timestamps.filter(t => t > windowStart)
 
+    // Sentinel: Probabilistic cleanup to prevent memory leaks
+    if (Math.random() < 0.01) { // 1% chance
+      this.prune()
+    }
+
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
 

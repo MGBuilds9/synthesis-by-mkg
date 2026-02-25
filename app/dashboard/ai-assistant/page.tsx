@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -11,7 +11,7 @@ export default function AIChatPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [provider, setProvider] = useState('OPENAI')
   const [loading, setLoading] = useState(false)
-  const [sessionId, setSessionId] = useState(`session-${Date.now()}`)
+  const [sessionId] = useState(`session-${Date.now()}`)
   const [showContextSettings, setShowContextSettings] = useState(false)
   
   // Context domain toggles
@@ -29,8 +29,15 @@ export default function AIChatPage() {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  async function sendMessage(textOverride?: string) {
-    const messageText = typeof textOverride === 'string' ? textOverride : input
+  // Bolt: Sync input to ref to allow stable sendMessage callback without input dependency
+  const inputRef = useRef(input)
+  useEffect(() => {
+    inputRef.current = input
+  }, [input])
+
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    // Bolt: Use ref for current input value to keep callback stable during typing
+    const messageText = typeof textOverride === 'string' ? textOverride : inputRef.current
     if (!messageText.trim()) return
 
     const userMessage: Message = { role: 'user', content: messageText }
@@ -68,7 +75,7 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [sessionId, provider, contextDomains, askBeforeSearching])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -186,7 +193,7 @@ export default function AIChatPage() {
       <MessageList
         messages={messages}
         loading={loading}
-        onSuggestionClick={(text) => sendMessage(text)}
+        onSuggestionClick={sendMessage}
       />
 
       {/* Input */}

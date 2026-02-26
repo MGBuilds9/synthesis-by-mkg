@@ -149,13 +149,29 @@ export class SyncEngine {
       },
     })
 
-    const syncPromises = enabledScopes.map(scope => 
-      this.processSync(scope).catch(error => {
+    // Bolt: Limit concurrency to avoid overwhelming the database and external APIs
+    const concurrency = 5
+    const processing = new Set<Promise<void>>()
+
+    for (const scope of enabledScopes) {
+      if (processing.size >= concurrency) {
+        await Promise.race(processing)
+      }
+
+      const promise = this.processSync(scope).catch((error) => {
         console.error(`Failed to sync scope ${scope.id}:`, error)
       })
-    )
 
-    await Promise.allSettled(syncPromises)
+      // Create a promise that removes itself from the set upon completion
+      const distinctPromise = promise.then(() => {
+        processing.delete(distinctPromise)
+      })
+
+      processing.add(distinctPromise)
+    }
+
+    // Wait for remaining
+    await Promise.all(processing)
   }
 }
 

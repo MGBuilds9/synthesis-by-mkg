@@ -454,5 +454,51 @@ describe('SyncEngine', () => {
 
       consoleErrorSpy.mockRestore()
     })
+
+    it('should limit concurrency when syncing multiple scopes', async () => {
+      // Create 10 scopes
+      const mockScopes = Array.from({ length: 10 }, (_, i) => ({
+        id: `scope-${i}`,
+        scopeName: `Scope ${i}`,
+        scopeType: 'GMAIL_LABEL',
+        syncEnabled: true,
+        historicalDays: 30,
+        connectedAccount: {
+          id: `account-${i}`,
+          provider: 'GMAIL',
+          providerAccountId: `gmail-${i}`,
+          accessToken: 'token',
+        },
+      }))
+
+      mockPrisma.syncScope.findMany.mockResolvedValue(mockScopes)
+
+      let activeCount = 0
+      let maxActiveCount = 0
+
+      // Spy on processSync to introduce delay and track concurrency
+      // We cast engine to any to access/mock private method
+      const originalProcessSync = (engine as any).processSync
+
+      // Override the method on the instance
+      ;(engine as any).processSync = async (scope: any) => {
+        activeCount++
+        maxActiveCount = Math.max(maxActiveCount, activeCount)
+
+        // Simulate work
+        await new Promise((resolve) => setTimeout(resolve, 10))
+
+        activeCount--
+        return Promise.resolve()
+      }
+
+      await engine.syncAllEnabledScopes()
+
+      expect(maxActiveCount).toBeLessThanOrEqual(5)
+      expect(activeCount).toBe(0)
+
+      // Restore original method
+      ;(engine as any).processSync = originalProcessSync
+    })
   })
 })

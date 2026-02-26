@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
   // Sentinel: Add security headers to all responses
@@ -22,6 +23,31 @@ export function middleware(request: NextRequest) {
     'Strict-Transport-Security',
     'max-age=31536000; includeSubDomains'
   )
+
+  // Sentinel: Protect sensitive routes
+  // Checks for exact match or sub-paths to avoid matching similarly named routes (e.g. /dashboard-public)
+  const protectedPaths = ['/dashboard', '/api/messages', '/api/files', '/api/ai']
+  const isProtected = protectedPaths.some(path =>
+    request.nextUrl.pathname === path ||
+    request.nextUrl.pathname.startsWith(path + '/')
+  )
+
+  if (isProtected) {
+    const token = await getToken({ req: request })
+    if (!token) {
+      const signInUrl = new URL('/auth/signin', request.url)
+      signInUrl.searchParams.set('callbackUrl', request.url)
+
+      const redirectResponse = NextResponse.redirect(signInUrl)
+
+      // Sentinel: Copy security headers to redirect response for defense in depth
+      headers.forEach((value, key) => {
+        redirectResponse.headers.set(key, value)
+      })
+
+      return redirectResponse
+    }
+  }
 
   return response
 }

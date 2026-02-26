@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, Loader2 } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -102,7 +102,7 @@ export default function StoragePage() {
       {/* Storage Accounts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Link
-          href="/dashboard/integrations"
+          href="/dashboard/settings"
           className="border rounded-lg p-6 hover:shadow-md transition-shadow"
         >
           <div className="flex items-center mb-4">
@@ -119,7 +119,7 @@ export default function StoragePage() {
         </Link>
 
         <Link
-          href="/dashboard/integrations"
+          href="/dashboard/settings"
           className="border rounded-lg p-6 hover:shadow-md transition-shadow"
         >
           <div className="flex items-center mb-4">
@@ -149,7 +149,6 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -167,18 +166,26 @@ export default function StoragePage() {
           </div>
           <button
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Searching...</span>
+              </>
+            ) : (
+              'Search'
+            )}
           </button>
         </div>
 
         {/* Provider Filter */}
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2" role="group" aria-label="Filter files by provider">
           <button
             onClick={() => setSelectedProvider("ALL")}
+            aria-pressed={selectedProvider === "ALL"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "ALL"
                 ? "bg-blue-600 text-white"
@@ -189,6 +196,7 @@ export default function StoragePage() {
           </button>
           <button
             onClick={() => setSelectedProvider("GDRIVE")}
+            aria-pressed={selectedProvider === "GDRIVE"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "GDRIVE"
                 ? "bg-blue-600 text-white"
@@ -199,6 +207,7 @@ export default function StoragePage() {
           </button>
           <button
             onClick={() => setSelectedProvider("ONEDRIVE")}
+            aria-pressed={selectedProvider === "ONEDRIVE"}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedProvider === "ONEDRIVE"
                 ? "bg-blue-600 text-white"
@@ -273,7 +282,6 @@ export default function StoragePage() {
                       href={file.webViewLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
                       aria-label={`Open ${file.name} in new tab`}
                     >

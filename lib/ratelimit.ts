@@ -28,8 +28,13 @@ export class RateLimiter {
 
     let timestamps = this.requests.get(key) || []
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    // Bolt: Optimization - Only filter if the oldest timestamp is expired.
+    // If the oldest timestamp is still within the window, all subsequent ones are too.
+    // This avoids O(n) filtering on every request for the "happy path".
+    if (timestamps.length > 0 && timestamps[0] <= windowStart) {
+      // Filter out timestamps older than the window
+      timestamps = timestamps.filter(t => t > windowStart)
+    }
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit

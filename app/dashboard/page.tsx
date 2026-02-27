@@ -24,6 +24,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Fetch today's stats
+    // Note: We use the callback form of setState if we were updating based on previous state,
+    // but here we are setting fresh values. The empty dependency array ensures this runs only once.
     setTodayStats({
       newEmails: 5,
       newChats: 12,

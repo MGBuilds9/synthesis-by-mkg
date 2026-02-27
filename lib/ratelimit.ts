@@ -28,8 +28,23 @@ export class RateLimiter {
 
     let timestamps = this.requests.get(key) || []
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    // Bolt: Optimization - Avoid O(N) filter on every request
+    // Since timestamps are chronological, check if the oldest one is expired first.
+    if (timestamps.length > 0 && timestamps[0] <= windowStart) {
+      // Find the first valid timestamp index
+      // In worst case this is O(N), but for typical rate limits (small N),
+      // checking index 0 first is a huge win for the common case (not expired or few items).
+      // For larger N, binary search could be used, but overhead might not be worth it for <100 items.
+      const firstValidIndex = timestamps.findIndex(t => t > windowStart)
+
+      if (firstValidIndex === -1) {
+        // All timestamps are expired
+        timestamps = []
+      } else if (firstValidIndex > 0) {
+        // Remove expired timestamps
+        timestamps = timestamps.slice(firstValidIndex)
+      }
+    }
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -50,6 +65,12 @@ export class RateLimiter {
     const oldestTimestamp = timestamps.length > 0 ? timestamps[0] : now
     const reset = oldestTimestamp + this.windowMs
 
+    // Bolt: Optimization - Probabilistic pruning to prevent memory leaks
+    // 1% chance to prune expired keys on every check
+    if (Math.random() < 0.01) {
+      this.prune()
+    }
+
     return {
       success,
       limit: this.limit,
@@ -67,11 +88,17 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
-      if (validTimestamps.length === 0) {
+      // Bolt: Optimization - Check only the newest timestamp
+      // If the newest timestamp is expired, then ALL timestamps for this key are expired.
+      // This makes the check O(1) per key instead of O(M) where M is requests per key.
+      if (timestamps.length === 0 || timestamps[timestamps.length - 1] <= windowStart) {
         this.requests.delete(key)
       } else {
-        this.requests.set(key, validTimestamps)
+        // If there are valid timestamps but some are old, we could filter them here,
+        // but 'check()' handles lazy cleanup on access.
+        // We only care about removing completely dead keys to free map slots.
+        // However, if we want to be strict about memory, we can slice here too.
+        // For performance, we'll stick to just deleting fully expired keys.
       }
     }
   }

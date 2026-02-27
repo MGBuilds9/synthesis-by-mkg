@@ -13,11 +13,10 @@ export default function InboxPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
-      setShortcutSymbol("⌘")
+    // Check platform only once on mount
+    const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if (isMac) {
+      setShortcutSymbol("⌘");
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -29,7 +28,7 @@ export default function InboxPage() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, []) // Empty dependency array ensures this runs only once
 
   return (
     <div className="p-4 sm:p-6">

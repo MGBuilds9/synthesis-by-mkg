@@ -14,11 +14,10 @@ export default function ChatsPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
-      setShortcutSymbol("⌘")
+    // Check platform only once on mount
+    const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if (isMac) {
+      setShortcutSymbol("⌘");
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -30,7 +29,7 @@ export default function ChatsPage() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, []) // Empty dependency array ensures this runs only once
 
   const showWorkspaceSelector = selectedPlatform === 'discord' || selectedPlatform === 'slack' || selectedPlatform === 'teams'
   const showChannelSelector = selectedPlatform === 'discord' || selectedPlatform === 'slack' || selectedPlatform === 'teams'

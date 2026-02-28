@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2024-05-18 - Keyboard Hints and Button Tooltips Visual Hierarchy
+**Learning:** Adding `<kbd>` elements instead of plain text for keyboard shortcuts, along with explanatory tooltips via `title` attributes on icon-only or dynamic-state buttons, significantly improves discoverability and intuitive interaction. Interactive `<select>` elements look disjointed if they lack pointer cursors and hover states compared to adjacent buttons.
+**Action:** When creating new interactive UI patterns containing shortcuts or contextual state (like loading/disabled), use semantic `<kbd>` tags for shortcuts, explicit `title` attributes explaining why a state is inactive, and ensure unified styling interactions (`cursor-pointer`, `hover:bg-*`, `transition-colors`) across neighboring control elements like buttons and dropdowns.

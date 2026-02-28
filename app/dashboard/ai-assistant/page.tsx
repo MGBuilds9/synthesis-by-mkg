@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -8,6 +8,7 @@ import MessageList, { Message } from './components/MessageList'
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const inputRef = useRef('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [provider, setProvider] = useState('OPENAI')
   const [loading, setLoading] = useState(false)
@@ -29,13 +30,15 @@ export default function AIChatPage() {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  async function sendMessage(textOverride?: string) {
-    const messageText = typeof textOverride === 'string' ? textOverride : input
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    // Bolt: Use inputRef.current to avoid adding input to dependency array
+    const messageText = typeof textOverride === 'string' ? textOverride : inputRef.current
     if (!messageText.trim()) return
 
     const userMessage: Message = { role: 'user', content: messageText }
     setMessages(prev => [...prev, userMessage])
     setInput('')
+    inputRef.current = ''
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
     }
@@ -68,7 +71,7 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [sessionId, provider, contextDomains, askBeforeSearching])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -186,7 +189,7 @@ export default function AIChatPage() {
       <MessageList
         messages={messages}
         loading={loading}
-        onSuggestionClick={(text) => sendMessage(text)}
+        onSuggestionClick={sendMessage}
       />
 
       {/* Input */}
@@ -197,7 +200,9 @@ export default function AIChatPage() {
               ref={textareaRef}
               value={input}
               onChange={(e) => {
-                setInput(e.target.value)
+                const newValue = e.target.value
+                setInput(newValue)
+                inputRef.current = newValue
                 e.target.style.height = 'auto'
                 e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px'
               }}

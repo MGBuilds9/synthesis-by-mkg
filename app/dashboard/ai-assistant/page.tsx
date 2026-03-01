@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -8,6 +8,7 @@ import MessageList, { Message } from './components/MessageList'
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const inputRef = useRef('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [provider, setProvider] = useState('OPENAI')
   const [loading, setLoading] = useState(false)
@@ -29,13 +30,17 @@ export default function AIChatPage() {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  async function sendMessage(textOverride?: string) {
-    const messageText = typeof textOverride === 'string' ? textOverride : input
+  // ⚡ Bolt: Memoized `sendMessage` to prevent `MessageList` re-renders on every keystroke.
+  // We use `inputRef` to access the latest input value without adding `input` to the dependency array.
+  // Expected impact: Eliminates unnecessary child re-renders while typing, improving responsiveness.
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const messageText = typeof textOverride === 'string' ? textOverride : inputRef.current
     if (!messageText.trim()) return
 
     const userMessage: Message = { role: 'user', content: messageText }
     setMessages(prev => [...prev, userMessage])
     setInput('')
+    inputRef.current = ''
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
     }
@@ -68,7 +73,7 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [provider, contextDomains, askBeforeSearching, sessionId])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -186,7 +191,7 @@ export default function AIChatPage() {
       <MessageList
         messages={messages}
         loading={loading}
-        onSuggestionClick={(text) => sendMessage(text)}
+        onSuggestionClick={sendMessage}
       />
 
       {/* Input */}
@@ -198,6 +203,7 @@ export default function AIChatPage() {
               value={input}
               onChange={(e) => {
                 setInput(e.target.value)
+                inputRef.current = e.target.value
                 e.target.style.height = 'auto'
                 e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px'
               }}

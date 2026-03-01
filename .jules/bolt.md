@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-03-01 - Decoupling High-Frequency State Updates
+**Learning:** React state updates (like tying in a text input) can trigger unnecessary child component re-renders if event handlers passed to them depend on that state and aren't properly memoized. Standard `useCallback` with a state dependency still recreates the function on every keystroke.
+**Action:** Use a `useRef` to store the high-frequency state value (updated alongside state in the `onChange` handler). The `useCallback` can then read `ref.current` without including the state in its dependency array, preventing stale closures and child component re-renders.

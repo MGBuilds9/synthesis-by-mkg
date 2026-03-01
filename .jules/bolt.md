@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-03-01 - Adding Optional Query Parameters for Performance
+**Learning:** When adding optional query parameters to API routes for performance optimization (e.g., `includeCount`), defaulting to the existing behavior (e.g., returning the count) prevents breaking changes for existing consumers that rely on the original payload structure.
+**Action:** Always set the default value of a new optimization parameter to preserve backwards compatibility unless explicitly refactoring all callers.

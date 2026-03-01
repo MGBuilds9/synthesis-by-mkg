@@ -32,7 +32,7 @@ export default function StoragePage() {
 
     // Palette: Add CMD/Ctrl+K shortcut for search focus
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
@@ -149,7 +149,6 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -275,7 +274,6 @@ export default function StoragePage() {
                       rel="noopener noreferrer"
                       aria-label={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                      aria-label={`Open ${file.name} in new tab`}
                     >
                       Open <ExternalLink className="w-3 h-3" />
                     </a>

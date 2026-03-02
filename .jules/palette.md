@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-02-15 - Global Search Input Pattern
+**Learning:** Dashboard pages (Storage, Chats, Inbox) require consistent search interaction for good UX. Missing features in one place (like a clear button or keyboard shortcut) create disjointed experiences.
+**Action:** All primary search inputs must include a `Cmd/Ctrl+K` global shortcut (using `navigator.platform` for the correct hint symbol), a dynamic placeholder, and an absolute-positioned clear (X) button that appears when text is present.

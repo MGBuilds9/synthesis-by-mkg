@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## 2026-02-13 - Resource Exhaustion in Authenticated API Endpoints
+**Vulnerability:** The `/api/messages/list` endpoint lacked rate limiting for authenticated users, making the system vulnerable to Denial of Service (DoS) and resource exhaustion attacks (e.g., overwhelming the database) even from valid accounts.
+**Learning:** Authenticated API endpoints are still vulnerable to resource exhaustion (DoS) attacks from compromised accounts or malicious insiders. Session validation alone is insufficient to protect system resources.
+**Prevention:** Consistently implement per-user rate limiting (e.g., using `lib/ratelimit.ts`) on all data-retrieval endpoints alongside session checks. Ensure rate limits are appropriate for the expected usage patterns.

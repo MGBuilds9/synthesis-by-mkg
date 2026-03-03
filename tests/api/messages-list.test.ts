@@ -22,8 +22,15 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn().mockReturnValue({ success: true, limit: 60, remaining: 59, reset: 0 })
+  }
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
@@ -33,6 +40,14 @@ describe('GET /api/messages/list', () => {
       { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },
       { id: 'account-2', accountLabel: 'Work Outlook', provider: 'OUTLOOK' },
     ] as any)
+
+    // Default mock for rateLimiter (success)
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: 1000
+    })
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {
@@ -50,6 +65,29 @@ describe('GET /api/messages/list', () => {
 
     expect(response.status).toBe(401)
     expect(data.error).toBe('Unauthorized')
+  })
+
+  it('returns 429 when rate limit is exceeded', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: false,
+      limit: 60,
+      remaining: 0,
+      reset: 1000
+    })
+
+    const request = createRequest()
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(429)
+    expect(data.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('1000')
   })
 
   it('returns threads with default pagination', async () => {
@@ -111,6 +149,7 @@ describe('GET /api/messages/list', () => {
     expect(data.total).toBe(2)
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
 
     expect(prisma.connectedAccount.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-123' },

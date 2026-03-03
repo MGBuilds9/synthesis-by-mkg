@@ -39,12 +39,12 @@ export async function GET(request: NextRequest) {
 
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering FileItem by connectedAccountId which is indexed
-    const accountWhere: any = {
+    const accountWhere: Record<string, any> = {
       userId: session.user.id,
     }
 
     if (provider) {
-      accountWhere.provider = provider
+      accountWhere.provider = provider as any
     }
 
     const accounts = await prisma.connectedAccount.findMany({
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     const accountIds = accounts.map((account) => account.id)
     const accountMap = new Map(accounts.map((a) => [a.id, a]))
 
-    const whereClause: any = {
+    const whereClause: Record<string, any> = {
       connectedAccountId: { in: accountIds },
     }
 

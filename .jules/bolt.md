@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-06-05 - Avoid Mixing Multiple Optimizations
+**Learning:** When tasked to implement ONE performance optimization, making multiple unrequested modifications simultaneously causes the code review to fail and severely increases the chance of introducing unrequested behavior changes or regressions.
+**Action:** Strictly isolate a single optimization that provides measurable impact. If the hot path optimization affects the test suite execution inappropriately, analyze why, and do not introduce backwards compatibility-breaking changes simply to optimize the "default" behavior of unrelated endpoints.

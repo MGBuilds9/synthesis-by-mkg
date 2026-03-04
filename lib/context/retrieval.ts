@@ -107,15 +107,26 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         },
       })
 
-      return msgs.map(msg => ({
-        id: msg.id,
-        provider: msg.provider,
-        sender: msg.sender,
-        // Bolt: Truncate content to truncateContentLength (if provided) to save memory.
-        content: truncateContentLength ? msg.content.slice(0, truncateContentLength) : msg.content,
-        sentAt: msg.sentAt,
-        subject: threadMap.get(msg.threadId) || null,
-      }))
+      // Bolt: Optimized mapping and string truncation
+      // Using a pre-allocated array and manual loop is faster for high-frequency operations.
+      // String slicing is only performed if the length exceeds the limit, avoiding unnecessary allocations.
+      const mappedMsgs = new Array(msgs.length)
+      for (let i = 0; i < msgs.length; i++) {
+        const msg = msgs[i]
+        let content = msg.content
+        if (truncateContentLength && content.length > truncateContentLength) {
+          content = content.slice(0, truncateContentLength)
+        }
+        mappedMsgs[i] = {
+          id: msg.id,
+          provider: msg.provider,
+          sender: msg.sender,
+          content: content,
+          sentAt: msg.sentAt,
+          subject: threadMap.get(msg.threadId) || null,
+        }
+      }
+      return mappedMsgs
     })(),
 
     // 2. Fetch Files
@@ -141,13 +152,19 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         },
       })
 
-      return files.map(file => ({
-        id: file.id,
-        provider: file.provider,
-        name: file.name,
-        modifiedTime: file.modifiedTime,
-        webViewLink: file.webViewLink,
-      }))
+      // Bolt: Pre-allocated array mapping for files
+      const mappedFiles = new Array(files.length)
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        mappedFiles[i] = {
+          id: file.id,
+          provider: file.provider,
+          name: file.name,
+          modifiedTime: file.modifiedTime,
+          webViewLink: file.webViewLink,
+        }
+      }
+      return mappedFiles
     })(),
 
     // 3. Fetch Notion Pages
@@ -173,13 +190,19 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
         },
       })
 
-      return resources.map(resource => ({
-        id: resource.id,
-        title: resource.title,
-        type: resource.resourceType,
-        lastEditedTime: resource.lastEditedTime,
-        url: resource.url,
-      }))
+      // Bolt: Pre-allocated array mapping for notion pages
+      const mappedResources = new Array(resources.length)
+      for (let i = 0; i < resources.length; i++) {
+        const resource = resources[i]
+        mappedResources[i] = {
+          id: resource.id,
+          title: resource.title,
+          type: resource.resourceType,
+          lastEditedTime: resource.lastEditedTime,
+          url: resource.url,
+        }
+      }
+      return mappedResources
     })(),
   ])
 
@@ -195,23 +218,33 @@ export function summarizeContext(contextData: any): string {
 
   if (contextData.messages.length > 0) {
     parts.push(`Recent Messages (${contextData.messages.length}):`)
-    contextData.messages.slice(0, 5).forEach((msg: any) => {
-      parts.push(`- ${msg.sender}: ${msg.content.slice(0, 100)}...`)
-    })
+    // Bolt: Optimized context summarization loops
+    // Avoids creating new arrays with slice() and function overhead of forEach()
+    // Conditionally slices string contents to reduce memory allocations.
+    const msgLimit = Math.min(contextData.messages.length, 5)
+    for (let i = 0; i < msgLimit; i++) {
+      const msg = contextData.messages[i]
+      const content = msg.content.length > 100 ? `${msg.content.slice(0, 100)}...` : msg.content
+      parts.push(`- ${msg.sender}: ${content}`)
+    }
   }
 
   if (contextData.files.length > 0) {
     parts.push(`\nRecent Files (${contextData.files.length}):`)
-    contextData.files.slice(0, 5).forEach((file: any) => {
+    const fileLimit = Math.min(contextData.files.length, 5)
+    for (let i = 0; i < fileLimit; i++) {
+      const file = contextData.files[i]
       parts.push(`- ${file.name} (${file.provider})`)
-    })
+    }
   }
 
   if (contextData.notionPages.length > 0) {
     parts.push(`\nNotion Pages (${contextData.notionPages.length}):`)
-    contextData.notionPages.slice(0, 5).forEach((page: any) => {
+    const pageLimit = Math.min(contextData.notionPages.length, 5)
+    for (let i = 0; i < pageLimit; i++) {
+      const page = contextData.notionPages[i]
       parts.push(`- ${page.title} (${page.type})`)
-    })
+    }
   }
 
   return parts.join('\n')

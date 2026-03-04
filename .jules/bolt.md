@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-06-12 - Optimized Array Mapping and Truncation in Context Retrieval
+**Learning:** High-frequency mapping operations and string slicing (like those used when retrieving and summarizing AI context) create unnecessary memory allocations if done with `.map()`, `.slice()`, and `.forEach()`, especially when string slices are performed unconditionally on short strings.
+**Action:** Use manual `for` loops with pre-allocated arrays (e.g., `new Array(n)`) instead of `.map()`, and only call `.slice()` on strings if `length > limit`. This reduces function invocation overhead and minimizes garbage collection pressure.

@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     // Bolt: Optimized to await user message save and LLM response in parallel
     // This removes the DB write latency from the critical path
-    const [_, response] = await Promise.all([
+    const [, response] = await Promise.all([
       saveUserMessagePromise,
       llmProvider.chat(messages, model, systemPrompt),
     ])

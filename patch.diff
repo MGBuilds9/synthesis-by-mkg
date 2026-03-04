@@ -1,0 +1,18 @@
+--- app/dashboard/storage/page.tsx
++++ app/dashboard/storage/page.tsx
+@@ -149,7 +149,6 @@
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+-              aria-label="Search files"
+             />
+             {searchQuery && (
+               <button
+@@ -275,7 +274,6 @@
+                       href={file.webViewLink}
+                       target="_blank"
+                       rel="noopener noreferrer"
+-                      aria-label={`Open ${file.name} in new tab`}
+                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                       aria-label={`Open ${file.name} in new tab`}
+                     >

@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## 2026-03-04 - Missing Rate Limiting on Authenticated Endpoint
+**Vulnerability:** The GET `/api/messages/list` endpoint validated user sessions but failed to implement rate limiting, allowing authenticated users to send unlimited requests. This leaves the database vulnerable to resource exhaustion (DoS) attacks, especially if an account is compromised.
+**Learning:** Authenticated API endpoints are not inherently safe from abuse. Relying solely on session validation is insufficient; defensive programming requires rate limiting on *all* endpoints that perform significant work (like DB queries), even for trusted users.
+**Prevention:** Always implement per-user rate limiting (e.g., via `lib/ratelimit.ts`) alongside session checks on API routes to ensure robust protection against both intentional abuse and accidental client-side loops.

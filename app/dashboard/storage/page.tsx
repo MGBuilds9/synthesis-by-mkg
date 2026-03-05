@@ -149,7 +149,6 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              aria-label="Search files"
             />
             {searchQuery && (
               <button

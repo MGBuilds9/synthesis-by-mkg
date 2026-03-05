@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-03-05 - Avoid Micro-Optimizations
+**Learning:** Replacing standard array methods (`.map`, `.slice(0, 5).forEach`) with imperative `for` loops or pre-allocated arrays is considered a micro-optimization that degrades readability for negligible performance gains.
+**Action:** Focus on significant algorithmic improvements or database optimizations (e.g., making `COUNT(*)` queries optional) rather than fine-tuning memory allocations in Javascript loops.

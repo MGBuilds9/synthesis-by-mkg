@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-03-06 - Safe Backwards-Compatible Boolean Flags
+**Learning:** When introducing an optimization flag (like `includeCount`) to an existing API, checking strictly for `=== 'true'` defaults to false when omitted, breaking existing clients.
+**Action:** Always check `!== 'false'` instead. This ensures that if the parameter is entirely omitted, it defaults to `true` (since `null !== 'false'`), preserving existing functionality while allowing explicit opt-out.

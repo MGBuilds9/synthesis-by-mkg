@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Mail, Search, Filter, ChevronDown, Calendar } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Mail, Search, Filter, ChevronDown, Calendar, X } from 'lucide-react'
+import Link from 'next/link'
 
 export default function InboxPage() {
   const [selectedProvider, setSelectedProvider] = useState('all')
@@ -9,6 +10,29 @@ export default function InboxPage() {
   const [selectedDateRange, setSelectedDateRange] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [shortcutSymbol, setShortcutSymbol] = useState('Ctrl')
+
+  useEffect(() => {
+    // Detect Mac OS for shortcut symbol to avoid hydration mismatch
+    if (typeof window !== 'undefined' && navigator.platform.toLowerCase().includes('mac')) {
+      setShortcutSymbol('⌘')
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // CMD+K or CTRL+K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <div className="p-4 sm:p-6">
@@ -60,13 +84,27 @@ export default function InboxPage() {
           <div className="flex-1 min-w-full sm:min-w-[300px] sm:max-w-md relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" aria-hidden="true" />
             <input
+              ref={searchInputRef}
               type="text"
               aria-label="Search emails"
-              placeholder="Search emails..."
+              placeholder={`Search emails... (${shortcutSymbol}+K)`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
+              className="w-full pl-10 pr-10 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('')
+                  searchInputRef.current?.focus()
+                }}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           <button 
@@ -123,7 +161,11 @@ export default function InboxPage() {
         <div className="p-6 sm:p-8 text-center text-gray-500">
           <Mail className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" aria-hidden="true" />
           <p className="text-base sm:text-lg font-medium">No emails yet</p>
-          <p className="text-sm mt-1">Connect your Gmail or Outlook account to get started</p>
+          <p className="text-sm mt-1">
+            <Link href="/dashboard/settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+              Connect your Gmail or Outlook account
+            </Link> to get started
+          </p>
         </div>
       </div>
     </div>

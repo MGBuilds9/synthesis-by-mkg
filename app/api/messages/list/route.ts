@@ -8,7 +8,7 @@ import { rateLimiter } from '@/lib/ratelimit'
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    if (!session?.user?.id || !session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering MessageThread by connectedAccountId which is indexed
     const accountWhere: any = {
-      userId: (session.user as any).id,
+      userId: session.user.id,
     }
 
     if (provider) {

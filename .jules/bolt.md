@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-06-15 - Optional Count in List Endpoints
+**Learning:** Running `prisma.count()` alongside `findMany` in list endpoints (like files or messages) introduces unnecessary database load if the client doesn't need to display the total count (e.g., infinite scrolling, or just showing the latest items).
+**Action:** Make the count query optional using an `includeCount` query parameter. Default it to `true` (by checking `!== 'false'`) to preserve backward compatibility, and fall back to `-1` when bypassed. This avoids expensive DB aggregations when not required.

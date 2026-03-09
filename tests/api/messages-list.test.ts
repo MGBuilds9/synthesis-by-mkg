@@ -279,6 +279,35 @@ describe('GET /api/messages/list', () => {
     expect(data.threads[0].messages[0].content).toBe('Most recent message')
   })
 
+  it('skips total count when includeCount is false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Thread 1',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-05'),
+        messages: [],
+      },
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.threads).toHaveLength(1)
+    expect(data.total).toBe(-1)
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
   it('returns empty array when no threads found', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

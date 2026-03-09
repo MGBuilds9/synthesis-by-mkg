@@ -22,8 +22,15 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn().mockReturnValue({ success: true, limit: 60, remaining: 59, reset: 0 }),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list - Security', () => {
   beforeEach(() => {
@@ -68,5 +75,43 @@ describe('GET /api/messages/list - Security', () => {
         take: 1, // Expect min value
       })
     )
+  })
+
+  it('includes rate limit headers in successful responses', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: 1234567890,
+    })
+
+    const request = createRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('59')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('1234567890')
+  })
+
+  it('returns 429 Too Many Requests when rate limit is exceeded', async () => {
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: false,
+      limit: 60,
+      remaining: 0,
+      reset: 1234567890,
+    })
+
+    const request = createRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(429)
+    const data = await response.json()
+    expect(data.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('1234567890')
   })
 })

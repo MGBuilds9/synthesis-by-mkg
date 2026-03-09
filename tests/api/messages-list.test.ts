@@ -22,12 +22,27 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn().mockReturnValue({ success: true, limit: 60, remaining: 59, reset: 12345 }),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: 1234567890
+    })
+
     // Default mock for connected accounts
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
       { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },
@@ -54,7 +69,7 @@ describe('GET /api/messages/list', () => {
 
   it('returns threads with default pagination', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: 'user-123' },
+      user: { id: 'user-123', email: 'test@example.com' },
     } as any)
 
     const mockThreads = [
@@ -153,7 +168,7 @@ describe('GET /api/messages/list', () => {
 
   it('filters by provider when specified', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: 'user-123' },
+      user: { id: 'user-123', email: 'test@example.com' },
     } as any)
 
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
@@ -205,7 +220,7 @@ describe('GET /api/messages/list', () => {
 
   it('returns correct pagination metadata with custom limit and offset', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: 'user-123' },
+      user: { id: 'user-123', email: 'test@example.com' },
     } as any)
 
     const mockThreads = [
@@ -244,7 +259,7 @@ describe('GET /api/messages/list', () => {
 
   it('includes latest message for each thread', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: 'user-123' },
+      user: { id: 'user-123', email: 'test@example.com' },
     } as any)
 
     const mockThreads = [
@@ -281,7 +296,7 @@ describe('GET /api/messages/list', () => {
 
   it('returns empty array when no threads found', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: 'user-123' },
+      user: { id: 'user-123', email: 'test@example.com' },
     } as any)
 
     vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
@@ -298,7 +313,7 @@ describe('GET /api/messages/list', () => {
 
   it('returns 500 on internal error', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: 'user-123' },
+      user: { id: 'user-123', email: 'test@example.com' },
     } as any)
 
     vi.mocked(prisma.connectedAccount.findMany).mockRejectedValue(

@@ -3,12 +3,29 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import logger from '@/lib/logger'
+import { rateLimiter } from '@/lib/ratelimit'
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Sentinel: Rate limiting
+    const rateLimit = rateLimiter.check(session.user.email)
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
+          },
+        }
+      )
     }
 
     const { searchParams } = new URL(request.url)
@@ -21,7 +38,7 @@ export async function GET(request: NextRequest) {
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering MessageThread by connectedAccountId which is indexed
     const accountWhere: any = {
-      userId: session.user.id,
+      userId: (session.user as any).id,
     }
 
     if (provider) {
@@ -82,12 +99,19 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       threads: threadsWithAccount,
       total,
       limit,
       offset,
     })
+
+    // Sentinel: Add rate limit headers
+    response.headers.set('X-RateLimit-Limit', rateLimit.limit.toString())
+    response.headers.set('X-RateLimit-Remaining', rateLimit.remaining.toString())
+    response.headers.set('X-RateLimit-Reset', rateLimit.reset.toString())
+
+    return response
   } catch (error: any) {
     logger.error('Failed to fetch messages', { error })
     return NextResponse.json(

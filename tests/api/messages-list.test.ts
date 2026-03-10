@@ -22,6 +22,12 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn().mockReturnValue({ success: true, limit: 60, remaining: 59, reset: 0 })
+  }
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 

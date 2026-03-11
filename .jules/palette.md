@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2024-05-24 - Actionable Empty States
+**Learning:** Empty states displaying missing data (e.g., 'No emails yet') create user friction when they lack direct paths to resolve the issue, forcing users to manually navigate to settings pages.
+**Action:** Always include an actionable `<Link>` pointing directly to the relevant settings or connection page within empty state messages to help users immediately resolve the state.

@@ -22,12 +22,20 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn().mockReturnValue({ success: true, limit: 60, remaining: 59, reset: 0 }),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(rateLimiter.check).mockReturnValue({ success: true, limit: 60, remaining: 59, reset: 0 })
     // Default mock for connected accounts
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
       { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },
@@ -102,6 +110,9 @@ describe('GET /api/messages/list', () => {
     const data = await response.json()
 
     expect(response.status).toBe(200)
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('59')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('0')
     expect(data.threads).toHaveLength(2)
     expect(data.threads[0].id).toBe('thread-1')
     expect(data.threads[0].connectedAccount).toEqual({
@@ -311,5 +322,23 @@ describe('GET /api/messages/list', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch messages')
+  })
+
+  it('returns 429 when rate limit is exceeded', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(rateLimiter.check).mockReturnValue({ success: false, limit: 60, remaining: 0, reset: 1234567890 })
+
+    const request = createRequest()
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(429)
+    expect(data.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
+    expect(response.headers.get('X-RateLimit-Reset')).toBe('1234567890')
   })
 })

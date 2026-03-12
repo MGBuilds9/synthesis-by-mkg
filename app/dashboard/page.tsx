@@ -23,13 +23,16 @@ export default function DashboardPage() {
   ])
 
   useEffect(() => {
-    // Fetch today's stats
-    setTodayStats({
-      newEmails: 5,
-      newChats: 12,
-      recentFiles: 8,
-      recentNotionPages: 3,
-    })
+    // Simulate fetching today's stats with a timeout to avoid synchronous set state in effect
+    const timeoutId = setTimeout(() => {
+      setTodayStats({
+        newEmails: 5,
+        newChats: 12,
+        recentFiles: 8,
+        recentNotionPages: 3,
+      })
+    }, 0)
+    return () => clearTimeout(timeoutId)
   }, [])
 
   return (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Mail, Search, Filter, ChevronDown, Calendar } from 'lucide-react'
 
 export default function InboxPage() {
@@ -120,10 +121,16 @@ export default function InboxPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 sm:p-8 text-center text-gray-500">
+        <div className="p-6 sm:p-8 text-center text-gray-500 flex flex-col items-center">
           <Mail className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" aria-hidden="true" />
           <p className="text-base sm:text-lg font-medium">No emails yet</p>
-          <p className="text-sm mt-1">Connect your Gmail or Outlook account to get started</p>
+          <p className="text-sm mt-1 mb-4">Connect your Gmail or Outlook account to get started</p>
+          <Link
+            href="/dashboard/settings"
+            className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            Go to Settings
+          </Link>
         </div>
       </div>
     </div>

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.max(1, Math.min(100, isNaN(rawLimit) ? 50 : rawLimit))
     const offset = parseInt(searchParams.get('offset') || '0')
     const search = searchParams.get('search')
-    const includeCount = searchParams.get('includeCount') === 'true'
+    const includeCount = searchParams.get('includeCount') !== 'false'
 
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering FileItem by connectedAccountId which is indexed

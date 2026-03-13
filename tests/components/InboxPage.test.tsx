@@ -40,8 +40,11 @@ describe('InboxPage', () => {
 
     expect(screen.getByText('No emails yet')).toBeInTheDocument()
     expect(
-      screen.getByText('Connect your Gmail or Outlook account to get started')
+      screen.getByText(/Connect your Gmail or Outlook account/i)
     ).toBeInTheDocument()
+
+    const settingsLink = screen.getByRole('link', { name: /Settings/i })
+    expect(settingsLink).toHaveAttribute('href', '/dashboard/settings')
   })
 
   it('has Compose button', () => {

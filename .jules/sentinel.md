@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## 2024-05-24 - Async Rate Limiter
+**Vulnerability:** The rate limiter implementation was synchronous. Adding it blindly without `await` could be a vulnerability if the underlying library used Promises. However, in this case, the `RateLimiter.check()` method in `lib/ratelimit.ts` *is* synchronous. The reviewer mistakenly flagged it as a blocking bug.
+**Learning:** Always explicitly verify the exact implementation of the security library you are using instead of relying on common assumptions (e.g. that all rate limiters use Promises).
+**Prevention:** Use `read_file` or `cat` to verify the actual source code of internal dependencies like `lib/ratelimit.ts` before using them.

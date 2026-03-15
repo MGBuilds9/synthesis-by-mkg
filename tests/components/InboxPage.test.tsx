@@ -40,7 +40,7 @@ describe('InboxPage', () => {
 
     expect(screen.getByText('No emails yet')).toBeInTheDocument()
     expect(
-      screen.getByText('Connect your Gmail or Outlook account to get started')
+      screen.getByText(/Connect your Gmail or Outlook account/)
     ).toBeInTheDocument()
   })
 

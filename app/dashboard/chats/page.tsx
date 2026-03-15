@@ -217,7 +217,7 @@ export default function ChatsPage() {
           <MessageSquare className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" aria-hidden="true" />
           <p className="text-base sm:text-lg font-medium">No chats yet</p>
           <p className="text-sm mt-1 px-4">
-            <Link href="/dashboard/settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+            <Link href="/dashboard/settings" aria-label="Connect your accounts in Settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
               Connect your accounts
             </Link> to get started
           </p>

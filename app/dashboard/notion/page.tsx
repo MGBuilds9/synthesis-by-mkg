@@ -31,7 +31,7 @@ export default function NotionPage() {
           <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
           <p className="text-lg font-medium">No Notion pages synced yet</p>
           <p className="text-sm mt-1 px-4">
-            <Link href="/dashboard/settings" aria-label="Connect your accounts in Settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+            <Link href="/dashboard/settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
               Connect your Notion workspace
             </Link> to get started
           </p>

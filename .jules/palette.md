@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-03-16 - Empty State Navigation
+**Learning:** Empty states (like "No emails yet") without actionable resolution paths create user friction. Users often don't know where to go to fix the missing data state (e.g., they need to go to Settings to connect accounts, but there is no direct link).
+**Action:** Always include an actionable `<Link>` in empty states pointing directly to the configuration page (like `/dashboard/settings`) with a descriptive `aria-label` (e.g., "Connect your accounts in Settings") to resolve the missing data state.

@@ -24,12 +24,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Fetch today's stats
-    setTodayStats({
-      newEmails: 5,
-      newChats: 12,
-      recentFiles: 8,
-      recentNotionPages: 3,
-    })
+    setTimeout(() => {
+      setTodayStats({
+        newEmails: 5,
+        newChats: 12,
+        recentFiles: 8,
+        recentNotionPages: 3,
+      })
+    }, 0)
   }, [])
 
   return (

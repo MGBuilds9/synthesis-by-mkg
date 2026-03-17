@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2024-05-24 - Label in Name Pattern
+**Learning:** Adding `aria-label` to text-heavy links that completely overrides the visible text violates WCAG 2.5.3 (Label in Name). Sighted users using Voice Control software fail to activate elements when the accessible name differs entirely from what they see and speak.
+**Action:** When adding descriptive text or calls-to-action as interactive elements (like `Link`), rely on the visible text for the accessible name instead of using `aria-label` unless providing an icon-only button or adding *context* to the visible string.

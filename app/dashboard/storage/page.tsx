@@ -58,6 +58,10 @@ export default function StoragePage() {
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
 
+      // Bolt: Set includeCount to false to skip expensive database aggregation queries since
+      // the total count isn't displayed on this infinite-scroll/polling UI, significantly reducing backend load.
+      params.append("includeCount", "false");
+
       const queryString = params.toString();
       const url = queryString
         ? `/api/files/list?${queryString}`

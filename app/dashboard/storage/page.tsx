@@ -218,9 +218,13 @@ export default function StoragePage() {
           </div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            {selectedProvider === "ALL"
-              ? "No files yet. Connect your storage accounts to start syncing."
-              : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
+            {selectedProvider === "ALL" ? (
+              <>
+                No files yet. <Link href="/dashboard/settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">Connect your storage accounts</Link> to start syncing.
+              </>
+            ) : (
+              `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`
+            )}
           </div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">

@@ -32,7 +32,7 @@ describe('InboxPage', () => {
 
     const searchInput = screen.getByRole('textbox', { name: /search emails/i })
     expect(searchInput).toBeInTheDocument()
-    expect(searchInput).toHaveAttribute('placeholder', 'Search emails...')
+    expect(searchInput).toHaveAttribute('placeholder', 'Search emails... (Ctrl+K)')
   })
 
   it('shows empty state with "No emails yet"', () => {
@@ -40,8 +40,9 @@ describe('InboxPage', () => {
 
     expect(screen.getByText('No emails yet')).toBeInTheDocument()
     expect(
-      screen.getByText('Connect your Gmail or Outlook account to get started')
+      screen.getByRole('link', { name: /connect your gmail or outlook account/i })
     ).toBeInTheDocument()
+    expect(screen.getByText('to get started')).toBeInTheDocument()
   })
 
   it('has Compose button', () => {

@@ -24,10 +24,12 @@ vi.mock('@/lib/auth', () => ({
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list - Security', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(rateLimiter as any).requests.clear()
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
@@ -68,5 +70,23 @@ describe('GET /api/messages/list - Security', () => {
         take: 1, // Expect min value
       })
     )
+  })
+
+  it('enforces rate limiting and returns 429 when exceeded', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    // Exhaust rate limit (60 requests)
+    for (let i = 0; i < 60; i++) {
+      await GET(createRequest())
+    }
+
+    // 61st request should be blocked
+    const request = createRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(429)
+    const data = await response.json()
+    expect(data.error).toBe('Too many requests')
   })
 })

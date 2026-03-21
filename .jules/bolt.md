@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-06-21 - Optimizing List Pagination Queries
+**Learning:** Using `Promise.all` to fetch items and count totals simultaneously (e.g., `[findMany, count]`) is a common pattern for list views, but counting all rows can become an expensive bottleneck in large tables, especially when clients only need the next page of items.
+**Action:** Expose an `includeCount` query parameter (defaulting to true for backward compatibility) and optionally bypass the `count` query (using `Promise.resolve(-1)`) when clients explicitly opt out (e.g., `includeCount=false`).

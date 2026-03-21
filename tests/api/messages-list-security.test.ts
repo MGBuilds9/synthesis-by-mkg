@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { GET } from '@/app/api/messages/list/route'
+import { rateLimiter } from '@/lib/ratelimit'
 
 vi.mock('next-auth', () => ({
   getServerSession: vi.fn(),
@@ -28,6 +29,7 @@ import { prisma } from '@/lib/prisma'
 describe('GET /api/messages/list - Security', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(rateLimiter as any).requests.clear()
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)
@@ -68,5 +70,21 @@ describe('GET /api/messages/list - Security', () => {
         take: 1, // Expect min value
       })
     )
+  })
+
+  it('returns 429 when rate limit is exceeded', async () => {
+    const request = createRequest()
+
+    // Exhaust rate limit
+    for (let i = 0; i < 60; i++) {
+      await GET(request)
+    }
+
+    const response = await GET(request)
+    expect(response.status).toBe(429)
+
+    const data = await response.json()
+    expect(data.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
   })
 })

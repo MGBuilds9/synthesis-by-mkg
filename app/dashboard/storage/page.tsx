@@ -149,7 +149,6 @@ export default function StoragePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              aria-label="Search files"
             />
             {searchQuery && (
               <button
@@ -219,7 +218,15 @@ export default function StoragePage() {
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             {selectedProvider === "ALL"
-              ? "No files yet. Connect your storage accounts to start syncing."
+              ? (
+                <>
+                  No files yet.{" "}
+                  <Link href="/dashboard/settings" className="text-blue-600 hover:text-blue-500 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
+                    Connect your storage accounts
+                  </Link>{" "}
+                  to start syncing.
+                </>
+              )
               : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
           </div>
         ) : (
@@ -275,7 +282,6 @@ export default function StoragePage() {
                       rel="noopener noreferrer"
                       aria-label={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                      aria-label={`Open ${file.name} in new tab`}
                     >
                       Open <ExternalLink className="w-3 h-3" />
                     </a>

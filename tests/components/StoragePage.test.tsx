@@ -2,6 +2,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import StoragePage from '@/app/dashboard/storage/page'
 
+vi.mock('next/link', () => ({
+  default: ({ children, href }: any) => <a href={href}>{children}</a>
+}))
+
 // Mock fetch
 global.fetch = vi.fn()
 

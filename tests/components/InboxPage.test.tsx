@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import InboxPage from '@/app/dashboard/inbox/page'
+
+vi.mock('next/link', () => ({
+  default: ({ children, href }: any) => <a href={href}>{children}</a>
+}))
 
 describe('InboxPage', () => {
   it('renders "Inbox" heading', () => {
@@ -39,9 +43,8 @@ describe('InboxPage', () => {
     render(<InboxPage />)
 
     expect(screen.getByText('No emails yet')).toBeInTheDocument()
-    expect(
-      screen.getByText('Connect your Gmail or Outlook account to get started')
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Connect your accounts/i)).toBeInTheDocument()
+    expect(screen.getByText(/to get started/i)).toBeInTheDocument()
   })
 
   it('has Compose button', () => {

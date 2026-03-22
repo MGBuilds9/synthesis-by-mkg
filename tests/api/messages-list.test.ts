@@ -24,10 +24,12 @@ vi.mock('@/lib/auth', () => ({
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    ;(rateLimiter as any).requests.clear()
     // Default mock for connected accounts
     vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
       { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },

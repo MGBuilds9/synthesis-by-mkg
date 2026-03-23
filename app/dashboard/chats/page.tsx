@@ -141,6 +141,7 @@ export default function ChatsPage() {
             onClick={() => setShowFilters(!showFilters)}
             aria-label="Toggle filters"
             aria-expanded={showFilters}
+            aria-controls="filter-panel"
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
           >
             <Filter className="h-5 w-5 text-gray-600" aria-hidden="true" />
@@ -148,7 +149,7 @@ export default function ChatsPage() {
         </div>
 
         {showFilters && (showWorkspaceSelector || showChannelSelector || selectedPlatform === 'telegram') && (
-          <div className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
+          <div id="filter-panel" className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
             {showWorkspaceSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
                 <label className="text-sm font-medium text-gray-700 whitespace-nowrap">

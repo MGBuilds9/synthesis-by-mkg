@@ -39,9 +39,8 @@ describe('InboxPage', () => {
     render(<InboxPage />)
 
     expect(screen.getByText('No emails yet')).toBeInTheDocument()
-    expect(
-      screen.getByText('Connect your Gmail or Outlook account to get started')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Connect your Gmail or Outlook account')).toBeInTheDocument()
+    expect(screen.getByText('to get started')).toBeInTheDocument()
   })
 
   it('has Compose button', () => {

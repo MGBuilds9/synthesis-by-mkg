@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-03-25 - Filter Group Accessibility (Storage)
+**Learning:** Storage provider filter buttons act as a single choice group but lack semantic grouping and state for screen readers.
+**Action:** Added `role="group"`, `aria-label="Filter by provider"`, and `aria-pressed` states to the Storage page filters to ensure consistent accessibility across all dashboards.

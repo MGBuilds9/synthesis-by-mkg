@@ -312,4 +312,32 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch messages')
   })
+
+  it('skips count query when includeCount=false is provided', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Thread 1',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-05'),
+        messages: [],
+      },
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.total).toBe(-1)
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
 })

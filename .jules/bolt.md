@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-05-23 - Optionalizing Expensive List Counts
+**Learning:** Performing a `count` aggregation on every API list request (e.g., `/api/messages/list`) adds unnecessary latency when the client only needs the list items and not the total page count.
+**Action:** Make expensive database aggregations like `count()` optional via an `includeCount` query parameter, returning a default like `-1` when skipped, and execute them in parallel when requested.

@@ -270,7 +270,7 @@ describe('GET /api/messages/list', () => {
     vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
     vi.mocked(prisma.messageThread.count).mockResolvedValue(1)
 
-    const request = createRequest()
+    const request = createRequest({ includeCount: 'true' })
     const response = await GET(request)
     const data = await response.json()
 
@@ -294,6 +294,23 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(200)
     expect(data.threads).toEqual([])
     expect(data.total).toBe(0)
+  })
+
+  it('skips count when includeCount is false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.threads).toEqual([])
+    expect(data.total).toBe(-1)
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
   })
 
   it('returns 500 on internal error', async () => {

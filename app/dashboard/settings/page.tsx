@@ -13,7 +13,7 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+          <Link href="/dashboard" aria-label="Back to Dashboard" className="text-indigo-600 hover:text-indigo-700">
             ← Back to Dashboard
           </Link>
         </div>
@@ -34,7 +34,7 @@ export default function SettingsPage() {
                       <div className="font-medium text-gray-900">{account.provider}</div>
                       <div className="text-sm text-gray-500">{account.accountLabel}</div>
                     </div>
-                    <button className="text-red-600 hover:text-red-700 text-sm rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1">
+                    <button aria-label={`Disconnect ${account.provider} account ${account.accountLabel}`} className="text-red-600 hover:text-red-700 text-sm rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1">
                       Disconnect
                     </button>
                   </div>
@@ -43,27 +43,27 @@ export default function SettingsPage() {
             )}
             
             <div className="grid grid-cols-2 gap-3">
-              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+              <button aria-label="Connect Gmail email account" className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
                 <div className="font-medium text-gray-900">+ Gmail</div>
                 <div className="text-xs text-gray-500">Connect email</div>
               </button>
-              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+              <button aria-label="Connect Outlook email account" className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
                 <div className="font-medium text-gray-900">+ Outlook</div>
                 <div className="text-xs text-gray-500">Connect email</div>
               </button>
-              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+              <button aria-label="Connect Google Drive storage account" className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
                 <div className="font-medium text-gray-900">+ Google Drive</div>
                 <div className="text-xs text-gray-500">Connect storage</div>
               </button>
-              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+              <button aria-label="Connect OneDrive storage account" className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
                 <div className="font-medium text-gray-900">+ OneDrive</div>
                 <div className="text-xs text-gray-500">Connect storage</div>
               </button>
-              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+              <button aria-label="Connect Discord bot account" className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
                 <div className="font-medium text-gray-900">+ Discord</div>
                 <div className="text-xs text-gray-500">Connect bot</div>
               </button>
-              <button className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
+              <button aria-label="Connect Notion workspace account" className="px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition">
                 <div className="font-medium text-gray-900">+ Notion</div>
                 <div className="text-xs text-gray-500">Connect workspace</div>
               </button>

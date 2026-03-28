@@ -32,7 +32,8 @@ describe('InboxPage', () => {
 
     const searchInput = screen.getByRole('textbox', { name: /search emails/i })
     expect(searchInput).toBeInTheDocument()
-    expect(searchInput).toHaveAttribute('placeholder', 'Search emails...')
+    // Using regex to handle cross-platform shortcut symbol (Cmd vs Ctrl)
+    expect(searchInput.getAttribute('placeholder')).toMatch(/Search emails\.\.\. \((⌘|Ctrl)\+K\)/)
   })
 
   it('shows empty state with "No emails yet"', () => {

@@ -242,6 +242,23 @@ describe('GET /api/messages/list', () => {
     })
   })
 
+  it('skips counting when includeCount is false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(10)
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.total).toBe(-1)
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
   it('includes latest message for each thread', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

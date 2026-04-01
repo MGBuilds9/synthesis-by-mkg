@@ -22,8 +22,11 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit')
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
@@ -33,6 +36,13 @@ describe('GET /api/messages/list', () => {
       { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },
       { id: 'account-2', accountLabel: 'Work Outlook', provider: 'OUTLOOK' },
     ] as any)
+
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: Date.now() + 60000
+    })
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {
@@ -311,5 +321,28 @@ describe('GET /api/messages/list', () => {
 
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch messages')
+  })
+
+  it('returns 429 when rate limit exceeded', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: false,
+      limit: 60,
+      remaining: 0,
+      reset: Date.now() + 60000
+    })
+
+    const request = new NextRequest('http://localhost/api/messages/list')
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(429)
+    expect(data.error).toBe('Too many requests')
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('60')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('0')
+    expect(response.headers.get('X-RateLimit-Reset')).toBeDefined()
   })
 })

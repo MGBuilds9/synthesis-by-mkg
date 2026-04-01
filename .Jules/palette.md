@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-02-15 - Dynamic ARIA Labels
+**Learning:** Generic action buttons (like "Disconnect" or "Delete") within a mapped list often lack context for screen reader users, who only hear the generic text without knowing which item it applies to.
+**Action:** Always incorporate the item's specific context (like the provider name) into the `aria-label` of generic action buttons within a list to ensure clear accessibility.

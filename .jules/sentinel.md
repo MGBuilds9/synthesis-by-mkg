@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## YYYY-MM-DD - Missing Rate Limiting on Data Endpoints
+**Vulnerability:** The `/api/messages/list` endpoint lacked rate limiting, potentially allowing automated scripts to scrape large amounts of user data or cause resource exhaustion (DoS) by spamming requests.
+**Learning:** All endpoints that return bulk data must have rate limiting enabled, not just authentication or AI generation endpoints. Data extraction is a common attack vector.
+**Prevention:** Apply the `rateLimiter` middleware or check to all sensitive or data-heavy API routes by default.

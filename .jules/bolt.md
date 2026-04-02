@@ -25,3 +25,6 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+## 2026-05-23 - Consolidating redundant Array iterations
+**Learning:** Transforming a collection into multiple derived structures (e.g., an ID array and a Map) using sequential `.map()` calls creates unnecessary intermediate array allocations and iterates the collection multiple times.
+**Action:** Consolidate redundant `.map()` calls into a single iterative pass (like `for...of` or `.reduce()`) when deriving multiple structures from the same array to reduce CPU overhead and memory pressure.

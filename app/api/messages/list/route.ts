@@ -37,8 +37,12 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const accountIds = accounts.map((account) => account.id)
-    const accountMap = new Map(accounts.map(a => [a.id, a]))
+    const accountIds = []
+    const accountMap = new Map()
+    for (const account of accounts) {
+      accountIds.push(account.id)
+      accountMap.set(account.id, account)
+    }
 
     const whereClause: any = {
       connectedAccountId: { in: accountIds },

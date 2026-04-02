@@ -88,6 +88,7 @@ export default function InboxPage() {
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => {
                   setSearchQuery("")
                   searchInputRef.current?.focus()

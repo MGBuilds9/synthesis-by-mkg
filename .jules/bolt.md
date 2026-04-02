@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2024-04-02 - Make Prisma count optional in messages list endpoint
+**Learning:** Making expensive Prisma count queries optional in list endpoints significantly improves performance, but it must be implemented as opt-out (defaulting to true) to prevent breaking existing API contracts and frontend consumers.
+**Action:** Always implement `includeCount=false` (opt-out) rather than opt-in for existing endpoints when optimizing database queries to ensure backward compatibility.

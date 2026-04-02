@@ -151,6 +151,22 @@ describe('GET /api/messages/list', () => {
     })
   })
 
+  it('skips count when includeCount is false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+
+    const request = new NextRequest('http://localhost/api/messages/list?includeCount=false', { method: 'GET' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.total).toBe(-1)
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
   it('filters by provider when specified', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

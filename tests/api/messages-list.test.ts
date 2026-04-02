@@ -24,6 +24,13 @@ vi.mock('@/lib/auth', () => ({
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
+
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn(),
+  },
+}))
 
 describe('GET /api/messages/list', () => {
   beforeEach(() => {
@@ -33,6 +40,13 @@ describe('GET /api/messages/list', () => {
       { id: 'account-1', accountLabel: 'My Gmail', provider: 'GMAIL' },
       { id: 'account-2', accountLabel: 'Work Outlook', provider: 'OUTLOOK' },
     ] as any)
+
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: Date.now() + 60000,
+    })
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {

@@ -108,7 +108,7 @@ describe('GET /api/messages/list', () => {
       accountLabel: 'My Gmail',
       provider: 'GMAIL',
     })
-    expect(data.total).toBe(2)
+    expect(data.total).toBe(-1)
     expect(data.limit).toBe(50)
     expect(data.offset).toBe(0)
 
@@ -143,6 +143,36 @@ describe('GET /api/messages/list', () => {
       take: 50,
       skip: 0,
     })
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
+  it('returns total count when requested', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Project Update',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-15'),
+        messages: [],
+      },
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(5)
+
+    const request = createRequest({ includeCount: 'true' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.threads).toHaveLength(1)
+    expect(data.total).toBe(5)
 
     expect(prisma.messageThread.count).toHaveBeenCalledWith({
       where: {
@@ -227,7 +257,7 @@ describe('GET /api/messages/list', () => {
     const data = await response.json()
 
     expect(response.status).toBe(200)
-    expect(data.total).toBe(25)
+    expect(data.total).toBe(-1)
     expect(data.limit).toBe(10)
     expect(data.offset).toBe(10)
 
@@ -293,7 +323,7 @@ describe('GET /api/messages/list', () => {
 
     expect(response.status).toBe(200)
     expect(data.threads).toEqual([])
-    expect(data.total).toBe(0)
+    expect(data.total).toBe(-1)
   })
 
   it('returns 500 on internal error', async () => {

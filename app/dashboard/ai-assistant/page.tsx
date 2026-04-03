@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -29,7 +29,7 @@ export default function AIChatPage() {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  const sendMessage = useCallback(async (textOverride?: string) => {
+  async function sendMessage(textOverride?: string) {
     const messageText = typeof textOverride === 'string' ? textOverride : input
     if (!messageText.trim()) return
 
@@ -68,7 +68,17 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }, [input, sessionId, provider, contextDomains, askBeforeSearching])
+  }
+
+  // Bolt: Stable reference for suggestion clicks to prevent MessageList re-renders
+  const sendMessageRef = useRef(sendMessage)
+  useEffect(() => {
+    sendMessageRef.current = sendMessage
+  }, [sendMessage])
+
+  const handleSuggestionClick = useCallback((text: string) => {
+    sendMessageRef.current(text)
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -186,7 +196,7 @@ export default function AIChatPage() {
       <MessageList
         messages={messages}
         loading={loading}
-        onSuggestionClick={sendMessage}
+        onSuggestionClick={handleSuggestionClick}
       />
 
       {/* Input */}

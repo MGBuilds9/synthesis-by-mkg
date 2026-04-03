@@ -34,7 +34,10 @@ export default function SettingsPage() {
                       <div className="font-medium text-gray-900">{account.provider}</div>
                       <div className="text-sm text-gray-500">{account.accountLabel}</div>
                     </div>
-                    <button className="text-red-600 hover:text-red-700 text-sm rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1">
+                    <button
+                      className="text-red-600 hover:text-red-700 text-sm rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1"
+                      aria-label={`Disconnect ${account.provider}`}
+                    >
                       Disconnect
                     </button>
                   </div>

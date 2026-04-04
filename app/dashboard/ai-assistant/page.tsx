@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -25,12 +25,34 @@ export default function AIChatPage() {
   // Ask before searching context
   const [askBeforeSearching, setAskBeforeSearching] = useState(true)
 
+  // Bolt: Use refs to store latest state values for the memoized callback to prevent stale closures
+  // without triggering re-renders of the memoized MessageList component.
+  const stateRefs = useRef({
+    input,
+    provider,
+    contextDomains,
+    askBeforeSearching,
+    sessionId
+  })
+
+  useEffect(() => {
+    stateRefs.current = {
+      input,
+      provider,
+      contextDomains,
+      askBeforeSearching,
+      sessionId
+    }
+  }, [input, provider, contextDomains, askBeforeSearching, sessionId])
+
   function toggleContextDomain(domain: keyof typeof contextDomains) {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  async function sendMessage(textOverride?: string) {
-    const messageText = typeof textOverride === 'string' ? textOverride : input
+  // Bolt: Memoize sendMessage to prevent MessageList from re-rendering on every keystroke
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const { input: currentInput, provider: currentProvider, contextDomains: currentDomains, askBeforeSearching: currentAsk, sessionId: currentSessionId } = stateRefs.current
+    const messageText = typeof textOverride === 'string' ? textOverride : currentInput
     if (!messageText.trim()) return
 
     const userMessage: Message = { role: 'user', content: messageText }
@@ -46,11 +68,11 @@ export default function AIChatPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sessionId,
+          sessionId: currentSessionId,
           message: messageText,
-          provider,
-          contextDomains,
-          askBeforeSearchingContext: askBeforeSearching,
+          provider: currentProvider,
+          contextDomains: currentDomains,
+          askBeforeSearchingContext: currentAsk,
         }),
       })
 
@@ -68,7 +90,7 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">

@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-06-01 - Stabilizing Callbacks for Memoized Components
+**Learning:** Passing a newly created function (like `sendMessage`) as a prop to a `React.memo` component (like `MessageList`) defeats the memoization, causing unnecessary re-renders whenever the parent state (like an input field) changes.
+**Action:** Wrap the callback in `useCallback`. If the callback depends on rapidly changing state, use the "latest ref" pattern (`useRef` + `useEffect` to sync) to keep the callback reference stable while still accessing current state values.

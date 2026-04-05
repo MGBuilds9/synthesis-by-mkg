@@ -37,8 +37,13 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const accountIds = accounts.map((account) => account.id)
-    const accountMap = new Map(accounts.map(a => [a.id, a]))
+    // Bolt: Consolidated redundant .map() calls into a single pass to reduce CPU overhead and intermediate array allocations
+    const accountIds: string[] = []
+    const accountMap = new Map()
+    for (const account of accounts) {
+      accountIds.push(account.id)
+      accountMap.set(account.id, account)
+    }
 
     const whereClause: any = {
       connectedAccountId: { in: accountIds },

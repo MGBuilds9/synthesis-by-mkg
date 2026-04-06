@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -29,8 +29,13 @@ export default function AIChatPage() {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
-  async function sendMessage(textOverride?: string) {
-    const messageText = typeof textOverride === 'string' ? textOverride : input
+  // Bolt: Store latest state in ref for stable callbacks without stale closures
+  const latestStateRef = useRef({ input, sessionId, provider, contextDomains, askBeforeSearching })
+  latestStateRef.current = { input, sessionId, provider, contextDomains, askBeforeSearching }
+
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const { input: currentInput, sessionId: currentSessionId, provider: currentProvider, contextDomains: currentContextDomains, askBeforeSearching: currentAskBeforeSearching } = latestStateRef.current
+    const messageText = typeof textOverride === 'string' ? textOverride : currentInput
     if (!messageText.trim()) return
 
     const userMessage: Message = { role: 'user', content: messageText }
@@ -46,11 +51,11 @@ export default function AIChatPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sessionId,
+          sessionId: currentSessionId,
           message: messageText,
-          provider,
-          contextDomains,
-          askBeforeSearchingContext: askBeforeSearching,
+          provider: currentProvider,
+          contextDomains: currentContextDomains,
+          askBeforeSearchingContext: currentAskBeforeSearching,
         }),
       })
 
@@ -68,7 +73,7 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -186,7 +191,7 @@ export default function AIChatPage() {
       <MessageList
         messages={messages}
         loading={loading}
-        onSuggestionClick={(text) => sendMessage(text)}
+        onSuggestionClick={sendMessage}
       />
 
       {/* Input */}

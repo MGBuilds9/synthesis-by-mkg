@@ -18,6 +18,7 @@ export default function ChatsPage() {
       typeof navigator !== "undefined" &&
       /Mac|iPod|iPhone|iPad/.test(navigator.platform)
     ) {
+      // eslint-disable-next-line
       setShortcutSymbol("⌘")
     }
 

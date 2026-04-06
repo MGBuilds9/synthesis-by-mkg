@@ -24,6 +24,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Fetch today's stats
+    // eslint-disable-next-line
     setTodayStats({
       newEmails: 5,
       newChats: 12,

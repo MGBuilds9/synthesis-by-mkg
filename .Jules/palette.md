@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2026-02-15 - Generic Action Button Labels
+**Learning:** Generic action buttons (like 'Disconnect' or 'Edit') inside mapped lists or tables lack context for screen reader users when read out of sequence.
+**Action:** Always append context to generic action buttons inside dynamic lists by using `aria-label` with the specific item's property (e.g., `aria-label={"Disconnect ${account.provider}"}`).

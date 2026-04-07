@@ -36,7 +36,7 @@ describe('GET /api/messages/list', () => {
   })
 
   function createRequest(searchParams: Record<string, string> = {}): NextRequest {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams({ includeCount: 'true', ...searchParams })
     const url = `http://localhost/api/messages/list${params.toString() ? '?' + params.toString() : ''}`
     return new NextRequest(url, { method: 'GET' })
   }

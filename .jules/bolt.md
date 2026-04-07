@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-04-07 - Optional Count Queries
+**Learning:** Executing `count` queries on every list API request is expensive and often unnecessary when clients don't need strict pagination (e.g. infinite scroll).
+**Action:** Conditionally run `count` queries only when an `includeCount=true` parameter is provided by the client.

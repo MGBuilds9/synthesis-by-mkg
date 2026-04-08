@@ -151,6 +151,36 @@ describe('GET /api/messages/list', () => {
     })
   })
 
+  it('skips total count when explicitly set to false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Project Update',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-15'),
+        messages: [],
+      },
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(5)
+
+    const request = createRequest({ includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.threads).toHaveLength(1)
+    expect(data.total).toBe(-1)
+
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
+
   it('filters by provider when specified', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

@@ -143,7 +143,6 @@ export default function StoragePage() {
             <input
               ref={searchInputRef}
               type="text"
-              aria-label="Search files"
               placeholder={`Search files... (${shortcutSymbol}+K)`}
               className="w-full px-4 py-2 border rounded-lg pr-8"
               value={searchQuery}
@@ -275,7 +274,6 @@ export default function StoragePage() {
                       rel="noopener noreferrer"
                       aria-label={`Open ${file.name} in new tab`}
                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                      aria-label={`Open ${file.name} in new tab`}
                     >
                       Open <ExternalLink className="w-3 h-3" />
                     </a>

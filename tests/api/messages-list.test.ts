@@ -312,4 +312,21 @@ describe('GET /api/messages/list', () => {
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to fetch messages')
   })
+
+  it('skips count query when includeCount is false', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = new NextRequest('http://localhost:5000/api/messages/list?includeCount=false', { method: 'GET' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.total).toBe(-1)
+    expect(prisma.messageThread.count).not.toHaveBeenCalled()
+  })
 })

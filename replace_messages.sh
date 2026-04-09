@@ -1,1 +1,0 @@
-sed -i "s/const offset = parseInt(searchParams.get('offset') || '0')/const offset = parseInt(searchParams.get('offset') || '0')\n    const skipCount = searchParams.get('skipCount') === 'true'/g" app/api/messages/list/route.ts

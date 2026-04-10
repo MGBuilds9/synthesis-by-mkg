@@ -25,3 +25,6 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+## 2024-05-24 - Optional Pagination Count Queries
+**Learning:** Returning total counts on paginated endpoints requires an expensive full-table aggregation which degrades performance, but completely removing it breaks existing API contracts.
+**Action:** Add optional query parameters (like `includeCount`) that allow clients to skip expensive aggregations, while defaulting to true for backwards compatibility.

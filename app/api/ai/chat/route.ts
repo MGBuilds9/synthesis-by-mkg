@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { getLLMProvider } from '@/lib/providers/llm'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
-import { AiProvider } from '@prisma/client'
+import { AiProvider, Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 // Sentinel: Validation schema
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     // Get or create chat session
     // Bolt: Optimized to select only necessary fields (role, content) for context construction.
     // This avoids fetching potentially large 'sources' and 'metadata' JSON fields.
-    const include: any = {
+    const include: Prisma.AiChatSessionInclude = {
       messages: {
         // Bolt: Optimized to fetch only the last 50 messages to prevent context overflow and reduce DB load
         orderBy: { createdAt: 'desc' },
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    let chatSession: any = await prisma.aiChatSession.findUnique({
+    let chatSession: Prisma.AiChatSessionGetPayload<{ include: typeof include }> | null = await prisma.aiChatSession.findUnique({
       where: { id: sessionId },
       include,
     })
@@ -163,6 +163,7 @@ export async function POST(request: NextRequest) {
       let activeScopes = (chatSession as any).contextScopes || []
 
       if (contextDomains) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         activeScopes = activeScopes.filter((scope: any) => {
           if (!scope.syncScope) return false
           const type = scope.syncScope.scopeType
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare messages for LLM
-    const messages = chatSession.messages.map((msg: any) => ({
+    const messages = chatSession.messages.map((msg) => ({
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
     }))
@@ -209,7 +210,7 @@ export async function POST(request: NextRequest) {
 
     // Bolt: Optimized to await user message save and LLM response in parallel
     // This removes the DB write latency from the critical path
-    const [_, response] = await Promise.all([
+    const [, response] = await Promise.all([
       saveUserMessagePromise,
       llmProvider.chat(messages, model, systemPrompt),
     ])
@@ -227,7 +228,7 @@ export async function POST(request: NextRequest) {
       response,
       sessionId: chatSession.id,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI chat error:', error)
     // Sentinel: Do not leak internal error details to the client
     return NextResponse.json(

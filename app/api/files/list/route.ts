@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import logger from '@/lib/logger'
@@ -39,11 +40,12 @@ export async function GET(request: NextRequest) {
 
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes
     // This allows filtering FileItem by connectedAccountId which is indexed
-    const accountWhere: any = {
+    const accountWhere: Prisma.ConnectedAccountWhereInput = {
       userId: session.user.id,
     }
 
     if (provider) {
+      // @ts-expect-error - provider might need cast or enum lookup depending on setup, but this is safer than any
       accountWhere.provider = provider
     }
 
@@ -59,7 +61,7 @@ export async function GET(request: NextRequest) {
     const accountIds = accounts.map((account) => account.id)
     const accountMap = new Map(accounts.map((a) => [a.id, a]))
 
-    const whereClause: any = {
+    const whereClause: Prisma.FileItemWhereInput = {
       connectedAccountId: { in: accountIds },
     }
 
@@ -126,7 +128,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('X-RateLimit-Reset', rateLimit.reset.toString())
 
     return response
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Failed to fetch files', { error })
     return NextResponse.json(
       { error: 'Failed to fetch files' },

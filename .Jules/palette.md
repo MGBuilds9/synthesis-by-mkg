@@ -29,3 +29,6 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+## 2024-04-10 - Reusable Search Bar Pattern
+**Learning:** The 'Cmd+K to focus' and 'Clear (X) button' is a highly reusable, expected UX pattern across dashboard pages with search inputs (Storage, Chats, Inbox), significantly improving keyboard accessibility and interaction speed.
+**Action:** Always include keyboard shortcuts and a clear button when implementing global or page-level search inputs.

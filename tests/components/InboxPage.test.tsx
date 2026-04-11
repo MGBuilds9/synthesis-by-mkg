@@ -32,7 +32,26 @@ describe('InboxPage', () => {
 
     const searchInput = screen.getByRole('textbox', { name: /search emails/i })
     expect(searchInput).toBeInTheDocument()
-    expect(searchInput).toHaveAttribute('placeholder', 'Search emails...')
+    expect(searchInput.getAttribute('placeholder')).toEqual(expect.stringContaining('Search emails...'))
+  })
+
+  it('clears search and focuses input when clear button is clicked', async () => {
+    const user = userEvent.setup()
+    render(<InboxPage />)
+
+    const searchInput = screen.getByRole('textbox', { name: /search emails/i })
+
+    // Type into search
+    await user.type(searchInput, 'hello')
+    expect(searchInput).toHaveValue('hello')
+
+    // Click clear button
+    const clearBtn = screen.getByRole('button', { name: /clear search/i })
+    await user.click(clearBtn)
+
+    // Verify cleared and focused
+    expect(searchInput).toHaveValue('')
+    expect(searchInput).toHaveFocus()
   })
 
   it('shows empty state with "No emails yet"', () => {

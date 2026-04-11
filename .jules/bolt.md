@@ -25,3 +25,6 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+## 2026-04-11 - Prevent unmemoization with the Latest Ref Pattern
+**Learning:** Using inline arrow functions or unstable callbacks defeats React.memo() on child components, causing unnecessary re-renders. Storing the callback in a mutable ref and referencing it in a stable `useCallback` allows the child component to stay memoized while always executing the latest version of the handler.
+**Action:** Always use the latest ref pattern (`useRef` + `useEffect` + `useCallback`) when passing callbacks that depend on rapidly changing state (like input text) down to memoized list components.

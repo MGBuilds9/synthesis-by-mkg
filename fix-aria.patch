@@ -1,0 +1,10 @@
+--- app/dashboard/storage/page.tsx
++++ app/dashboard/storage/page.tsx
+@@ -150,3 +150,2 @@
+               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+-              aria-label="Search files"
+             />
+@@ -276,3 +275,2 @@
+                       className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+-                      aria-label={`Open ${file.name} in new tab`}
+                     >

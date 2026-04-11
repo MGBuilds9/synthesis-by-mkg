@@ -25,3 +25,6 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+## 2024-04-11 - Stabilize callbacks for memoized children
+**Learning:** Inline arrow functions in props passed to memoized children (like `onSuggestionClick={(text) => sendMessage(text)}`) create a new function instance on every render, defeating the `React.memo` optimization and causing unnecessary re-renders when parent state changes.
+**Action:** Use `useCallback` combined with the 'latest ref' pattern to stabilize callbacks that depend on rapidly changing state, and pass them directly as props (e.g., `onSuggestionClick={sendMessage}`).

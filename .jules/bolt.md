@@ -25,3 +25,7 @@
 ## 2026-05-22 - Optimized Sync Logging
 **Learning:** High-frequency logging to the database (e.g., `SYNC_START` events) using `logProviderActivity` causes database contention and latency during parallel sync operations.
 **Action:** Use the default `logger` (console/stdout) for operational start events and reserve database logging for success/error states or critical audits.
+
+## 2026-05-23 - Avoid Expensive Count Queries in API List Endpoints
+**Learning:** Returning a total count on every list request incurs significant performance penalties due to expensive aggregation operations, particularly for large datasets. Many clients and UI views do not always require the total count (e.g., infinite scroll or simple list views).
+**Action:** Make count aggregation optional via a query parameter flag (e.g., `includeCount=true/false`) and bypass the Prisma count query when not explicitly requested. Ensure the flag defaults securely (e.g., preserving backwards compatibility if needed, but optimally defaulting to false for internal calls).

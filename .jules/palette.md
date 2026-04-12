@@ -29,3 +29,6 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+## 2026-04-12 - Search Input Accessibility
+**Learning:** Search inputs across the application (like in the Notion dashboard) often lack an `aria-label`, which forces screen readers to rely on placeholders. Placeholders are an accessibility anti-pattern when used as the sole accessible name. Additionally, when fixing duplicate `aria-label` attributes (like in the Storage dashboard), it is critical to ensure exactly one instance remains in the correct position rather than removing it entirely, which causes a regression.
+**Action:** Always ensure search inputs have an explicitly defined `aria-label` (e.g., `aria-label="Search [domain]"`). When fixing duplicate props, carefully relocate the remaining prop to satisfy linters/reviewers without losing the semantic meaning.

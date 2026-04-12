@@ -17,6 +17,7 @@ export default function InboxPage() {
       typeof navigator !== "undefined" &&
       /Mac|iPod|iPhone|iPad/.test(navigator.platform)
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShortcutSymbol("⌘")
     }
 

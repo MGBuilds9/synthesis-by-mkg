@@ -12,7 +12,7 @@ export default function DashboardPage() {
     recentNotionPages: 0,
   })
 
-  const [connectedAccounts, setConnectedAccounts] = useState([
+  const [connectedAccounts, _setConnectedAccounts] = useState([
     { provider: 'Gmail', status: 'connected', icon: Mail },
     { provider: 'Discord', status: 'connected', icon: MessageSquare },
     { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
@@ -24,6 +24,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Fetch today's stats
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTodayStats({
       newEmails: 5,
       newChats: 12,

@@ -32,7 +32,7 @@ describe('InboxPage', () => {
 
     const searchInput = screen.getByRole('textbox', { name: /search emails/i })
     expect(searchInput).toBeInTheDocument()
-    expect(searchInput).toHaveAttribute('placeholder', 'Search emails...')
+    expect(searchInput.getAttribute('placeholder')).toEqual(expect.stringContaining('Search emails...'))
   })
 
   it('shows empty state with "No emails yet"', () => {

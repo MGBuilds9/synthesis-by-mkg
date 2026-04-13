@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { GET } from '@/app/api/messages/list/route'
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn(),
+  },
+}))
+
 vi.mock('next-auth', () => ({
   getServerSession: vi.fn(),
 }))
@@ -24,10 +30,17 @@ vi.mock('@/lib/auth', () => ({
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('GET /api/messages/list - Security', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: Date.now() + 60000,
+    })
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },
     } as any)

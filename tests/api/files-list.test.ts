@@ -88,7 +88,7 @@ describe('GET /api/files/list', () => {
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
     vi.mocked(prisma.fileItem.count).mockResolvedValue(2)
 
-    const request = createRequest()
+    const request = createRequest({ includeCount: 'false' })
     const response = await GET(request)
     const data = await response.json()
 
@@ -188,7 +188,7 @@ describe('GET /api/files/list', () => {
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
     vi.mocked(prisma.fileItem.count).mockResolvedValue(1)
 
-    const request = createRequest({ provider: 'GOOGLE_DRIVE' })
+    const request = createRequest({ provider: 'GOOGLE_DRIVE', includeCount: 'false' })
     const response = await GET(request)
     const data = await response.json()
 
@@ -331,7 +331,7 @@ describe('GET /api/files/list', () => {
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
     vi.mocked(prisma.fileItem.count).mockResolvedValue(25)
 
-    const request = createRequest({ limit: '10', offset: '10' })
+    const request = createRequest({ limit: '10', offset: '10', includeCount: 'false' })
     const response = await GET(request)
     const data = await response.json()
 
@@ -361,7 +361,7 @@ describe('GET /api/files/list', () => {
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
     vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
 
-    const request = createRequest()
+    const request = createRequest({ includeCount: 'false' })
     const response = await GET(request)
     const data = await response.json()
 

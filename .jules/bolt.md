@@ -29,3 +29,6 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+## 2026-06-25 - Prevent Unused Aggregation Queries from the Frontend
+**Learning:** By default, list endpoints (like `/api/files/list`) may execute expensive aggregation queries (like database `count`) to return total numbers for pagination.
+**Action:** When a frontend UI (like the Storage page) does not utilize pagination totals, explicitly pass the appropriate query parameter (e.g., `includeCount=false`) from the client to skip the expensive aggregation query. Ensure corresponding tests are updated to expect the modified query string.

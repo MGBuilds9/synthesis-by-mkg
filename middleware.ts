@@ -23,6 +23,12 @@ export function middleware(request: NextRequest) {
     'max-age=31536000; includeSubDomains'
   )
 
+  // Content-Security-Policy: Mitigate XSS attacks
+  headers.set(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
+  )
+
   return response
 }
 

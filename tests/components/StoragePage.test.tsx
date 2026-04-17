@@ -90,7 +90,7 @@ describe('StoragePage', () => {
     })
 
     // Check for the "Open" link - just has "Open" text, no title attribute
-    const openLink = screen.getByRole('link', { name: /Open/i })
+    const openLink = screen.getByRole('link', { name: /Open Report.pdf in new tab/i })
     expect(openLink).toBeInTheDocument()
     expect(openLink).toHaveAttribute('href', 'https://example.com/report.pdf')
     expect(openLink).toHaveAttribute('target', '_blank')

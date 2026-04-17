@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-15 - Bypass Expensive DB Count on Frontend Fetch
+**Learning:** The frontend lists (e.g. Storage page files list) do not display or utilize the total count returned by the API. The API explicitly supports an `includeCount` flag to skip the `prisma.*.count` aggregation query.
+**Action:** Append `includeCount=false` to API fetch URL parameters in frontend components where total count is unnecessary, significantly reducing backend latency and DB load for list views.

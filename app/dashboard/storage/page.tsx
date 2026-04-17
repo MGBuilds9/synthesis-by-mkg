@@ -57,6 +57,7 @@ export default function StoragePage() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
+      params.append("includeCount", "false");
 
       const queryString = params.toString();
       const url = queryString

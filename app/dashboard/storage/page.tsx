@@ -57,11 +57,12 @@ export default function StoragePage() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
+      // Bolt: Added includeCount=false to bypass expensive database count queries.
+      // Impact: Reduces API latency and DB load since the UI doesn't display total count.
+      params.append("includeCount", "false");
 
       const queryString = params.toString();
-      const url = queryString
-        ? `/api/files/list?${queryString}`
-        : "/api/files/list";
+      const url = `/api/files/list?${queryString}`;
 
       const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) {

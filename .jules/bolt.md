@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-21 - Ignore Reviewer Hallucinations Regarding Existing Backend Features
+**Learning:** The automated code reviewer may incorrectly assert that an added API parameter is hallucinated and will break the application, even if the backend explicitly parses and supports that parameter (e.g., `includeCount`).
+**Action:** Always verify the backend code (e.g., via `cat app/api/files/list/route.ts`) to confirm the parameter's existence. If the parameter is valid and supported by the backend, proceed with the submission despite the false positive review.

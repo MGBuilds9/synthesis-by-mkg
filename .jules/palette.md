@@ -32,3 +32,6 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+## 2026-04-18 - External Link Clarity
+**Learning:** Found a missing accessible description in `app/dashboard/storage/page.tsx` for the "Open" link in the table rows. The generic "Open" text with a new tab icon leaves screen readers without context of what file is being opened.
+**Action:** Implemented the pattern learned on 2026-02-12 by adding an `aria-label` describing the destination and behavior, e.g., ``aria-label={`Open ${file.name} in new tab`}``.

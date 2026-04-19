@@ -58,6 +58,9 @@ export default function StoragePage() {
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
 
+      // Bolt: Skip expensive database count queries since the UI does not display total count
+      params.append("includeCount", "false");
+
       const queryString = params.toString();
       const url = queryString
         ? `/api/files/list?${queryString}`

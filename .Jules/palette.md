@@ -29,3 +29,7 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+
+## 2024-05-25 - Search Clear Button
+**Learning:** Adding a clear button (X icon) to search inputs improves UX by allowing users to reset queries in one click. However, it's crucial to ensure `type="button"` is set to prevent unintended form submissions if the input is ever wrapped in a form.
+**Action:** Always include `type="button"` when implementing in-input actions like clear buttons.

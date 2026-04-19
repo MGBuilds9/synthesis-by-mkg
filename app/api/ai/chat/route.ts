@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getLLMProvider } from '@/lib/providers/llm'
+import logger from '@/lib/logger'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
 import { AiProvider } from '@prisma/client'
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
         )
       }
     } catch (error) {
-      console.error('Rate limit check failed:', error)
+      logger.error('Rate limit check failed:', { error })
       // Sentinel: Fail closed to protect resources
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },
@@ -228,7 +229,7 @@ export async function POST(request: NextRequest) {
       sessionId: chatSession.id,
     })
   } catch (error: any) {
-    console.error('AI chat error:', error)
+    logger.error('AI chat error:', { error })
     // Sentinel: Do not leak internal error details to the client
     return NextResponse.json(
       { error: 'Failed to process chat' },

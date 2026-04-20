@@ -72,6 +72,7 @@ export default function StoragePage() {
       setFiles(data.files || []);
     } catch (error: any) {
       if (error.name === "AbortError") return;
+      // Sentinel: Client side error
       console.error("Failed to fetch files:", error);
       setFiles([]);
     } finally {

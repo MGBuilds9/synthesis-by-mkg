@@ -64,6 +64,7 @@ export default function AIChatPage() {
         }])
       }
     } catch (error) {
+      // Sentinel: Handled using console.error on client side
       console.error('Failed to send message:', error)
     } finally {
       setLoading(false)

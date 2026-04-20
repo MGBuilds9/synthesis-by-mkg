@@ -29,3 +29,6 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+## 2026-06-05 - Avoid Unnecessary Counts in Frontend Lookups
+**Learning:** Adding the \`includeCount=false\` URL parameter in fetch calls explicitly skips backend database count aggregations, saving time and compute resources when the UI doesn't use the pagination count directly.
+**Action:** When components fetch data lists but only render the items (without total counts), ensure fetch URLs specify \`includeCount=false\`.

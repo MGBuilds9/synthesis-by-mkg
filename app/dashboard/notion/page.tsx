@@ -9,11 +9,14 @@ export default function NotionPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
-      setShortcutSymbol("⌘")
+    if (typeof window !== 'undefined') {
+      if (
+        typeof navigator !== "undefined" &&
+        /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+      ) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setShortcutSymbol("⌘")
+      }
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {

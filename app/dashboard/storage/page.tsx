@@ -23,11 +23,14 @@ export default function StoragePage() {
 
   // Palette: Detect platform for keyboard shortcut symbol
   useEffect(() => {
-    if (
-      typeof navigator !== "undefined" &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-    ) {
-      setShortcutSymbol("⌘");
+    if (typeof window !== 'undefined') {
+      if (
+        typeof navigator !== "undefined" &&
+        /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+      ) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setShortcutSymbol("⌘");
+      }
     }
 
     // Palette: Add CMD/Ctrl+K shortcut for search focus

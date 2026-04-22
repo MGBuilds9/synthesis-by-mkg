@@ -28,12 +28,15 @@ vi.mock('@/lib/context/retrieval', () => ({
   summarizeContext: vi.fn(),
 }))
 
+vi.mock('@/lib/logger', () => ({ default: { error: vi.fn() } }))
+
 vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import logger from '@/lib/logger'
 import { getLLMProvider } from '@/lib/providers/llm'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 
@@ -347,5 +350,6 @@ describe('POST /api/ai/chat', () => {
     expect(response.status).toBe(500)
     expect(data.error).toBe('Failed to process chat')
     expect(data.details).toBeUndefined()
+    expect(logger.error).toHaveBeenCalledWith('AI chat error', expect.objectContaining({ error: expect.any(Error) }))
   })
 })

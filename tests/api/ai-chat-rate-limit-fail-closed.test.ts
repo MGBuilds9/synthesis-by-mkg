@@ -29,12 +29,15 @@ vi.mock('@/lib/context/retrieval', () => ({
   summarizeContext: vi.fn(),
 }))
 
+vi.mock('@/lib/logger', () => ({ default: { error: vi.fn() } }))
+
 vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import logger from '@/lib/logger'
 import { getLLMProvider } from '@/lib/providers/llm'
 
 describe('POST /api/ai/chat - Rate Limit Fail Closed', () => {
@@ -84,5 +87,6 @@ describe('POST /api/ai/chat - Rate Limit Fail Closed', () => {
     expect(response.status).toBe(503)
     const data = await response.json()
     expect(data.error).toBe('Service temporarily unavailable')
+    expect(logger.error).toHaveBeenCalledWith('Rate limit check failed', expect.objectContaining({ error: expect.any(Error) }))
   })
 })

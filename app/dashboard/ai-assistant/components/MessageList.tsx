@@ -40,6 +40,7 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
               <div className="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {SUGGESTIONS.map((suggestion) => (
                   <button
+                    type="button"
                     key={suggestion}
                     onClick={() => onSuggestionClick(suggestion)}
                     className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-600 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition-all shadow-sm group focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"

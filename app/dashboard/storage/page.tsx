@@ -57,11 +57,10 @@ export default function StoragePage() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
+      params.append("includeCount", "false"); // Bolt: Skip expensive count query
 
       const queryString = params.toString();
-      const url = queryString
-        ? `/api/files/list?${queryString}`
-        : "/api/files/list";
+      const url = `/api/files/list?${queryString}`;
 
       const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) {

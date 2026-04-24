@@ -57,6 +57,8 @@ export default function StoragePage() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
+      // Bolt: Bypass expensive count query since UI doesn't use it
+      params.append("includeCount", "false");
 
       const queryString = params.toString();
       const url = queryString

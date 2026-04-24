@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-05 - Avoid Unnecessary Backend Code Review False Positives
+**Learning:** An automated code reviewer might flag a frontend parameter addition (like `includeCount=false`) as a hallucination if it assumes the backend implementation is missing. However, sometimes the backend might already have the logic implemented but the frontend isn't utilizing it yet.
+**Action:** When a code reviewer incorrectly claims a backend change is missing, verify the codebase with `grep` or `cat`. If the backend logic exists, ensure frontend changes adhere to all other constraints (like adding explanatory comments) and proceed with the valid optimization, ignoring the false positive.

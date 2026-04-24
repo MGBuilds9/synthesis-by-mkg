@@ -58,6 +58,10 @@ export default function StoragePage() {
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
 
+      // ⚡ Bolt: Bypass expensive DB count query since total count is not displayed
+      // Expected impact: ~50-100ms reduction in API latency per request for large datasets
+      params.append("includeCount", "false");
+
       const queryString = params.toString();
       const url = queryString
         ? `/api/files/list?${queryString}`

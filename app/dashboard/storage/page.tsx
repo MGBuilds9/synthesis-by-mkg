@@ -55,13 +55,13 @@ export default function StoragePage() {
 
     try {
       const params = new URLSearchParams();
+      // Bolt: Append includeCount=false to bypass expensive backend database count queries since the UI does not display the total count
+      params.append("includeCount", "false");
       if (search) params.append("search", search);
       if (provider !== "ALL") params.append("provider", provider);
 
       const queryString = params.toString();
-      const url = queryString
-        ? `/api/files/list?${queryString}`
-        : "/api/files/list";
+      const url = `/api/files/list?${queryString}`;
 
       const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) {

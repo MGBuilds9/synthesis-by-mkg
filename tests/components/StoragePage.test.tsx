@@ -123,8 +123,8 @@ describe('StoragePage', () => {
     expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
 
     // Verify fetch was called with empty search (or initial fetch)
-    // fetchFiles('') -> /api/files/list
-    expect(global.fetch).toHaveBeenCalledWith('/api/files/list', expect.anything())
+    // fetchFiles('') -> /api/files/list?includeCount=false
+    expect(global.fetch).toHaveBeenCalledWith('/api/files/list?includeCount=false', expect.anything())
 
     // Wait for any state updates to complete to avoid "act" warnings
     await waitFor(() => {
@@ -148,7 +148,7 @@ describe('StoragePage', () => {
 
     // Verify fetch was called with provider=GDRIVE
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/files/list?provider=GDRIVE', expect.anything())
+      expect(global.fetch).toHaveBeenCalledWith('/api/files/list?includeCount=false&provider=GDRIVE', expect.anything())
     })
 
     // Click All filter
@@ -157,7 +157,7 @@ describe('StoragePage', () => {
 
     // Verify fetch was called with no provider (or provider=ALL logic, which is just base URL)
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/files/list', expect.anything())
+      expect(global.fetch).toHaveBeenCalledWith('/api/files/list?includeCount=false', expect.anything())
     })
   })
 })

@@ -1,15 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault()
+    setIsLoading(true)
     // Sign in logic will be implemented with NextAuth
     console.log('Sign in with:', { email, password })
+    // Simulate API call for loading state demonstration
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setIsLoading(false)
   }
 
   return (
@@ -21,10 +27,11 @@ export default function SignInPage() {
         
         <form onSubmit={handleSignIn} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -34,10 +41,11 @@ export default function SignInPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -48,9 +56,17 @@ export default function SignInPage() {
           
           <button
             type="submit"
-            className="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Signing In...
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
         

@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-05 - Avoid Unnecessary Counts in Frontend Fetch Calls
+**Learning:** Adding the `includeCount` parameter handling in the backend endpoints requires the frontend to explicitly append `includeCount=false` to bypass the expensive count queries when listing items.
+**Action:** Always append `includeCount=false` to fetch calls for lists (like `/api/files/list`) in frontend components if the UI doesn't need to display the total count. Update the Vitest component tests to expect this query parameter.

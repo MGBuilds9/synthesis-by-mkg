@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## 2026-04-26 - Information Leakage via Raw Console Error
+**Vulnerability:** The AI chat endpoint used raw `console.error` to log exceptions, which can leak sensitive stack traces, request parameters, or environment details to stdout in production, exposing them to attackers if logs are misconfigured or accessed improperly.
+**Learning:** Production environments must use structured logging to safely capture, format, and sanitize errors before they are written to logs.
+**Prevention:** Avoid `console.error` for internal errors in API routes. Always import and use the application's dedicated, structured logger (e.g., `logger.error('message', { error })`) to ensure secure handling of error details.

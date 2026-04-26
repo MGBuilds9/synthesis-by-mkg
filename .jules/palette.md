@@ -32,3 +32,7 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+
+## 2026-04-26 - Actionable Empty States
+**Learning:** Empty states with plain text instructing users to 'connect accounts' cause friction. Users must manually navigate to settings to resolve the empty state.
+**Action:** Always wrap instructional text in empty states with an interactive `<Link>` component that routes users directly to the resolution page (e.g., Settings) to improve discoverability and reduce click-path length.

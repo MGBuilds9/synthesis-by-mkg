@@ -29,3 +29,6 @@
 ## 2026-02-14 - Keyboard Shortcut Pattern
 **Learning:** Platform-specific keyboard shortcuts (Cmd vs Ctrl) require client-side detection via `navigator.platform` which triggers a re-render. This is a known trade-off for accurate UX.
 **Action:** Standardize the `shortcutSymbol` state pattern with `useEffect` across all search inputs to ensure correct keyboard hints.
+## 2024-04-23 - Interactive Element Type Overrides
+**Learning:** React defaults \`<button>\` elements to \`type="submit"\`, which can cause unintended side effects (like full page reloads or form submissions) if generic icon buttons or lists of connection buttons are ever wrapped in a \`<form>\`.
+**Action:** Always explicitly declare \`type="button"\` on non-submitting interactive elements to ensure robust UX, even when building simple layouts.

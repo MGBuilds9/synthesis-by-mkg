@@ -17,3 +17,8 @@
 **Vulnerability:** The AI Chat endpoint ignored user-provided `contextDomains` preferences, retrieving and sending data from all connected accounts (including emails) to the LLM even when explicitly disabled by the user.
 **Learning:** Frontend privacy toggles are cosmetic if the backend does not enforce them. API endpoints must validate and apply all user-provided constraints for data access.
 **Prevention:** Explicitly filter data retrieval scopes on the backend based on request parameters, ensuring strict adherence to user consent before accessing sensitive data.
+
+## 2026-02-13 - Missing Content Security Policy
+**Vulnerability:** The application was missing a Content-Security-Policy (CSP) header, which acts as a defense-in-depth mechanism against Cross-Site Scripting (XSS) and data injection attacks.
+**Learning:** Even with modern frameworks like React that automatically escape HTML, a CSP is crucial for preventing malicious scripts from executing if a vulnerability exists. Next.js applications require specific directives (like `unsafe-inline` and `unsafe-eval` for scripts) to function correctly in development and production without strict nonces.
+**Prevention:** Always implement a strong CSP early in the development lifecycle, adjusting directives as needed while maintaining the principle of least privilege for content sources.

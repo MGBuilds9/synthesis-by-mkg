@@ -78,3 +78,5 @@ Day-one platforms: Craft (5 MCPs), Teams, Telegram, OneDrive
 - **Decisions:** Updated component (accessibility improvements) rather than just fixing tests. No API mismatch existed — server handled all params correctly.
 - **Tests:** 180/180 passed. Build clean.
 - **Pushed:** Commit ab8e58e to main.
+
+- 2026-04-27: Repo hygiene — merged 5 (#509 logger fix, #510 skip DB count, #499 Notion search UX, #511 aria-label external links, #493 button a11y), rewrote 2 (#512 CSP header, #508 actionable empty states — applied manually due to conflicts), closed 43 (duplicates/dependabot major bumps). 184/184 tests. 54 remote branches deleted.

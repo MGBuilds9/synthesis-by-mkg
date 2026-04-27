@@ -19,7 +19,7 @@ describe('NotionPage', () => {
   it('shows empty state with "No Notion pages synced yet"', () => {
     render(<NotionPage />)
     expect(screen.getByText('No Notion pages synced yet')).toBeInTheDocument()
-    expect(screen.getByText('Connect your Notion workspace to get started')).toBeInTheDocument()
+    expect(screen.getByText(/Connect your Notion workspace/i)).toBeInTheDocument()
   })
 
   it('clears search and focuses input when clear button is clicked', async () => {

@@ -23,6 +23,21 @@ export function middleware(request: NextRequest) {
     'max-age=31536000; includeSubDomains'
   )
 
+  // Sentinel: Add Content-Security-Policy to mitigate XSS and data injection attacks
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' blob: data:;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+  `.replace(/\s{2,}/g, ' ').trim()
+
+  headers.set('Content-Security-Policy', cspHeader)
+
   return response
 }
 

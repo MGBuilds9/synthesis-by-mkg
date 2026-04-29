@@ -1,15 +1,24 @@
 'use client'
 
 import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault()
-    // Sign in logic will be implemented with NextAuth
-    console.log('Sign in with:', { email, password })
+    setIsLoading(true)
+    try {
+      // Sign in logic will be implemented with NextAuth
+      console.log('Sign in with:', { email, password })
+      // Simulate network request
+      await new Promise(resolve => setTimeout(resolve, 800))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -48,9 +57,18 @@ export default function SignInPage() {
           
           <button
             type="submit"
-            className="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
+            disabled={isLoading}
+            aria-busy={isLoading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                <span>Signing in...</span>
+              </>
+            ) : (
+              <span>Sign In</span>
+            )}
           </button>
         </form>
         
@@ -64,7 +82,7 @@ export default function SignInPage() {
             </div>
           </div>
           
-          <button className="mt-4 w-full px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700">
+          <button type="button" className="mt-4 w-full px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700">
             Sign in with Google
           </button>
         </div>

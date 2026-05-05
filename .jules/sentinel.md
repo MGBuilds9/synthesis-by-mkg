@@ -22,3 +22,8 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+
+## 2024-05-25 - Missing Rate Limit Headers
+**Vulnerability:** The AI Chat endpoint (`/api/ai/chat`) returned a `429 Too Many Requests` status code without any corresponding rate limit headers (like `Retry-After`). This "blind" rate limiting prevents legitimate clients from understanding the backoff requirements.
+**Learning:** Returning a 429 status code is insufficient for a complete rate limiting implementation. Without headers to inform the client of the limit and the reset interval, clients might retry aggressively, causing unnecessary processing overhead on the server and exacerbating the load during a rate-limit event.
+**Prevention:** Always include standard rate limit headers (`Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) when returning a `429 Too Many Requests` response.

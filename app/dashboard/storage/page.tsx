@@ -23,12 +23,14 @@ export default function StoragePage() {
 
   // Palette: Detect platform for keyboard shortcut symbol
   useEffect(() => {
+    let symbol = "Ctrl";
     if (
       typeof navigator !== "undefined" &&
       /Mac|iPod|iPhone|iPad/.test(navigator.platform)
     ) {
-      setShortcutSymbol("⌘");
+      symbol = "⌘";
     }
+    setShortcutSymbol(symbol);
 
     // Palette: Add CMD/Ctrl+K shortcut for search focus
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,7 +42,7 @@ export default function StoragePage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [setShortcutSymbol]);
 
   // Bolt: Memoized fetch function to handle request cancellation and params
   const fetchFiles = useCallback(async (provider: string, search?: string) => {

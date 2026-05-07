@@ -29,3 +29,6 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+## 2026-06-18 - Prevent React.memo Breakage with Latest-Ref Pattern
+**Learning:** Passing inline arrow functions (like `(text) => sendMessage(text)`) as props to `React.memo` components destroys memoization because the function reference changes on every render (e.g. when typing in an input). Using `useCallback` directly on `sendMessage` is often difficult due to stale closures.
+**Action:** Implement the "latest-ref" pattern by storing the function in a `useRef` updated via `useEffect`, and passing a stable `useCallback` wrapper with an empty dependency array to the memoized child component.

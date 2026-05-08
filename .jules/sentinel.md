@@ -22,3 +22,7 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+## 2026-05-08 - Insecure Logging in Sync Engine
+**Vulnerability:** Internal synchronization errors in `lib/sync/engine.ts` were being logged using `console.error`.
+**Learning:** Background processes that do not have direct client-facing HTTP responses must still utilize centralized, secure logging mechanisms to ensure visibility, observability, and to prevent potentially sensitive state or stack traces from spilling into unmonitored standard output streams.
+**Prevention:** Always use the application's structured logger (e.g., `logger.error`) instead of `console` methods for server-side and background processes.

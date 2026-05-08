@@ -151,7 +151,7 @@ export class SyncEngine {
 
     const syncPromises = enabledScopes.map(scope => 
       this.processSync(scope).catch(error => {
-        console.error(`Failed to sync scope ${scope.id}:`, error)
+        logger.error(`Failed to sync scope ${scope.id}:`, { error })
       })
     )
 

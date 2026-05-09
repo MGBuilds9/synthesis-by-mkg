@@ -72,7 +72,7 @@ export default function StoragePage() {
       setFiles(data.files || []);
     } catch (error: any) {
       if (error.name === "AbortError") return;
-      console.error("Failed to fetch files:", error);
+      console.error("Failed to fetch files");
       setFiles([]);
     } finally {
       // Only reset loading state if this request wasn't aborted/superseded

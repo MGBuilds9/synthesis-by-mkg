@@ -1,0 +1,215 @@
+name: GitHub to Linear Sync
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  sync-to-linear:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ====================================================================
+      # PART A: On push to any branch -> Create a Linear issue
+      # ====================================================================
+      - name: Push - Create Linear Issue
+        if: github.event_name == 'push'
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: |
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          REPO="${{ github.repository }}"
+
+          # Determine commit type from conventional commit prefix
+          COMMIT_TYPE="general"
+          FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)
+          if echo "$FIRST_LINE" | grep -qE '^(feat|feature)(\(.+\))?!?:\s'; then
+            COMMIT_TYPE="feature"
+          elif echo "$FIRST_LINE" | grep -qE '^fix(\(.+\))?!?:\s'; then
+            COMMIT_TYPE="fix"
+          elif echo "$FIRST_LINE" | grep -qE '^docs(\(.+\))?!?:\s'; then
+            COMMIT_TYPE="docs"
+          elif echo "$FIRST_LINE" | grep -qE '^refactor(\(.+\))?!?:\s'; then
+            COMMIT_TYPE="refactor"
+          elif echo "$FIRST_LINE" | grep -qE '^(chore|ci|build|test)(\(.+\))?!?:\s'; then
+            COMMIT_TYPE="chore"
+          fi
+
+          TITLE="Audit: synthesis-by-mkg - ${COMMIT_TYPE}"
+          DESCRIPTION="**Commit SHA:** \`${COMMIT_SHA}\`\n\n**Commit Message:** ${COMMIT_MSG}\n\n**Repository:** ${REPO}"
+
+          echo "Creating Linear issue for push — ${TITLE}"
+
+          curl -s -X POST https://api.linear.app/graphql \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${LINEAR_API_KEY}" \
+            -d "$(jq -n \
+              --arg title "$TITLE" \
+              --arg desc "$DESCRIPTION" \
+              '{
+                query: "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title url } } }",
+                variables: {
+                  input: {
+                    teamId: "f5308d1f-43a5-474c-9ce3-5be155cb0be1",
+                    title: $title,
+                    description: $desc,
+                    priority: 3,
+                    labelIds: ["9f879fca-2940-471b-838e-07ae9239cca7", "ceeb80ae-ce90-4c88-8214-e8a3b067cf19"]
+                  }
+                }
+              }'
+            )"
+
+      # ====================================================================
+      # PART B: On PR events -> Search / Create / Update Linear issue
+      # ====================================================================
+
+      # Step B1 — Search for an existing issue with the PR number in the title
+      - name: PR - Search for Existing Linear Issue
+        if: github.event_name == 'pull_request'
+        id: search
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          SEARCH_RESULT=$(curl -s -X POST https://api.linear.app/graphql \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${LINEAR_API_KEY}" \
+            -d "$(jq -n \
+              --arg teamId "f5308d1f-43a5-474c-9ce3-5be155cb0be1" \
+              --arg searchTerm "PR #${PR_NUMBER}" \
+              '{
+                query: "query($teamId: String!, $searchTerm: String!) { issues(filter: { team: { id: { eq: $teamId } }, title: { contains: $searchTerm } }, first: 5) { nodes { id title url } } }",
+                variables: {
+                  teamId: $teamId,
+                  searchTerm: $searchTerm
+                }
+              }'
+            )")
+
+          # Store full result for debugging
+          echo "SEARCH_RAW_RESULT<<EOF" >> $GITHUB_ENV
+          echo "$SEARCH_RESULT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          ISSUE_COUNT=$(echo "$SEARCH_RESULT" | jq '.data.issues.nodes | length')
+          echo "ISSUE_COUNT=${ISSUE_COUNT}" >> $GITHUB_ENV
+          echo "count=${ISSUE_COUNT}" >> $GITHUB_OUTPUT
+
+          if [ "$ISSUE_COUNT" -gt 0 ]; then
+            ISSUE_ID=$(echo "$SEARCH_RESULT" | jq -r '.data.issues.nodes[0].id')
+            echo "EXISTING_ISSUE_ID=${ISSUE_ID}" >> $GITHUB_ENV
+            echo "id=${ISSUE_ID}" >> $GITHUB_OUTPUT
+            echo "Found existing Linear issue: ${ISSUE_ID}"
+          else
+            echo "No existing Linear issue found — will create a new one"
+          fi
+
+      # Step B2 — Get changed files for the PR description
+      - name: PR - Get Changed Files
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const fileList = files.map(f =>
+              `- \`${f.filename}\` (${f.status}, +${f.additions}/-${f.deletions})`
+            );
+            const changedFiles = fileList.join('\n');
+
+            core.exportVariable('CHANGED_FILES', changedFiles);
+            core.setOutput('count', files.length);
+            console.log(`Found ${files.length} changed files`);
+
+      # Step B3 — Create (or update) the Linear issue
+      - name: PR - Create or Update Linear Issue
+        if: github.event_name == 'pull_request'
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          CHANGED_FILES="${CHANGED_FILES}"
+          EXISTING_ID="${EXISTING_ISSUE_ID}"
+          ISSUE_COUNT="${ISSUE_COUNT}"
+
+          DISPLAY_TITLE="Audit: synthesis-by-mkg - PR #${PR_NUMBER} - ${PR_TITLE}"
+
+          # Build a structured markdown description
+          DESCRIPTION=$(cat <<- ENDDESC
+          ## Pull Request #${PR_NUMBER}
+
+          **URL:** ${PR_URL}
+
+          **Title:** ${PR_TITLE}
+
+          **Description:**
+          ${PR_BODY:-_No description provided._}
+
+          **Changed Files:**
+          ${CHANGED_FILES:-_No files changed or unable to fetch._}
+          ENDDESC
+          )
+
+          if [ "$ISSUE_COUNT" -gt 0 ] && [ -n "$EXISTING_ID" ]; then
+            echo "UPDATING existing Linear issue: ${EXISTING_ID}"
+            curl -s -X POST https://api.linear.app/graphql \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${LINEAR_API_KEY}" \
+              -d "$(jq -n \
+                --arg id "$EXISTING_ID" \
+                --arg title "$DISPLAY_TITLE" \
+                --arg desc "$DESCRIPTION" \
+                '{
+                  query: "mutation($id: String!, $input: IssueUpdateInput!) { issueUpdate(id: $id, input: $input) { success issue { id title url } } }",
+                  variables: {
+                    id: $id,
+                    input: {
+                      title: $title,
+                      description: $desc
+                    }
+                  }
+                }'
+              )"
+          else
+            echo "CREATING new Linear issue: ${DISPLAY_TITLE}"
+            curl -s -X POST https://api.linear.app/graphql \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${LINEAR_API_KEY}" \
+              -d "$(jq -n \
+                --arg title "$DISPLAY_TITLE" \
+                --arg desc "$DESCRIPTION" \
+                '{
+                  query: "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title url } } }",
+                  variables: {
+                    input: {
+                      teamId: "f5308d1f-43a5-474c-9ce3-5be155cb0be1",
+                      title: $title,
+                      description: $desc,
+                      priority: 3,
+                      labelIds: ["9f879fca-2940-471b-838e-07ae9239cca7", "ceeb80ae-ce90-4c88-8214-e8a3b067cf19"]
+                    }
+                  }
+                }'
+              )"
+          fi

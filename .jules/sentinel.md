@@ -22,7 +22,7 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
-## 2026-05-09 - Insecure Logging in Sync Engine
-**Vulnerability:** Internal error objects were logged to `console.error` instead of the centralized structured logger in the backend sync engine, which can lead to information leakage (e.g., sensitive stack traces) in server output streams that are not properly managed or redacted.
-**Learning:** All errors in backend scheduled tasks or background jobs must use the application's structured logger, not standard console streams, to ensure safe logging and redaction.
-**Prevention:** Do not use `console.error` or `console.log` for error handling in Node.js/Next.js backend processes.
+## 2026-05-09 - Bash Script Injection in GitHub Actions
+**Vulnerability:** User-controlled GitHub event properties (like PR titles and bodies) were passed directly into bash scripts using inline string interpolation (`${{ ... }}`), allowing unescaped characters (like backticks) to execute arbitrary shell commands.
+**Learning:** Never interpolate untrusted GitHub context variables directly into bash scripts within workflows, as it leads to command injection vulnerabilities.
+**Prevention:** Always pass untrusted context data via the `env` context and reference the environment variables in the bash script (e.g., `PR_BODY="${PR_BODY_ENV}"`).

@@ -27,3 +27,8 @@
 **Vulnerability:** The sync engine (`lib/sync/engine.ts`) used `console.error` to log unhandled sync process errors.
 **Learning:** Background processes that fetch sensitive user data must use structured loggers to prevent stack traces or data leakage into unmonitored standard output streams.
 **Prevention:** Consistently use the centralized `logger.error` utility for all backend services, including async worker loops.
+
+## 2024-05-25 - Github Action Bash Injection
+**Vulnerability:** The Github Actions workflow (`.github/workflows/github-to-linear-sync.yml`) used inline string interpolation (`${{ github.event.pull_request.body }}`) inside a `run` script.
+**Learning:** This is a classic bash injection vulnerability. User-controlled data (like PR titles, bodies, and commit messages) can contain quotes, backticks, or other shell-special characters that break the script syntax or execute arbitrary commands.
+**Prevention:** Always map dynamic context variables (like `${{ github.event.pull_request.body }}`) into the script's environment via the `env:` block instead of interpolating them directly in the `run:` string.

@@ -76,7 +76,14 @@ export async function POST(request: NextRequest) {
       if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
         return NextResponse.json(
           { error: 'Too many requests' },
-          { status: 429 }
+          {
+            status: 429,
+            headers: {
+              'Retry-After': '60',
+              'X-RateLimit-Limit': MAX_MESSAGES_PER_MINUTE.toString(),
+              'X-RateLimit-Remaining': '0',
+            }
+          }
         )
       }
     } catch (error) {

@@ -46,6 +46,7 @@ export default function ChatsPage() {
         <div className="flex gap-3 sm:gap-4 flex-wrap items-center">
           <div className="flex gap-2 flex-wrap" role="group" aria-label="Platform filter">
             <button
+              type="button"
               onClick={() => setSelectedPlatform('all')}
               aria-pressed={selectedPlatform === 'all'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -57,6 +58,7 @@ export default function ChatsPage() {
               All
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('discord')}
               aria-pressed={selectedPlatform === 'discord'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -68,6 +70,7 @@ export default function ChatsPage() {
               Discord
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('whatsapp')}
               aria-pressed={selectedPlatform === 'whatsapp'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -79,6 +82,7 @@ export default function ChatsPage() {
               WhatsApp
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('slack')}
               aria-pressed={selectedPlatform === 'slack'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -90,6 +94,7 @@ export default function ChatsPage() {
               Slack
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('teams')}
               aria-pressed={selectedPlatform === 'teams'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -101,6 +106,7 @@ export default function ChatsPage() {
               Teams
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('telegram')}
               aria-pressed={selectedPlatform === 'telegram'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -126,6 +132,7 @@ export default function ChatsPage() {
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => {
                   setSearchQuery("")
                   searchInputRef.current?.focus()
@@ -139,6 +146,7 @@ export default function ChatsPage() {
           </div>
 
           <button 
+            type="button"
             onClick={() => setShowFilters(!showFilters)}
             aria-label="Toggle filters"
             aria-expanded={showFilters}

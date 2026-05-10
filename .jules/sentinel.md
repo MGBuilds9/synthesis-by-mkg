@@ -22,3 +22,8 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+
+## 2024-05-25 - Credential Exposure in Frontend Logging
+**Vulnerability:** The sign-in page (`app/auth/signin/page.tsx`) used `console.log` to print the user's email and plaintext password upon form submission.
+**Learning:** Frontend logging can easily leak sensitive information to the browser console, which may be collected by telemetry/analytics tools or viewed by anyone with physical access to the device.
+**Prevention:** Never log passwords, tokens, or other sensitive PII to the browser console. Always use proper authentication libraries (like NextAuth) and handle credentials securely in memory or via HTTPS requests without exposing them in logs.

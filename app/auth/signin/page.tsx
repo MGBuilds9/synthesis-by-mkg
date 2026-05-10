@@ -9,7 +9,7 @@ export default function SignInPage() {
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault()
     // Sign in logic will be implemented with NextAuth
-    console.log('Sign in with:', { email, password })
+    // Sentinel: Removed console.log that exposed plaintext credentials
   }
 
   return (

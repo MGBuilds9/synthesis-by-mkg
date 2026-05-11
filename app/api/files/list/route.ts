@@ -59,6 +59,22 @@ export async function GET(request: NextRequest) {
     const accountIds = accounts.map((account) => account.id)
     const accountMap = new Map(accounts.map((a) => [a.id, a]))
 
+    // Bolt: Early return if no accounts match to avoid unnecessary DB queries
+    if (accountIds.length === 0) {
+      const response = NextResponse.json({
+        files: [],
+        total: includeCount ? 0 : -1,
+        limit,
+        offset,
+      })
+
+      response.headers.set('X-RateLimit-Limit', rateLimit.limit.toString())
+      response.headers.set('X-RateLimit-Remaining', rateLimit.remaining.toString())
+      response.headers.set('X-RateLimit-Reset', rateLimit.reset.toString())
+
+      return response
+    }
+
     const whereClause: any = {
       connectedAccountId: { in: accountIds },
     }

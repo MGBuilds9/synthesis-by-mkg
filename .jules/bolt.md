@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-10 - Avoid Unnecessary DB Queries for Empty Sets
+**Learning:** In list endpoints like `GET /api/messages/list` or `GET /api/files/list`, filtering by relations (e.g., connected accounts) that yield empty sets (no accounts exist) will still execute a subsequent expensive query like `prisma.messageThread.findMany({ where: { connectedAccountId: { in: [] } } })`. An `in: []` query is practically guaranteed to return an empty array but incurs a database roundtrip.
+**Action:** Always implement an early return when a prerequisite list of IDs is empty to avoid executing the query.

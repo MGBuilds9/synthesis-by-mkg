@@ -22,3 +22,8 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+
+## 2026-05-11 - Command Injection in GitHub Actions
+**Vulnerability:** The `.github/workflows/github-to-linear-sync.yml` workflow interpolated user-controlled input (`github.event.pull_request.body`, `github.event.head_commit.message`, etc.) directly into a bash script string. This caused backticks in the PR description to be executed as shell commands, exposing the runner to command injection.
+**Learning:** Never pass untrusted or user-controlled data directly into a shell script via string interpolation (`${{ ... }}`) in GitHub Actions. Bash will evaluate special characters (like backticks or `$()`), which leads to command injection vulnerabilities.
+**Prevention:** Always pass user-controlled input to bash scripts via the `env` context and reference them as environment variables (e.g., `PR_BODY="${PR_BODY}"`). This securely bypasses string interpolation.

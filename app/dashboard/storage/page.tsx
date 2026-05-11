@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, FolderOpen, Loader2 } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -220,14 +220,26 @@ export default function StoragePage() {
       {/* Files List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Searching...
+          <div className="p-16 text-center text-gray-500 flex flex-col items-center justify-center" role="status">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400 mb-4" aria-hidden="true" />
+            <p className="text-base font-medium">Searching...</p>
+            <span className="sr-only">Loading files</span>
           </div>
         ) : files.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            {selectedProvider === "ALL"
-              ? "No files yet. Connect your storage accounts to start syncing."
-              : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
+          <div className="p-12 sm:p-16 text-center text-gray-500">
+            <FolderOpen className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-3 text-gray-300" aria-hidden="true" />
+            <p className="text-base sm:text-lg font-medium">
+              {selectedProvider === "ALL"
+                ? "No files yet"
+                : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found`}
+            </p>
+            {selectedProvider === "ALL" && (
+              <p className="text-sm mt-1 px-4">
+                <Link href="/dashboard/settings" className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+                  Connect your storage accounts
+                </Link> to start syncing
+              </p>
+            )}
           </div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">

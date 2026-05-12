@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-12 - Early Returns for Empty Prisma In Queries
+**Learning:** When querying Prisma with an `in` operator (e.g., `where: { id: { in: ids } }`), if the target ID array is empty, Prisma still executes an unnecessary database query.
+**Action:** Always implement an early return before the Prisma query if the prerequisite array is empty to optimize performance and prevent guaranteed empty-set database roundtrips.

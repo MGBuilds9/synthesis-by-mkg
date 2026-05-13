@@ -29,3 +29,6 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+## 2026-05-13 - Avoid inline arrow functions in memoized components
+**Learning:** `MessageList` was wrapped in `React.memo` to prevent re-renders, but the parent `AIChatPage` passed an inline arrow function `onSuggestionClick={(text) => sendMessage(text)}`. This created a new function reference on every parent render (e.g. when typing in the input field), defeating the purpose of `React.memo` and causing `MessageList` to re-render constantly.
+**Action:** When passing callbacks to memoized components, use the "latest-ref" pattern (`useRef` updated via `useEffect` + `useCallback` with empty deps) to provide a stable reference that doesn't trigger re-renders, while still having access to the latest state/functions.

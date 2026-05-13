@@ -26,11 +26,10 @@ jobs:
         if: github.event_name == 'push'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          REPO: ${{ github.repository }}
         run: |
-          COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          REPO="${{ github.repository }}"
-
           # Determine commit type from conventional commit prefix
           COMMIT_TYPE="general"
           FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)

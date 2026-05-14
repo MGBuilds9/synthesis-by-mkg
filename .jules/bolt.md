@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-05 - Avoid Github Actions Bash Injection
+**Learning:** Passing user-controlled inputs (like pull request bodies) into github actions bash scripts via string interpolation (e.g. `"${{ github.event.pull_request.body }}"`) can cause syntax errors and bash injection vulnerabilities.
+**Action:** Always use the `env` block to pass these parameters to the environment securely.

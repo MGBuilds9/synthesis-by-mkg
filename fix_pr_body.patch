@@ -1,0 +1,21 @@
+--- .github/workflows/github-to-linear-sync.yml
++++ .github/workflows/github-to-linear-sync.yml
+@@ -147,8 +147,8 @@
+         run: |
+           PR_NUMBER="${{ github.event.pull_request.number }}"
+           PR_TITLE="${{ github.event.pull_request.title }}"
+           PR_URL="${{ github.event.pull_request.html_url }}"
+-          PR_BODY="${{ github.event.pull_request.body }}"
+           CHANGED_FILES="${CHANGED_FILES}"
+           EXISTING_ID="${EXISTING_ISSUE_ID}"
+           ISSUE_COUNT="${ISSUE_COUNT}"
+
+@@ -163,8 +163,8 @@
+           **Title:** ${PR_TITLE}
+
+           **Description:**
+-          ${PR_BODY:-_No description provided._}
++          ${PR_BODY:-_No description provided._}
+
+           **Changed Files:**
+           ${CHANGED_FILES:-_No files changed or unable to fetch._}

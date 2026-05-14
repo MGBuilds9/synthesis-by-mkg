@@ -37,7 +37,7 @@ export default function InboxPage() {
     <div className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inbox</h1>
-        <button className="px-3 sm:px-4 py-3 sm:py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-colors touch-manipulation min-h-[44px] sm:min-h-0">
+        <button type="button" className="px-3 sm:px-4 py-3 sm:py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-colors touch-manipulation min-h-[44px] sm:min-h-0">
           Compose
         </button>
       </div>
@@ -46,6 +46,7 @@ export default function InboxPage() {
         <div className="flex gap-3 sm:gap-4 flex-wrap items-center">
           <div className="flex gap-2 flex-wrap" role="group" aria-label="Filter by provider">
             <button
+              type="button"
               onClick={() => setSelectedProvider('all')}
               aria-pressed={selectedProvider === 'all'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -57,6 +58,7 @@ export default function InboxPage() {
               All
             </button>
             <button
+              type="button"
               onClick={() => setSelectedProvider('gmail')}
               aria-pressed={selectedProvider === 'gmail'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -68,6 +70,7 @@ export default function InboxPage() {
               Gmail
             </button>
             <button
+              type="button"
               onClick={() => setSelectedProvider('outlook')}
               aria-pressed={selectedProvider === 'outlook'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -107,10 +110,11 @@ export default function InboxPage() {
           </div>
 
           <button 
+            type="button"
             onClick={() => setShowFilters(!showFilters)}
             aria-label="Toggle filters"
             aria-expanded={showFilters}
-            aria-controls="filter-panel"
+            aria-controls={showFilters ? 'filter-panel' : undefined}
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
           >
             <Filter className="h-5 w-5 text-gray-600" aria-hidden="true" />

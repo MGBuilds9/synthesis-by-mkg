@@ -46,6 +46,7 @@ export default function ChatsPage() {
         <div className="flex gap-3 sm:gap-4 flex-wrap items-center">
           <div className="flex gap-2 flex-wrap" role="group" aria-label="Platform filter">
             <button
+              type="button"
               onClick={() => setSelectedPlatform('all')}
               aria-pressed={selectedPlatform === 'all'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -57,6 +58,7 @@ export default function ChatsPage() {
               All
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('discord')}
               aria-pressed={selectedPlatform === 'discord'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -68,6 +70,7 @@ export default function ChatsPage() {
               Discord
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('whatsapp')}
               aria-pressed={selectedPlatform === 'whatsapp'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -79,6 +82,7 @@ export default function ChatsPage() {
               WhatsApp
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('slack')}
               aria-pressed={selectedPlatform === 'slack'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -90,6 +94,7 @@ export default function ChatsPage() {
               Slack
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('teams')}
               aria-pressed={selectedPlatform === 'teams'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -101,6 +106,7 @@ export default function ChatsPage() {
               Teams
             </button>
             <button
+              type="button"
               onClick={() => setSelectedPlatform('telegram')}
               aria-pressed={selectedPlatform === 'telegram'}
               className={`px-3 sm:px-4 py-3 sm:py-2 rounded-lg font-medium transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
@@ -126,6 +132,7 @@ export default function ChatsPage() {
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => {
                   setSearchQuery("")
                   searchInputRef.current?.focus()
@@ -139,9 +146,11 @@ export default function ChatsPage() {
           </div>
 
           <button 
+            type="button"
             onClick={() => setShowFilters(!showFilters)}
             aria-label="Toggle filters"
             aria-expanded={showFilters}
+            aria-controls={showFilters && (showWorkspaceSelector || showChannelSelector || selectedPlatform === 'telegram') ? 'filter-panel' : undefined}
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
           >
             <Filter className="h-5 w-5 text-gray-600" aria-hidden="true" />
@@ -149,7 +158,7 @@ export default function ChatsPage() {
         </div>
 
         {showFilters && (showWorkspaceSelector || showChannelSelector || selectedPlatform === 'telegram') && (
-          <div className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
+          <div id="filter-panel" className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
             {showWorkspaceSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
                 <label className="text-sm font-medium text-gray-700 whitespace-nowrap">

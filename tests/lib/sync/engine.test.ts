@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
 import { SyncEngine } from '@/lib/sync/engine'
 import { subDays } from 'date-fns'
+import logger from '@/lib/logger'
 
 // Mock dependencies
 vi.mock('@/lib/prisma', () => ({
@@ -427,7 +428,7 @@ describe('SyncEngine', () => {
     })
 
     it('should catch and log errors without throwing', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const loggerErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {})
 
       const mockScope = {
         id: 'scope-1',
@@ -447,12 +448,14 @@ describe('SyncEngine', () => {
 
       await engine.syncAllEnabledScopes()
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('Failed to sync scope scope-1'),
-        expect.any(Error)
+        expect.objectContaining({
+          error: expect.any(String)
+        })
       )
 
-      consoleErrorSpy.mockRestore()
+      loggerErrorSpy.mockRestore()
     })
   })
 })

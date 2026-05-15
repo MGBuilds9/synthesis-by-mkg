@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-10 - O(1) Set Lookups in High-Frequency Callbacks
+**Learning:** Using array literal `['A', 'B'].includes(val)` checks inside callback functions like `Array.filter` causes unnecessary object allocations and garbage collection overhead on every iteration, potentially slowing down critical request paths.
+**Action:** Extract membership checks to module-level `Set` constants and use `Set.has()` for O(1) lookups without redundant allocations.

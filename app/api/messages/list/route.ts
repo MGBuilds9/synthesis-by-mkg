@@ -64,30 +64,33 @@ export async function GET(request: NextRequest) {
 
     // Bolt: Optimized to run findMany and optional count in parallel to reduce latency
     // Bolt: Only count if explicitly requested to avoid expensive aggregation on every request
-    const [threads, total] = await Promise.all([
-      prisma.messageThread.findMany({
-        where: whereClause,
-        include: {
-          messages: {
-            // Bolt: Select only necessary fields to reduce payload size (excludes htmlContent)
-            select: {
-              id: true,
-              sender: true,
-              content: true,
-              sentAt: true,
-              isRead: true,
-              providerMessageId: true,
+    // Bolt: Bypass query entirely if no connected accounts match (Prisma runs query even for empty 'in' array)
+    const [threads, total] = accountIds.length > 0
+      ? await Promise.all([
+          prisma.messageThread.findMany({
+            where: whereClause,
+            include: {
+              messages: {
+                // Bolt: Select only necessary fields to reduce payload size (excludes htmlContent)
+                select: {
+                  id: true,
+                  sender: true,
+                  content: true,
+                  sentAt: true,
+                  isRead: true,
+                  providerMessageId: true,
+                },
+                orderBy: { sentAt: 'desc' },
+                take: 1,
+              },
             },
-            orderBy: { sentAt: 'desc' },
-            take: 1,
-          },
-        },
-        orderBy: { lastMessageAt: 'desc' },
-        take: limit,
-        skip: offset,
-      }),
-      includeCount ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(-1),
-    ])
+            orderBy: { lastMessageAt: 'desc' },
+            take: limit,
+            skip: offset,
+          }),
+          includeCount ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(-1),
+        ])
+      : [[], 0]
 
     // Bolt: Map connected account details in memory to avoid N+1/JOIN query
     const threadsWithAccount = threads.map(thread => {

@@ -428,7 +428,7 @@ describe('SyncEngine', () => {
     })
 
     it('should catch and log errors without throwing', async () => {
-      const loggerErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {})
+      const loggerErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => logger)
 
       const mockScope = {
         id: 'scope-1',

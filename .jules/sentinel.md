@@ -22,3 +22,7 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+
+## 2024-05-15 - Bash Injection in GitHub Actions
+**Learning:** When passing user-controlled input (like github.event.pull_request.body or github.event.head_commit.message) into bash scripts within GitHub Actions, always pass them via the env context rather than inline string interpolation. Inline string interpolation allows unescaped characters like backticks to execute unintended commands, leading to command injection vulnerabilities.
+**Action:** Always use the `env` context mapping in GitHub Actions workflows to pass external dynamic text into scripts.

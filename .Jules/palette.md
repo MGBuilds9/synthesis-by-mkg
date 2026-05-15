@@ -32,3 +32,7 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+
+## 2026-05-15 - Filter Panel Accessibility
+**Learning:** Filter controls often implement interactive dropdowns or panels for filtering logic (e.g. Workspace or Email select options). While `aria-expanded` is frequently included on the trigger button to convey state, `aria-controls` is often missing. Without `aria-controls` linking the button's action to the target container's `id`, screen readers fail to associate the elements, making navigation confusing.
+**Action:** Always ensure that interactive UI elements (like buttons) conditionally controlling visibility of related content include an `aria-controls` property correctly pointing to the target element's `id`. For conditionally rendered components in React, use ternary operators to apply the ID strictly when the target exists.

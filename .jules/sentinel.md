@@ -22,3 +22,8 @@
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+
+## 2024-05-24 - Sanitized Error Logging
+**Vulnerability:** The sync engine used `console.error` and logged raw error objects, potentially leaking sensitive stack traces to unmonitored standard output.
+**Learning:** Even when using centralized loggers, error objects must be explicitly sanitized (e.g., extracting just the message) to prevent stack trace leaks.
+**Prevention:** Ensure all error logging sanitizes the error object before passing it to the logging mechanism.

@@ -32,3 +32,9 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+## 2026-05-16 - Filter Toggle Accessibility
+**Learning:** React elements with `aria-expanded` that conditionally render target elements must use the same exact boolean logic for the `aria-controls` attribute, setting it to `undefined` when the target is unmounted to prevent screen readers from referencing non-existent IDs.
+**Action:** Always link toggles to expanding panels with `id` and conditional `aria-controls` attributes.
+## 2026-05-16 - Linear API GraphQL Variables
+**Learning:** When interacting with the Linear GraphQL API, variables representing IDs (like team IDs or issue IDs) must be strictly typed as `ID!` rather than `String!` in the query signature. Using `String!` results in a `GRAPHQL_VALIDATION_FAILED` error.
+**Action:** Always verify GraphQL variable types against the API schema when writing integrations.

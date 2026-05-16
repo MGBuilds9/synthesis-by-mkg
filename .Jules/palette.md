@@ -35,3 +35,6 @@
 ## 2026-05-16 - Filter Toggle Accessibility
 **Learning:** React elements with `aria-expanded` that conditionally render target elements must use the same exact boolean logic for the `aria-controls` attribute, setting it to `undefined` when the target is unmounted to prevent screen readers from referencing non-existent IDs.
 **Action:** Always link toggles to expanding panels with `id` and conditional `aria-controls` attributes.
+## 2026-05-16 - Linear API GraphQL Variables
+**Learning:** When interacting with the Linear GraphQL API, variables representing IDs (like team IDs or issue IDs) must be strictly typed as `ID!` rather than `String!` in the query signature. Using `String!` results in a `GRAPHQL_VALIDATION_FAILED` error.
+**Action:** Always verify GraphQL variable types against the API schema when writing integrations.

@@ -181,7 +181,7 @@ jobs:
                 --arg title "$DISPLAY_TITLE" \
                 --arg desc "$DESCRIPTION" \
                 '{
-                  query: "mutation($id: String!, $input: IssueUpdateInput!) { issueUpdate(id: $id, input: $input) { success issue { id title url } } }",
+                  query: "mutation($id: ID!, $input: IssueUpdateInput!) { issueUpdate(id: $id, input: $input) { success issue { id title url } } }",
                   variables: {
                     id: $id,
                     input: {

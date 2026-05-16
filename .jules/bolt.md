@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-05-23 - Optimizing Re-renders with stable references
+**Learning:** Next.js memoized components still re-render if inline or recreated functions are passed as props. However, simple `useCallback` cannot capture changing state dependencies without adding them to the dependency array, which recreates the callback anyway.
+**Action:** Use the "latest-ref" pattern where an inline reference to state/functions is held in a mutable `useRef` updated via `useEffect`. Pass down a stable callback that accesses `ref.current` instead, keeping the dependency array empty while avoiding re-renders.

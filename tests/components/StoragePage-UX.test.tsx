@@ -49,9 +49,10 @@ describe("StoragePage UX", () => {
     render(<StoragePage />);
     await waitForLoad();
 
-    // The placeholder includes the shortcut hint like "Search files... (⌘+K)" or "Search files... (Ctrl+K)"
     const input = screen.getByLabelText("Search files");
-    expect(input).toHaveAttribute("placeholder", expect.stringContaining("+K)"));
+    expect(input).toHaveAttribute("aria-keyshortcuts", "meta+k control+k");
+    const kbd = screen.getByText(/K/);
+    expect(kbd).toBeInTheDocument();
   });
 
   it("hides shortcut hint when typing", async () => {
@@ -62,9 +63,10 @@ describe("StoragePage UX", () => {
 
     fireEvent.change(input, { target: { value: "test" } });
 
-    // The placeholder is always there, value just overlays it
-    // This test is checking behavior that doesn't apply - input value doesn't hide placeholder
     expect(input).toHaveValue("test");
+    // Visual hint is hidden when querying
+    const kbd = screen.queryByText(/K/);
+    expect(kbd).not.toBeInTheDocument();
   });
 
   it("focuses input after clearing search", async () => {

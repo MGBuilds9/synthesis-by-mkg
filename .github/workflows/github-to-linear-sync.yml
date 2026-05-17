@@ -25,10 +25,10 @@ jobs:
       - name: Push - Create Linear Issue
         if: github.event_name == 'push'
         env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
           COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
           REPO="${{ github.repository }}"
 
           # Determine commit type from conventional commit prefix
@@ -47,7 +47,15 @@ jobs:
           fi
 
           TITLE="Audit: synthesis-by-mkg - ${COMMIT_TYPE}"
-          DESCRIPTION="**Commit SHA:** \`${COMMIT_SHA}\`\n\n**Commit Message:** ${COMMIT_MSG}\n\n**Repository:** ${REPO}"
+          DESCRIPTION=$(cat <<- ENDDESC
+          **Commit SHA:** \`${COMMIT_SHA}\`
+
+          **Commit Message:**
+          ${{ env.COMMIT_MSG }}
+
+          **Repository:** ${REPO}
+          ENDDESC
+          )
 
           echo "Creating Linear issue for push — ${TITLE}"
 
@@ -143,12 +151,12 @@ jobs:
       - name: PR - Create or Update Linear Issue
         if: github.event_name == 'pull_request'
         env:
+          PR_BODY: ${{ github.event.pull_request.body }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
           CHANGED_FILES="${CHANGED_FILES}"
           EXISTING_ID="${EXISTING_ISSUE_ID}"
           ISSUE_COUNT="${ISSUE_COUNT}"
@@ -164,7 +172,7 @@ jobs:
           **Title:** ${PR_TITLE}
 
           **Description:**
-          ${PR_BODY:-_No description provided._}
+          ${{ env.PR_BODY }}
 
           **Changed Files:**
           ${CHANGED_FILES:-_No files changed or unable to fetch._}

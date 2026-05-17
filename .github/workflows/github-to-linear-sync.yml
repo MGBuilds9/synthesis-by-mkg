@@ -25,10 +25,10 @@ jobs:
       - name: Push - Create Linear Issue
         if: github.event_name == 'push'
         env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
           COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
           REPO="${{ github.repository }}"
 
           # Determine commit type from conventional commit prefix
@@ -47,7 +47,7 @@ jobs:
           fi
 
           TITLE="Audit: synthesis-by-mkg - ${COMMIT_TYPE}"
-          DESCRIPTION="**Commit SHA:** \`${COMMIT_SHA}\`\n\n**Commit Message:** ${COMMIT_MSG}\n\n**Repository:** ${REPO}"
+          DESCRIPTION="**Commit SHA:** \`${COMMIT_SHA}\`\n\n**Commit Message:** ${{ env.COMMIT_MSG }}\n\n**Repository:** ${REPO}"
 
           echo "Creating Linear issue for push — ${TITLE}"
 

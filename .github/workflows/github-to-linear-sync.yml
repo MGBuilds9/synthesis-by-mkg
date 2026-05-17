@@ -47,7 +47,15 @@ jobs:
           fi
 
           TITLE="Audit: synthesis-by-mkg - ${COMMIT_TYPE}"
-          DESCRIPTION="**Commit SHA:** \`${COMMIT_SHA}\`\n\n**Commit Message:** ${{ env.COMMIT_MSG }}\n\n**Repository:** ${REPO}"
+          DESCRIPTION=$(cat <<- ENDDESC
+          **Commit SHA:** \`${COMMIT_SHA}\`
+
+          **Commit Message:**
+          ${{ env.COMMIT_MSG }}
+
+          **Repository:** ${REPO}
+          ENDDESC
+          )
 
           echo "Creating Linear issue for push — ${TITLE}"
 

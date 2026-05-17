@@ -37,7 +37,9 @@ describe("ChatsPage UX", () => {
     render(<ChatsPage />);
 
     const input = screen.getByLabelText("Search chats") as HTMLInputElement;
-    expect(input.placeholder).toMatch(/\((⌘|Ctrl)\+K\)/);
+    expect(input).toHaveAttribute("aria-keyshortcuts", "meta+k control+k");
+    const kbd = screen.getByText(/K/);
+    expect(kbd).toBeInTheDocument();
   });
 
   it("clears search and focuses input when clear button is clicked", () => {

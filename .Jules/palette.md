@@ -32,3 +32,7 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+
+## 2026-06-25 - Search Keyboard Hints Visual UX
+**Learning:** Hardcoded keyboard shortcuts in input placeholders violate accessibility rules and duplicate aria labels cause issues. Relying on placeholders for dynamic hints causes UI jank.
+**Action:** Always place dynamic keyboard shortcut hints in a separate visual `<kbd>` element overlaid on the input, use clean semantic placeholders, and implement `aria-keyshortcuts="meta+k control+k"` directly on the input.

@@ -42,11 +42,19 @@ export default function NotionPage() {
             ref={searchInputRef}
             type="text"
             aria-label="Search Notion pages"
-            placeholder={`Search Notion pages... (${shortcutSymbol}+K)`}
+            aria-keyshortcuts="meta+k control+k"
+            placeholder="Search Notion pages..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
+          {!searchQuery && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none hidden sm:flex items-center">
+              <kbd className="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-mono font-medium text-gray-500 bg-gray-100 border border-gray-200 rounded" aria-hidden="true">
+                {shortcutSymbol} K
+              </kbd>
+            </div>
+          )}
           {searchQuery && (
             <button
               type="button"

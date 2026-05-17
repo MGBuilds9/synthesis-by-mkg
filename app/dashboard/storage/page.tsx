@@ -144,12 +144,20 @@ export default function StoragePage() {
               ref={searchInputRef}
               type="text"
               aria-label="Search files"
-              placeholder={`Search files... (${shortcutSymbol}+K)`}
+              aria-keyshortcuts="meta+k control+k"
+              placeholder="Search files..."
               className="w-full px-4 py-2 border rounded-lg pr-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
+            {!searchQuery && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none hidden sm:flex items-center">
+                <kbd className="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-mono font-medium text-gray-500 bg-gray-100 border border-gray-200 rounded" aria-hidden="true">
+                  {shortcutSymbol} K
+                </kbd>
+              </div>
+            )}
             {searchQuery && (
               <button
                 type="button"

@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     // Bolt: Optimized to run findMany and optional count in parallel to reduce latency
     // Bolt: Only count if explicitly requested to avoid expensive aggregation on every request
     const [files, total] = await Promise.all([
-      prisma.fileItem.findMany({
+      accountIds.length > 0 ? prisma.fileItem.findMany({
         where: whereClause,
         // Bolt: Optimized to select only necessary fields to reduce payload size
         // Bolt: Removed connectedAccount join to improve performance, re-attached in memory
@@ -89,8 +89,10 @@ export async function GET(request: NextRequest) {
         orderBy: { modifiedTime: 'desc' },
         take: limit,
         skip: offset,
-      }),
-      includeCount ? prisma.fileItem.count({ where: whereClause }) : Promise.resolve(-1),
+      }) : Promise.resolve([]),
+      accountIds.length > 0
+        ? (includeCount ? prisma.fileItem.count({ where: whereClause }) : Promise.resolve(-1))
+        : Promise.resolve(0),
     ])
 
     // Bolt: Attach connected account details in memory to avoid N+1/JOIN query overhead

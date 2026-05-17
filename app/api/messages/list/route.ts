@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     // Bolt: Optimized to run findMany and optional count in parallel to reduce latency
     // Bolt: Only count if explicitly requested to avoid expensive aggregation on every request
     const [threads, total] = await Promise.all([
-      prisma.messageThread.findMany({
+      accountIds.length > 0 ? prisma.messageThread.findMany({
         where: whereClause,
         include: {
           messages: {
@@ -85,8 +85,10 @@ export async function GET(request: NextRequest) {
         orderBy: { lastMessageAt: 'desc' },
         take: limit,
         skip: offset,
-      }),
-      includeCount ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(-1),
+      }) : Promise.resolve([]),
+      accountIds.length > 0
+        ? (includeCount ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(-1))
+        : Promise.resolve(0),
     ])
 
     // Bolt: Map connected account details in memory to avoid N+1/JOIN query

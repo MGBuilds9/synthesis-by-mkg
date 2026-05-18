@@ -26,10 +26,13 @@ jobs:
         if: github.event_name == 'push'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GH_COMMIT_SHA: ${{ github.sha }}
+          GH_COMMIT_MSG: ${{ github.event.head_commit.message }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
-          REPO="${{ github.repository }}"
+          COMMIT_SHA="${GH_COMMIT_SHA}"
+          COMMIT_MSG="${GH_COMMIT_MSG}"
+          REPO="${GH_REPO}"
 
           # Determine commit type from conventional commit prefix
           COMMIT_TYPE="general"
@@ -81,8 +84,9 @@ jobs:
         id: search
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_NUMBER="${GH_PR_NUMBER}"
 
           SEARCH_RESULT=$(curl -s -X POST https://api.linear.app/graphql \
             -H "Content-Type: application/json" \
@@ -144,11 +148,15 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_PR_TITLE: ${{ github.event.pull_request.title }}
+          GH_PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_NUMBER="${GH_PR_NUMBER}"
+          PR_TITLE="${GH_PR_TITLE}"
+          PR_URL="${GH_PR_URL}"
+          PR_BODY="${GH_PR_BODY}"
           CHANGED_FILES="${CHANGED_FILES}"
           EXISTING_ID="${EXISTING_ISSUE_ID}"
           ISSUE_COUNT="${ISSUE_COUNT}"

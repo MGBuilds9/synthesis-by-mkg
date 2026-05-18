@@ -91,7 +91,7 @@ jobs:
               --arg teamId "f5308d1f-43a5-474c-9ce3-5be155cb0be1" \
               --arg searchTerm "PR #${PR_NUMBER}" \
               '{
-                query: "query($teamId: String!, $searchTerm: String!) { issues(filter: { team: { id: { eq: $teamId } }, title: { contains: $searchTerm } }, first: 5) { nodes { id title url } } }",
+                query: "query($teamId: ID!, $searchTerm: String!) { issues(filter: { team: { id: { eq: $teamId } }, title: { contains: $searchTerm } }, first: 5) { nodes { id title url } } }",
                 variables: {
                   teamId: $teamId,
                   searchTerm: $searchTerm
@@ -144,11 +144,11 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
           CHANGED_FILES="${CHANGED_FILES}"
           EXISTING_ID="${EXISTING_ISSUE_ID}"
           ISSUE_COUNT="${ISSUE_COUNT}"

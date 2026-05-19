@@ -95,9 +95,10 @@ export default function AIChatPage() {
             </select>
             
             <button
+              type="button"
               onClick={() => setShowContextSettings(!showContextSettings)}
               aria-expanded={showContextSettings}
-              aria-controls="context-settings-panel"
+              aria-controls={showContextSettings ? 'context-settings-panel' : undefined}
               aria-label="Context settings"
               className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
             >
@@ -213,6 +214,7 @@ export default function AIChatPage() {
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none min-h-[48px] max-h-[200px]"
             />
             <button
+              type="button"
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               aria-label={loading ? 'Sending message' : 'Send message'}

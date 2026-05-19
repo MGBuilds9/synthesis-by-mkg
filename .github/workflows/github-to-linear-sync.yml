@@ -26,9 +26,10 @@ jobs:
         if: github.event_name == 'push'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          HEAD_COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          COMMIT_MSG="${HEAD_COMMIT_MSG}"
           REPO="${{ github.repository }}"
 
           # Determine commit type from conventional commit prefix
@@ -91,7 +92,7 @@ jobs:
               --arg teamId "f5308d1f-43a5-474c-9ce3-5be155cb0be1" \
               --arg searchTerm "PR #${PR_NUMBER}" \
               '{
-                query: "query($teamId: String!, $searchTerm: String!) { issues(filter: { team: { id: { eq: $teamId } }, title: { contains: $searchTerm } }, first: 5) { nodes { id title url } } }",
+                query: "query($teamId: ID!, $searchTerm: String!) { issues(filter: { team: { id: { eq: $teamId } }, title: { contains: $searchTerm } }, first: 5) { nodes { id title url } } }",
                 variables: {
                   teamId: $teamId,
                   searchTerm: $searchTerm
@@ -144,11 +145,13 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PULL_REQUEST_TITLE: ${{ github.event.pull_request.title }}
+          PULL_REQUEST_BODY: ${{ github.event.pull_request.body }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_TITLE="${PULL_REQUEST_TITLE}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_BODY="${PULL_REQUEST_BODY}"
           CHANGED_FILES="${CHANGED_FILES}"
           EXISTING_ID="${EXISTING_ISSUE_ID}"
           ISSUE_COUNT="${ISSUE_COUNT}"

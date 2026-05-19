@@ -88,9 +88,9 @@ export async function GET(request: NextRequest) {
             skip: offset,
           })
         : Promise.resolve([]),
-      accountIds.length > 0
-        ? (includeCount ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(-1))
-        : Promise.resolve(0),
+      includeCount
+        ? (accountIds.length > 0 ? prisma.messageThread.count({ where: whereClause }) : Promise.resolve(0))
+        : Promise.resolve(-1),
     ])
 
     // Bolt: Map connected account details in memory to avoid N+1/JOIN query

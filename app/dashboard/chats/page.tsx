@@ -149,6 +149,7 @@ export default function ChatsPage() {
           </button>
         </div>
 
+        {/* Render filter options if applicable */}
         {showFilters && (showWorkspaceSelector || showChannelSelector || selectedPlatform === 'telegram') && (
           <div id="filter-panel" className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
             {showWorkspaceSelector && (

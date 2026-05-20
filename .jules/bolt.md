@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-18 - Module-level Sets for Array Membership Checks
+**Learning:** In performance-critical loops like `Array.filter` within API routes, using array literals for membership checks (e.g., `['A', 'B'].includes(x)`) causes redundant object allocations and garbage collection overhead during every execution.
+**Action:** Extract these array literals into `Set` constants at the module level and use `.has()` for membership checks to eliminate redundant allocations and lookup speed.

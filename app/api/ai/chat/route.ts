@@ -9,7 +9,7 @@ import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 import logger from '@/lib/logger'
 
-// Bolt: Module-level Sets for O(1) lookups and avoiding redundant allocations.....
+// Bolt: Module-level Sets for O(1) lookups and avoiding redundant allocations......
 const EMAIL_SCOPES = new Set(['GMAIL_LABEL', 'OUTLOOK_FOLDER'])
 const CHAT_SCOPES = new Set(['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'])
 const FILE_SCOPES = new Set(['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'])

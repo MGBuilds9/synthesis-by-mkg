@@ -26,9 +26,10 @@ jobs:
         if: github.event_name == 'push'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          EVENT_HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          COMMIT_MSG="${EVENT_HEAD_COMMIT_MESSAGE}"
           REPO="${{ github.repository }}"
 
           # Determine commit type from conventional commit prefix
@@ -144,11 +145,14 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          EVENT_PR_TITLE: ${{ github.event.pull_request.title }}
+          EVENT_PR_URL: ${{ github.event.pull_request.html_url }}
+          EVENT_PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_TITLE="${EVENT_PR_TITLE}"
+          PR_URL="${EVENT_PR_URL}"
+          PR_BODY="${EVENT_PR_BODY}"
           CHANGED_FILES="${CHANGED_FILES}"
           EXISTING_ID="${EXISTING_ISSUE_ID}"
           ISSUE_COUNT="${ISSUE_COUNT}"

@@ -9,12 +9,6 @@ import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 import logger from '@/lib/logger'
 
-// Bolt: Extract array literals to module-level Sets to avoid reallocation per request
-const EMAIL_DOMAINS = new Set(['GMAIL_LABEL', 'OUTLOOK_FOLDER'])
-const CHAT_DOMAINS = new Set(['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'])
-const FILE_DOMAINS = new Set(['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'])
-const NOTION_DOMAINS = new Set(['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'])
-
 // Sentinel: Validation schema
 const chatRequestSchema = z.object({
   sessionId: z.string().min(1, 'Session ID is required'),
@@ -175,16 +169,16 @@ export async function POST(request: NextRequest) {
           const type = scope.syncScope.scopeType
 
           // Map scope types to domains
-          if (EMAIL_DOMAINS.has(type)) {
+          if (['GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(type)) {
             return contextDomains.emails !== false
           }
-          if (CHAT_DOMAINS.has(type)) {
+          if (['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'].includes(type)) {
             return contextDomains.chats !== false
           }
-          if (FILE_DOMAINS.has(type)) {
+          if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(type)) {
             return contextDomains.files !== false
           }
-          if (NOTION_DOMAINS.has(type)) {
+          if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(type)) {
             return contextDomains.notion !== false
           }
           return true

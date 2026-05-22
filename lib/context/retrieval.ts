@@ -1,6 +1,11 @@
 import { prisma } from '../prisma'
 import { subDays } from 'date-fns'
 
+// Bolt: Define Scope Sets at module level to avoid redundant object allocations in hot paths
+const MESSAGE_SCOPE_TYPES = new Set(['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'])
+const FILE_SCOPE_TYPES = new Set(['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'])
+const NOTION_SCOPE_TYPES = new Set(['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'])
+
 export interface ContextOptions {
   sessionId: string
   timeWindowDays?: number
@@ -48,11 +53,11 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
 
     const { connectedAccountId, scopeType } = contextScope.syncScope
 
-    if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) {
+    if (MESSAGE_SCOPE_TYPES.has(scopeType)) {
       messageAccountIds.add(connectedAccountId)
-    } else if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) {
+    } else if (FILE_SCOPE_TYPES.has(scopeType)) {
       fileAccountIds.add(connectedAccountId)
-    } else if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(scopeType)) {
+    } else if (NOTION_SCOPE_TYPES.has(scopeType)) {
       notionAccountIds.add(connectedAccountId)
     }
   })

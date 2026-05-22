@@ -28,6 +28,12 @@ const chatRequestSchema = z.object({
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
 const MAX_MESSAGES_PER_MINUTE = 10
 
+// Bolt: Define Scope Sets at module level to avoid redundant object allocations in hot path filters
+const EMAIL_SCOPE_TYPES = new Set(['GMAIL_LABEL', 'OUTLOOK_FOLDER'])
+const CHAT_SCOPE_TYPES = new Set(['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'])
+const FILE_SCOPE_TYPES = new Set(['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'])
+const NOTION_SCOPE_TYPES = new Set(['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'])
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -169,16 +175,16 @@ export async function POST(request: NextRequest) {
           const type = scope.syncScope.scopeType
 
           // Map scope types to domains
-          if (['GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(type)) {
+          if (EMAIL_SCOPE_TYPES.has(type)) {
             return contextDomains.emails !== false
           }
-          if (['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'].includes(type)) {
+          if (CHAT_SCOPE_TYPES.has(type)) {
             return contextDomains.chats !== false
           }
-          if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(type)) {
+          if (FILE_SCOPE_TYPES.has(type)) {
             return contextDomains.files !== false
           }
-          if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(type)) {
+          if (NOTION_SCOPE_TYPES.has(type)) {
             return contextDomains.notion !== false
           }
           return true

@@ -53,7 +53,7 @@ jobs:
 
           curl -s -X POST https://api.linear.app/graphql \
             -H "Content-Type: application/json" \
-            -H "Authorization: ${LINEAR_API_KEY}" \
+            -H "Authorization: Bearer ${LINEAR_API_KEY}" \
             -d "$(jq -n \
               --arg title "$TITLE" \
               --arg desc "$DESCRIPTION" \
@@ -86,7 +86,7 @@ jobs:
 
           SEARCH_RESULT=$(curl -s -X POST https://api.linear.app/graphql \
             -H "Content-Type: application/json" \
-            -H "Authorization: ${LINEAR_API_KEY}" \
+            -H "Authorization: Bearer ${LINEAR_API_KEY}" \
             -d "$(jq -n \
               --arg teamId "f5308d1f-43a5-474c-9ce3-5be155cb0be1" \
               --arg searchTerm "PR #${PR_NUMBER}" \
@@ -175,7 +175,7 @@ jobs:
             echo "UPDATING existing Linear issue: ${EXISTING_ID}"
             curl -s -X POST https://api.linear.app/graphql \
               -H "Content-Type: application/json" \
-              -H "Authorization: ${LINEAR_API_KEY}" \
+              -H "Authorization: Bearer ${LINEAR_API_KEY}" \
               -d "$(jq -n \
                 --arg id "$EXISTING_ID" \
                 --arg title "$DISPLAY_TITLE" \
@@ -195,7 +195,7 @@ jobs:
             echo "CREATING new Linear issue: ${DISPLAY_TITLE}"
             curl -s -X POST https://api.linear.app/graphql \
               -H "Content-Type: application/json" \
-              -H "Authorization: ${LINEAR_API_KEY}" \
+              -H "Authorization: Bearer ${LINEAR_API_KEY}" \
               -d "$(jq -n \
                 --arg title "$DISPLAY_TITLE" \
                 --arg desc "$DESCRIPTION" \

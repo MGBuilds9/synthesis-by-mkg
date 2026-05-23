@@ -29,3 +29,7 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+
+## 2026-06-15 - Bypass Prisma IN query for empty arrays
+**Learning:** Executing a Prisma query with `{ in: [] }` on an empty array still executes a database query that returns no results. This is unnecessary overhead and wastes connection pool resources.
+**Action:** When filtering by an array of IDs using `in`, check if the array is empty (`length === 0`) and bypass the query entirely using conditional ternary assignment to avoid duplicating response construction.

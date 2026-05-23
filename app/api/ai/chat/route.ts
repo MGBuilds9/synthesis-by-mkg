@@ -10,6 +10,21 @@ import { z } from 'zod'
 import logger from '@/lib/logger'
 
 // Sentinel: Validation schema
+// Bolt: Module-level Sets for O(1) membership checks and zero per-request allocation
+const EMAIL_SCOPES = new Set(['GMAIL_LABEL', 'OUTLOOK_FOLDER'])
+const CHAT_SCOPES = new Set([
+  'DISCORD_SERVER',
+  'DISCORD_CHANNEL',
+  'WHATSAPP_ACCOUNT',
+  'SLACK_WORKSPACE',
+  'SLACK_CHANNEL',
+  'TELEGRAM_CHAT',
+  'TEAMS_WORKSPACE',
+  'TEAMS_CHANNEL',
+])
+const FILE_SCOPES = new Set(['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'])
+const NOTION_SCOPES = new Set(['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'])
+
 const chatRequestSchema = z.object({
   sessionId: z.string().min(1, 'Session ID is required'),
   message: z.string().min(1, 'Message is required').max(5000, 'Message too long'),
@@ -169,16 +184,16 @@ export async function POST(request: NextRequest) {
           const type = scope.syncScope.scopeType
 
           // Map scope types to domains
-          if (['GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(type)) {
+          if (EMAIL_SCOPES.has(type)) {
             return contextDomains.emails !== false
           }
-          if (['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'].includes(type)) {
+          if (CHAT_SCOPES.has(type)) {
             return contextDomains.chats !== false
           }
-          if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(type)) {
+          if (FILE_SCOPES.has(type)) {
             return contextDomains.files !== false
           }
-          if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(type)) {
+          if (NOTION_SCOPES.has(type)) {
             return contextDomains.notion !== false
           }
           return true

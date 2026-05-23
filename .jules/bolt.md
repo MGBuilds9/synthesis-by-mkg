@@ -29,3 +29,6 @@
 ## 2026-06-05 - Avoid Unnecessary Counts
 **Learning:** Running aggregation queries like `count` alongside `findMany` unnecessarily loads the DB if the count isn't actually used by the client. The `includeCount` parameter parsing can also be tricky; checking `!== 'false'` preserves backward compatibility better than `=== 'true'`.
 **Action:** Add an `includeCount` flag to list endpoints, defaulting to true to preserve the API contract, and skip the `count` query when explicitly requested.
+## 2026-05-23 - Extracting array literals to module level Sets
+**Learning:** In performance-critical paths like Next.js API routes or frequent callbacks, using array literals for membership checks causes redundant object allocations and garbage collection overhead on every execution.
+**Action:** Extract these arrays into module-level Set constants and use has for O 1 lookups, eliminating redundant allocations and improving lookup performance.

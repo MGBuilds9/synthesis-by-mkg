@@ -131,7 +131,7 @@ jobs:
             });
 
             const fileList = files.map(f =>
-              `- \`${f.filename}\` (${f.status}, +${f.additions}/-${f.deletions})`
+              `- ${f.filename} (${f.status}, +${f.additions}/-${f.deletions})`
             );
             const changedFiles = fileList.join('\n');
 
@@ -144,12 +144,11 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
-          CHANGED_FILES="${CHANGED_FILES}"
           EXISTING_ID="${EXISTING_ISSUE_ID}"
           ISSUE_COUNT="${ISSUE_COUNT}"
 

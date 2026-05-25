@@ -21,4 +21,8 @@
 ## 2024-05-24 - Insecure Logging
 **Vulnerability:** The AI Chat API endpoint (`/api/ai/chat`) used `console.error` to log internal errors, potentially leaking sensitive stack traces or application state into standard output streams where they could be exposed to unauthorized parties or not centrally monitored.
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
-**Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
+
+## 2026-05-25 - Plaintext Credential Logging
+**Vulnerability:** The sign-in page logged the user's email and plaintext password to the client-side console on submission.
+**Learning:** Hardcoded console.logs containing sensitive authentication data during development must not be left in the code, as they can expose credentials to shoulder surfers or browser extensions.
+**Prevention:** Never log plaintext passwords or sensitive authentication credentials to the console under any circumstances.

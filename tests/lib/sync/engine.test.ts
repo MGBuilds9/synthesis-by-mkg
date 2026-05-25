@@ -427,7 +427,8 @@ describe('SyncEngine', () => {
     })
 
     it('should catch and log errors without throwing', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const logger = await import('@/lib/logger');
+      const consoleErrorSpy = vi.spyOn(logger.default || logger, 'error').mockImplementation(() => {})
 
       const mockScope = {
         id: 'scope-1',
@@ -449,7 +450,7 @@ describe('SyncEngine', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('Failed to sync scope scope-1'),
-        expect.any(Error)
+        { error: expect.any(Error) }
       )
 
       consoleErrorSpy.mockRestore()

@@ -151,7 +151,8 @@ export class SyncEngine {
 
     const syncPromises = enabledScopes.map(scope => 
       this.processSync(scope).catch(error => {
-        console.error(`Failed to sync scope ${scope.id}:`, error)
+        // Sentinel: Prevent leakage of sensitive stack traces by routing errors through structured logger
+        logger.error(`Failed to sync scope ${scope.id}:`, { error })
       })
     )
 

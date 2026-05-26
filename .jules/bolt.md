@@ -1,3 +1,6 @@
+## 2026-05-26 - GitHub Actions Bash Injection Workarounds
+**Learning:** Even when avoiding backticks and slashes, single quotes, double quotes, and other invisible/formatting characters in PR descriptions can still break inline bash substitutions within heredocs in GitHub Actions (like the `github-to-linear-sync` workflow).
+**Action:** When a workflow requires a completely sanitized string to prevent interpolation errors, strictly use ONLY alphanumeric characters and spaces in the PR description, and drop any emojis or punctuation altogether. If you are required to use specific emojis in the title by the persona, keep them strictly in the title.
 ## 2026-05-26 - Optimize Membership Checks
 **Learning:** In performance-critical callbacks like Array.filter within Next.js API routes, using array literals for membership checks (e.g., `['A', 'B'].includes(x)`) causes redundant object allocations and garbage collection overhead during every request execution.
 **Action:** Extract these array literals into `Set` constants at the module level and use `Set.has(x)`.

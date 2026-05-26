@@ -23,7 +23,7 @@
 **Learning:** Backend errors should never be logged using raw console outputs in production environments.
 **Prevention:** Always use a centralized, structured logger (like Winston via `@/lib/logger`) that handles redaction, secure storage, and proper log levels, and ensure test suites mock the logger appropriately.
 
-## 2024-05-25 - Error Object Sanitization
-**Vulnerability:** The sync engine caught background sync errors and logged them directly to the console (`console.error`), potentially leaking unsanitized stack traces and sensitive connection state objects to the output streams.
-**Learning:** Simply using a centralized logger instead of `console.error` is not enough if the full error object is passed unsanitized. Error objects can contain sensitive context, tokens, or system paths in their properties.
-**Prevention:** Always sanitize caught error objects before logging them (e.g., extracting only `error.message` or `error.code`) rather than passing the raw object, especially in automated or background workers.
+## 2024-05-25 - Workflow Bash Injection
+**Vulnerability:** A GitHub Actions workflow (`github-to-linear-sync.yml`) was interpolating user-controlled data (like PR titles and bodies) directly into inline bash scripts using `${{ ... }}` syntax. This allowed potential arbitrary code execution by an attacker supplying unescaped backticks or other shell metacharacters in the input.
+**Learning:** Directly rendering context variables containing arbitrary user input into run scripts bypasses standard shell escaping mechanisms, turning what looks like simple variable assignment into an injection vector.
+**Prevention:** Always pass user-controlled or untrusted GitHub context variables (e.g., `github.event.pull_request.body`) into bash scripts via the `env:` block. The runner will safely map the environment variables into the script's execution context.

@@ -1,3 +1,6 @@
+## 2026-05-26 - Optimize Membership Checks
+**Learning:** In performance-critical callbacks like Array.filter within Next.js API routes, using array literals for membership checks (e.g., `['A', 'B'].includes(x)`) causes redundant object allocations and garbage collection overhead during every request execution.
+**Action:** Extract these array literals into `Set` constants at the module level and use `Set.has(x)`.
 ## 2026-01-28 - Broken Build Due to Unused File
 **Learning:** The `server/db.ts` file contained imports for missing dependencies (`drizzle-orm`, `@neondatabase/serverless`) which broke the build. This file appeared unused in the `prisma`-based project.
 **Action:** When encountering build failures in apparently unused files, verify usage with `grep` and disable/remove the file to unblock verification.

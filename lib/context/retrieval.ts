@@ -1,6 +1,11 @@
 import { prisma } from '../prisma'
 import { subDays } from 'date-fns'
 
+// Bolt: Module-level Sets for fast O(1) membership lookups in high-frequency loops
+const EMAIL_CHAT_SCOPES = new Set(['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'])
+const FILE_SCOPES = new Set(['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'])
+const NOTION_SCOPES = new Set(['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'])
+
 export interface ContextOptions {
   sessionId: string
   timeWindowDays?: number
@@ -48,11 +53,12 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
 
     const { connectedAccountId, scopeType } = contextScope.syncScope
 
-    if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) {
+    // Bolt: Use Set.has() for O(1) membership lookups instead of allocating new arrays in the loop
+    if (EMAIL_CHAT_SCOPES.has(scopeType)) {
       messageAccountIds.add(connectedAccountId)
-    } else if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) {
+    } else if (FILE_SCOPES.has(scopeType)) {
       fileAccountIds.add(connectedAccountId)
-    } else if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(scopeType)) {
+    } else if (NOTION_SCOPES.has(scopeType)) {
       notionAccountIds.add(connectedAccountId)
     }
   })

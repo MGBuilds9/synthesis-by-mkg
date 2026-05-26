@@ -33,3 +33,7 @@
 ## 2026-06-06 - Avoid Prisma Queries with Empty IN Arrays
 **Learning:** When querying Prisma with an `in` operator (e.g., `where: { id: { in: ids } }`), if the target ID array is empty, Prisma still executes an unnecessary database query which returns an empty result but incurs overhead.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) instead of executing it with an empty array.
+
+## 2026-06-06 - Linear API GraphQL Variables Typing
+**Learning:** When constructing GraphQL queries for the Linear API (e.g., in GitHub Actions workflows), ensure that ID variables (like `$teamId` or `$id`) are explicitly typed as `ID!` instead of `String!` in the query signature to prevent `GRAPHQL_VALIDATION_FAILED` (400) errors.
+**Action:** When updating `.github/workflows/github-to-linear-sync.yml`, change `$teamId: String!` to `$teamId: ID!`.

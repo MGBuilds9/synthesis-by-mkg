@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import ChatsPage from '@/app/dashboard/chats/page'
 
@@ -56,6 +56,24 @@ describe('ChatsPage', () => {
       const filterButton = screen.getByLabelText('Toggle filters')
       expect(filterButton).toBeInTheDocument()
       expect(filterButton).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('filter button aria-controls points to filter panel when expanded', () => {
+      render(<ChatsPage />)
+      const filterButton = screen.getByLabelText('Toggle filters')
+
+      // Select discord platform so the filter panel actually renders when opened
+      const discordButton = screen.getByRole('button', { name: /discord/i })
+      fireEvent.click(discordButton)
+
+      // Initially no panel, so no aria-controls
+      expect(filterButton).not.toHaveAttribute('aria-controls')
+
+      // Expand filters
+      fireEvent.click(filterButton)
+
+      // Now aria-controls should point to the panel
+      expect(filterButton).toHaveAttribute('aria-controls', 'chats-filter-panel')
     })
 
     it('platform filter buttons use aria-pressed for selection state', () => {

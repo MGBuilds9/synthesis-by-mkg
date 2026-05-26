@@ -1,5 +1,6 @@
 import { prisma } from '../prisma'
 import { subDays } from 'date-fns'
+import { EMAIL_SCOPES, CHAT_SCOPES, FILE_SCOPES, NOTION_SCOPES } from './constants'
 
 export interface ContextOptions {
   sessionId: string
@@ -48,11 +49,11 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
 
     const { connectedAccountId, scopeType } = contextScope.syncScope
 
-    if (['DISCORD_CHANNEL', 'GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(scopeType)) {
+    if (scopeType === 'DISCORD_CHANNEL' || EMAIL_SCOPES.has(scopeType)) {
       messageAccountIds.add(connectedAccountId)
-    } else if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(scopeType)) {
+    } else if (FILE_SCOPES.has(scopeType)) {
       fileAccountIds.add(connectedAccountId)
-    } else if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(scopeType)) {
+    } else if (NOTION_SCOPES.has(scopeType)) {
       notionAccountIds.add(connectedAccountId)
     }
   })

@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { getLLMProvider } from '@/lib/providers/llm'
 import { retrieveAIContext, summarizeContext } from '@/lib/context/retrieval'
 import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
+import { EMAIL_SCOPES, CHAT_SCOPES, FILE_SCOPES, NOTION_SCOPES } from '@/lib/context/constants'
 import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 import logger from '@/lib/logger'
@@ -169,16 +170,16 @@ export async function POST(request: NextRequest) {
           const type = scope.syncScope.scopeType
 
           // Map scope types to domains
-          if (['GMAIL_LABEL', 'OUTLOOK_FOLDER'].includes(type)) {
+          if (EMAIL_SCOPES.has(type)) {
             return contextDomains.emails !== false
           }
-          if (['DISCORD_SERVER', 'DISCORD_CHANNEL', 'WHATSAPP_ACCOUNT', 'SLACK_WORKSPACE', 'SLACK_CHANNEL', 'TELEGRAM_CHAT', 'TEAMS_WORKSPACE', 'TEAMS_CHANNEL'].includes(type)) {
+          if (CHAT_SCOPES.has(type)) {
             return contextDomains.chats !== false
           }
-          if (['DRIVE_FOLDER', 'ONEDRIVE_FOLDER'].includes(type)) {
+          if (FILE_SCOPES.has(type)) {
             return contextDomains.files !== false
           }
-          if (['NOTION_WORKSPACE', 'NOTION_DATABASE', 'NOTION_PAGE'].includes(type)) {
+          if (NOTION_SCOPES.has(type)) {
             return contextDomains.notion !== false
           }
           return true

@@ -1,6 +1,3 @@
-## 2026-05-26 - GitHub Actions Bash Injection
-**Learning:** Passing user-controlled input like pull request titles or bodies via inline string interpolation (e.g., `${{ github.event.pull_request.body }}`) in GitHub Actions run scripts creates a critical bash injection vulnerability and often breaks syntax when strings contain quotes, backticks, or other special characters.
-**Action:** Always pass user-controlled input into bash scripts via the `env` block rather than direct interpolation.
 ## 2026-05-26 - Optimize Membership Checks
 **Learning:** In performance-critical callbacks like Array.filter within Next.js API routes, using array literals for membership checks (e.g., `['A', 'B'].includes(x)`) causes redundant object allocations and garbage collection overhead during every request execution.
 **Action:** Extract these array literals into `Set` constants at the module level and use `Set.has(x)`.

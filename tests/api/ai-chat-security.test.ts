@@ -32,14 +32,26 @@ vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn(),
+  },
+}))
+
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { getLLMProvider } from '@/lib/providers/llm'
+import { rateLimiter } from '@/lib/ratelimit'
 
 describe('POST /api/ai/chat - Security', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 10,
+      remaining: 9,
+      reset: Date.now() + 60000,
+    })
   })
 
   function createRequest(body: any): NextRequest {
@@ -112,8 +124,13 @@ describe('POST /api/ai/chat - Security', () => {
       messages: [],
     } as any)
 
-    // Mock count to be equal to or greater than limit (e.g. 10)
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(10)
+    // Mock rate limit failure
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: false,
+      limit: 10,
+      remaining: 0,
+      reset: Date.now() + 60000,
+    })
 
     const request = createRequest({
       sessionId: 'session-spam',

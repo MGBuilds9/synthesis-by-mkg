@@ -8,6 +8,7 @@ import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
 import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 import logger from '@/lib/logger'
+import { rateLimiter } from '@/lib/ratelimit'
 
 // Sentinel: Validation schema
 const chatRequestSchema = z.object({
@@ -23,10 +24,6 @@ const chatRequestSchema = z.object({
     notion: z.boolean().optional(),
   }).optional(),
 }).passthrough()
-
-// Sentinel: Rate limit configuration
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
-const MAX_MESSAGES_PER_MINUTE = 10
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,31 +57,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Sentinel: Rate Limiting
-    // Count user messages in the last minute
-    // We filter by user ID via session relation to ensure we count across all sessions for this user
-    try {
-      const recentMessageCount = await prisma.aiMessage.count({
-        where: {
-          session: { userId: session.user.id },
-          role: 'user',
-          createdAt: {
-            gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
-          }
-        }
-      })
-
-      if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
-        return NextResponse.json(
-          { error: 'Too many requests' },
-          { status: 429 }
-        )
-      }
-    } catch (error) {
-      logger.error('Rate limit check failed', { error })
-      // Sentinel: Fail closed to protect resources
+    const rateLimit = rateLimiter.check(session.user.id)
+    if (!rateLimit.success) {
       return NextResponse.json(
-        { error: 'Service temporarily unavailable' },
-        { status: 503 }
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
+          },
+        }
       )
     }
 
@@ -224,10 +208,16 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({
+    const finalResponse = NextResponse.json({
       response,
       sessionId: chatSession.id,
     })
+
+    finalResponse.headers.set('X-RateLimit-Limit', rateLimit.limit.toString())
+    finalResponse.headers.set('X-RateLimit-Remaining', rateLimit.remaining.toString())
+    finalResponse.headers.set('X-RateLimit-Reset', rateLimit.reset.toString())
+
+    return finalResponse
   } catch (error: any) {
     logger.error('Failed to process chat', { error })
     // Sentinel: Do not leak internal error details to the client

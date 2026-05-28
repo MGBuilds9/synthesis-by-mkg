@@ -11,9 +11,11 @@ vi.mock('@/lib/prisma', () => ({
     aiChatSession: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      findMany: vi.fn(),
     },
     aiMessage: {
       create: vi.fn(),
+      findMany: vi.fn(),
       count: vi.fn(),
     },
   },
@@ -39,6 +41,7 @@ import { getLLMProvider } from '@/lib/providers/llm'
 describe('POST /api/ai/chat - Model Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(prisma.aiChatSession.findMany).mockResolvedValue([{ id: "session-123" }] as any)
     vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
   })
 

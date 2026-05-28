@@ -63,15 +63,22 @@ export async function POST(request: NextRequest) {
     // Count user messages in the last minute
     // We filter by user ID via session relation to ensure we count across all sessions for this user
     try {
-      const recentMessageCount = await prisma.aiMessage.count({
+      // Bolt: Optimized to fetch session IDs first, avoiding an expensive JOIN on the AiMessage table
+      const userSessions = await prisma.aiChatSession.findMany({
+        where: { userId: session.user.id },
+        select: { id: true },
+      })
+      const sessionIds = userSessions.map((s: any) => s.id)
+
+      const recentMessageCount = sessionIds.length > 0 ? await prisma.aiMessage.count({
         where: {
-          session: { userId: session.user.id },
+          sessionId: { in: sessionIds },
           role: 'user',
           createdAt: {
             gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
           }
         }
-      })
+      }) : 0
 
       if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
         return NextResponse.json(

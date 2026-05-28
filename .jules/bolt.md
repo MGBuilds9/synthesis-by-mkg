@@ -33,3 +33,7 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+
+## 2026-05-28 - Avoid Unnecessary Relation Joins for Count Operations
+**Learning:** Fetching a count with relation filters (e.g., `session: { userId }`) forces Prisma to execute an expensive JOIN on large tables. This is especially detrimental in high-frequency operations like rate limiting.
+**Action:** Pre-fetch foreign key IDs (like `sessionId`) using `findMany` on the parent model and use the `in` operator on the target model. Always conditionally bypass the query if the IDs array is empty to eliminate unnecessary database calls.

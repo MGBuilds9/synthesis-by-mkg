@@ -17,6 +17,7 @@ vi.mock('@/lib/prisma', () => ({
     aiChatSession: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }))
@@ -42,6 +43,7 @@ describe('POST /api/ai/chat - Context Domain Filtering', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(prisma.aiChatSession.findMany).mockResolvedValue([{ id: "session-123" }] as any)
     vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
     vi.mocked(getLLMProvider).mockReturnValue(mockLLM)
     vi.mocked(retrieveAIContext).mockResolvedValue({ messages: [], files: [], notionPages: [] })

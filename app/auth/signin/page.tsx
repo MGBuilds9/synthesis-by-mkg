@@ -12,7 +12,7 @@ export default function SignInPage() {
     e.preventDefault()
     setLoading(true)
     // Sign in logic will be implemented with NextAuth
-    console.log('Sign in with:', { email, password })
+    console.log('Sign in attempt for:', { email }) // 🛡️ Sentinel: Removed plaintext password logging
     // Simulate network request for UX demonstration
     setTimeout(() => setLoading(false), 1000)
   }

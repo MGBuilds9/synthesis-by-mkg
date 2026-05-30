@@ -27,3 +27,8 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+
+## 2026-05-30 - Incomplete Remediation of Shell Injections
+**Vulnerability:** A previous fix for shell injection in `github-to-linear-sync.yml` addressed the PR body but missed other user-controlled fields like `github.event.pull_request.title` and `github.event.head_commit.message`.
+**Learning:** When fixing an injection vulnerability, all input vectors from the same source (e.g., GitHub Event Context) must be audited and secured simultaneously, as attackers will simply pivot to the next unprotected field.
+**Prevention:** Perform a comprehensive search for all instances of `${{` inside `run:` blocks across all workflows when auditing for injection vulnerabilities, rather than patching individual lines ad-hoc.

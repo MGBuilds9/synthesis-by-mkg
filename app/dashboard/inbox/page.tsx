@@ -110,7 +110,7 @@ export default function InboxPage() {
             onClick={() => setShowFilters(!showFilters)}
             aria-label="Toggle filters"
             aria-expanded={showFilters}
-            aria-controls="filter-panel"
+            aria-controls={showFilters ? 'filter-panel' : undefined}
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
           >
             <Filter className="h-5 w-5 text-gray-600" aria-hidden="true" />

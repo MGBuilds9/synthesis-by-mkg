@@ -35,3 +35,6 @@
 ## 2024-05-23 - Conditionally rendered elements and aria-controls
 **Learning:** When using aria-controls to link a toggle button to a collapsible panel, the attribute must point to a valid ID. If the target panel is conditionally rendered, the aria-controls attribute should also be conditionally applied to prevent referencing an element that doesn't exist in the DOM.
 **Action:** Always conditionally apply aria-controls using logic that strictly matches the target element's exact rendering condition.
+## 2026-06-01 - Conditionally Rendered aria-controls
+**Learning:** When a toggle button points to a conditionally rendered element using `aria-controls`, leaving the string value static when the element is closed creates an invalid IDREF error that accessibility audits flag.
+**Action:** Always conditionally apply the `aria-controls` attribute to only hold the ID value when the element is actually rendered in the DOM, and `undefined` otherwise.

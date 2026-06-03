@@ -27,3 +27,8 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+
+## 2026-06-03 - Plaintext Password Logging
+**Vulnerability:** The Sign In page logged the user's plaintext password to the browser console during the sign-in attempt (e.g., `console.log('Sign in with:', { email, password })`).
+**Learning:** Sensitive user credentials, especially passwords, must never be logged or exposed to client-side environments (like browser consoles) where they can be accessed by malicious scripts, extensions, or shoulder surfers.
+**Prevention:** Avoid logging passwords entirely. If logging sign-in attempts is necessary for debugging, log only non-sensitive identifiers like the email address or user ID.

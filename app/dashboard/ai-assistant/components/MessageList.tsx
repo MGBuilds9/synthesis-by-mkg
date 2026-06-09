@@ -76,13 +76,33 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                     <div className="space-y-1">
                       {msg.sources.map((source: any, idx: number) => (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          <ExternalLink className="h-3 w-3 text-blue-600 mt-0.5 flex-shrink-0" />
-                          <div className="flex-1">
-                            <span className="font-medium text-blue-900">{source.title}</span>
-                            {source.excerpt && (
-                              <p className="text-blue-700 mt-0.5">{source.excerpt}</p>
-                            )}
-                          </div>
+                          {source.url ? (
+                            <a
+                              href={source.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Open ${source.title} in new tab`}
+                              className="text-blue-600 hover:text-blue-800 flex items-start gap-2 w-full group"
+                            >
+                              <ExternalLink className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                              <div className="flex-1">
+                                <span className="font-medium text-blue-900 group-hover:underline">{source.title}</span>
+                                {source.excerpt && (
+                                  <p className="text-blue-700 mt-0.5 no-underline">{source.excerpt}</p>
+                                )}
+                              </div>
+                            </a>
+                          ) : (
+                            <>
+                              <ExternalLink className="h-3 w-3 text-blue-600 mt-0.5 flex-shrink-0 opacity-50" />
+                              <div className="flex-1">
+                                <span className="font-medium text-blue-900">{source.title}</span>
+                                {source.excerpt && (
+                                  <p className="text-blue-700 mt-0.5">{source.excerpt}</p>
+                                )}
+                              </div>
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>

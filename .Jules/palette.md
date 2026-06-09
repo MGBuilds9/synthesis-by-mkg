@@ -35,3 +35,7 @@
 ## 2024-05-23 - Conditionally rendered elements and aria-controls
 **Learning:** When using aria-controls to link a toggle button to a collapsible panel, the attribute must point to a valid ID. If the target panel is conditionally rendered, the aria-controls attribute should also be conditionally applied to prevent referencing an element that doesn't exist in the DOM.
 **Action:** Always conditionally apply aria-controls using logic that strictly matches the target element's exact rendering condition.
+
+## 2026-06-09 - External Link Interaction
+**Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
+**Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.

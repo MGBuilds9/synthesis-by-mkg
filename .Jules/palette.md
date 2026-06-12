@@ -35,3 +35,7 @@
 ## 2024-05-23 - Conditionally rendered elements and aria-controls
 **Learning:** When using aria-controls to link a toggle button to a collapsible panel, the attribute must point to a valid ID. If the target panel is conditionally rendered, the aria-controls attribute should also be conditionally applied to prevent referencing an element that doesn't exist in the DOM.
 **Action:** Always conditionally apply aria-controls using logic that strictly matches the target element's exact rendering condition.
+
+## 2026-06-12 - Conditional aria-controls for dynamic DOM
+**Learning:** Hardcoding `aria-controls` to an ID when the corresponding panel is conditionally rendered in React causes IDREF validation failures and accessibility issues when the panel is closed (not in DOM).
+**Action:** Always conditionally apply `aria-controls={isOpen ? 'panel-id' : undefined}` rather than using a static string to ensure the ID reference is valid.

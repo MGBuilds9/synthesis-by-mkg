@@ -33,7 +33,9 @@ export async function GET(request: NextRequest) {
     const rawLimit = parseInt(searchParams.get('limit') || '50')
     // Sentinel: Cap limit to 100 to prevent DoS
     const limit = Math.max(1, Math.min(100, isNaN(rawLimit) ? 50 : rawLimit))
-    const offset = parseInt(searchParams.get('offset') || '0')
+    const rawOffset = parseInt(searchParams.get('offset') || '0')
+    // Sentinel: Validate offset to prevent NaN passing to Prisma
+    const offset = Math.max(0, isNaN(rawOffset) ? 0 : rawOffset)
     const includeCount = searchParams.get('includeCount') !== 'false'
 
     // Bolt: Fetch connected account IDs first to avoid join and leverage indexes

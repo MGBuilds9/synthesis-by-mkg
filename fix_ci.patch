@@ -1,0 +1,15 @@
+--- .github/workflows/github-to-linear-sync.yml
++++ .github/workflows/github-to-linear-sync.yml
+@@ -21,11 +21,12 @@
+         if: github.event_name == 'push'
+         env:
+           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
++          COMMIT_MSG: ${{ github.event.head_commit.message }}
+         run: |
+           COMMIT_SHA="${{ github.sha }}"
+-          COMMIT_MSG="${{ github.event.head_commit.message }}"
+           REPO="${{ github.repository }}"
+
+           # Determine commit type from conventional commit prefix
+           COMMIT_TYPE="general"
+           FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)

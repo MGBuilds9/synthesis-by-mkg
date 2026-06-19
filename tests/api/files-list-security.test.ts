@@ -55,4 +55,18 @@ describe('GET /api/files/list - Security', () => {
       })
     )
   })
+
+  it('defaults invalid offset to 0 to prevent NaN Prisma query DoS', async () => {
+    vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
+    vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: 'invalid' })
+    await GET(request)
+
+    expect(prisma.fileItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+      })
+    )
+  })
 })

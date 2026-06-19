@@ -8,6 +8,7 @@ import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
 import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 import logger from '@/lib/logger'
+import { RateLimiter } from '@/lib/ratelimit'
 
 // Sentinel: Validation schema
 const chatRequestSchema = z.object({
@@ -27,6 +28,7 @@ const chatRequestSchema = z.object({
 // Sentinel: Rate limit configuration
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
 const MAX_MESSAGES_PER_MINUTE = 10
+const chatRateLimiter = new RateLimiter(RATE_LIMIT_WINDOW, MAX_MESSAGES_PER_MINUTE)
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,31 +62,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Sentinel: Rate Limiting
-    // Count user messages in the last minute
-    // We filter by user ID via session relation to ensure we count across all sessions for this user
-    try {
-      const recentMessageCount = await prisma.aiMessage.count({
-        where: {
-          session: { userId: session.user.id },
-          role: 'user',
-          createdAt: {
-            gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
+    // Use in-memory rate limiter instead of DB count to improve performance
+    const rateLimit = chatRateLimiter.check(`chat:${session.user.id}`)
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
           }
         }
-      })
-
-      if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
-        return NextResponse.json(
-          { error: 'Too many requests' },
-          { status: 429 }
-        )
-      }
-    } catch (error) {
-      logger.error('Rate limit check failed', { error })
-      // Sentinel: Fail closed to protect resources
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable' },
-        { status: 503 }
       )
     }
 

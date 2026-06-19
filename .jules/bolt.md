@@ -33,3 +33,7 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+
+## 2026-06-19 - Replaced Database Count with In-Memory Rate Limiting
+**Learning:** Using a database `count` query on a frequently accessed endpoint like `app/api/ai/chat/route.ts` for rate limiting adds latency and database load on every request.
+**Action:** Replace synchronous database-backed rate limiting with an in-memory sliding window `RateLimiter` (e.g., from `lib/ratelimit.ts`) to eliminate the database query and improve response times.

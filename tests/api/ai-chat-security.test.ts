@@ -28,6 +28,17 @@ vi.mock('@/lib/context/retrieval', () => ({
   summarizeContext: vi.fn(),
 }))
 
+vi.mock('@/lib/ratelimit', () => ({
+  RateLimiter: class {
+    check(key: string) {
+      if (key === 'chat:spammer-123') {
+        return { success: false, limit: 10, remaining: 0, reset: Date.now() + 60000 }
+      }
+      return { success: true, limit: 10, remaining: 9, reset: Date.now() + 60000 }
+    }
+  }
+}))
+
 vi.mock('@/lib/auth', () => ({
   authOptions: {},
 }))

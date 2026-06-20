@@ -33,3 +33,7 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+
+## 2026-06-20 - Prevent NaN in Prisma Queries
+**Learning:** Passing NaN as offset or skip values to Prisma (e.g. from parsing query params without validation) causes unhandled query exceptions, leading to potential DoS vulnerabilities and bad performance.
+**Action:** Always validate parsed integer inputs that default to NaN (like parseInt) using isNaN and apply fallbacks before passing to Prisma query properties.

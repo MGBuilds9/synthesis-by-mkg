@@ -59,10 +59,12 @@ describe('InboxPage', () => {
     const filterButton = screen.getByRole('button', { name: /toggle filters/i })
     expect(filterButton).toBeInTheDocument()
     expect(filterButton).toHaveAttribute('aria-expanded', 'false')
+    expect(filterButton).not.toHaveAttribute('aria-controls')
 
     await user.click(filterButton)
 
     expect(filterButton).toHaveAttribute('aria-expanded', 'true')
+    expect(filterButton).toHaveAttribute('aria-controls', 'filter-panel')
     expect(screen.getByText('Email Account:')).toBeInTheDocument()
     expect(screen.getByText('Date Range:')).toBeInTheDocument()
   })

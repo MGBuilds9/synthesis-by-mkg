@@ -37,9 +37,11 @@ describe('AIChatPage', () => {
 
     const settingsButton = screen.getByLabelText('Context settings')
     expect(settingsButton).toHaveAttribute('aria-expanded', 'false')
+    expect(settingsButton).not.toHaveAttribute('aria-controls')
 
     fireEvent.click(settingsButton)
     expect(settingsButton).toHaveAttribute('aria-expanded', 'true')
+    expect(settingsButton).toHaveAttribute('aria-controls', 'context-settings-panel')
     expect(screen.getByLabelText('Ask before searching context')).toBeInTheDocument()
   })
 

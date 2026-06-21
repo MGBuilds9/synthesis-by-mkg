@@ -32,3 +32,8 @@
 **Vulnerability:** Prisma queries crashed with 500 internal server errors when invalid numeric strings (e.g. \`?offset=abc\`) were parsed by \`parseInt\` resulting in \`NaN\` and passed directly to Prisma methods like \`skip\` or \`take\`. This can lead to unhandled exception crashes and potential Denial of Service (DoS).
 **Learning:** Always validate parsed inputs (especially numeric constraints like limit/offset) before passing them to ORM methods.
 **Prevention:** Use \`isNaN()\` checks and fallback values (e.g., \`Math.max(0, isNaN(val) ? 0 : val)\`) when extracting numeric query parameters.
+
+## 2026-06-21 - Bash Injection in GitHub Actions from Commit Messages
+**Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.head_commit.message }}`) directly into a bash script using inline string interpolation. If a commit message contained backticks, quotes, or subcommand syntax like $(), the shell evaluated it as a command, causing syntax errors (like `exit code 127`) or arbitrary execution.
+**Learning:** Inline string interpolation of GitHub context variables into bash scripts creates critical shell injection vulnerabilities, even for variables seemingly internal like commit messages.
+**Prevention:** Always pass context variables to bash scripts via the `env` block in GitHub Actions (e.g., `COMMIT_MSG: ${{ github.event.head_commit.message }}`) and reference them as environment variables (e.g., $COMMIT_MSG), rather than interpolating them directly into the script content.

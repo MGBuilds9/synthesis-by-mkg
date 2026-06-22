@@ -66,4 +66,20 @@ describe('InboxPage', () => {
     expect(screen.getByText('Email Account:')).toBeInTheDocument()
     expect(screen.getByText('Date Range:')).toBeInTheDocument()
   })
+
+
+  it('filter button aria-controls points to filter panel when expanded', async () => {
+    const user = userEvent.setup()
+    render(<InboxPage />)
+    const filterButton = screen.getByRole('button', { name: /toggle filters/i })
+
+    // Initially no panel, so no aria-controls
+    expect(filterButton).not.toHaveAttribute('aria-controls')
+
+    // Expand filters
+    await user.click(filterButton)
+
+    // Now aria-controls should point to the panel
+    expect(filterButton).toHaveAttribute('aria-controls', 'filter-panel')
+  })
 })

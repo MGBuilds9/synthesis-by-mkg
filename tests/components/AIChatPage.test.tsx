@@ -107,4 +107,18 @@ describe('AIChatPage', () => {
     expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
     expect(screen.getByText('Send')).toBeInTheDocument()
   })
+
+  it('settings button aria-controls points to panel when expanded', async () => {
+    render(<AIChatPage />)
+    const settingsButton = screen.getByRole('button', { name: /context settings/i })
+
+    // Initially no panel, so no aria-controls
+    expect(settingsButton).not.toHaveAttribute('aria-controls')
+
+    // Expand filters
+    fireEvent.click(settingsButton)
+
+    // Now aria-controls should point to the panel
+    expect(settingsButton).toHaveAttribute('aria-controls', 'context-settings-panel')
+  })
 })

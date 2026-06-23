@@ -27,3 +27,8 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+
+## 2026-06-23 - Unhandled NaN in Prisma Queries
+**Vulnerability:** Unvalidated numeric URL parameters (`offset`) passed to `parseInt` can result in `NaN`, which causes unhandled exceptions (500 errors) when passed to Prisma's `skip` or `take` methods.
+**Learning:** Prisma does not safely fallback when receiving `NaN` for pagination arguments, which can be leveraged for application-level DoS or log bloat.
+**Prevention:** Always validate parsed numeric inputs using `isNaN()` and enforce boundaries (e.g., `Math.max(0, ...)`) before passing them to Prisma.

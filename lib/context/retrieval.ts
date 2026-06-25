@@ -15,7 +15,7 @@ export async function retrieveAIContext(options: ContextOptions, preFetchedScope
   if (!contextScopes) {
     const session = await prisma.aiChatSession.findUnique({
       where: { id: sessionId },
-      include: {
+      select: {
         contextScopes: {
           where: { enabled: true },
           include: {

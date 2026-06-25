@@ -33,3 +33,7 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+
+## 2026-06-25 - Optimize AI Chat Session Context Retrieval
+**Learning:** Fetching the full `aiChatSession` model when only needing the related `contextScopes` retrieves unnecessary fields, increasing query time and memory footprint.
+**Action:** Replace `include` with `select` in Prisma queries when only specific relations are needed, avoiding the retrieval of parent model scalar fields.

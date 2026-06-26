@@ -216,6 +216,33 @@ describe('GET /api/messages/list', () => {
     })
   })
 
+  it('handles invalid offset correctly by falling back to 0', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockThreads = [
+      {
+        id: 'thread-1',
+        connectedAccountId: 'account-1',
+        subject: 'Thread 1',
+        provider: 'GMAIL',
+        lastMessageAt: new Date('2024-01-05'),
+        messages: [],
+      },
+    ]
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue(mockThreads as any)
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(1)
+
+    const request = createRequest({ offset: 'invalid' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.offset).toBe(0)
+  })
+
   it('returns correct pagination metadata with custom limit and offset', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

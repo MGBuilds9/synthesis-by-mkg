@@ -311,6 +311,34 @@ describe('GET /api/files/list', () => {
     })
   })
 
+  it('handles invalid offset correctly by falling back to 0', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    const mockFiles = [
+      {
+        id: 'file-11',
+        name: 'file11.pdf',
+        provider: 'GOOGLE_DRIVE',
+        size: 1024,
+        modifiedTime: new Date('2024-01-05'),
+        webViewLink: 'https://drive.google.com/file/11',
+        connectedAccountId: 'acc-1',
+      },
+    ]
+
+    vi.mocked(prisma.fileItem.findMany).mockResolvedValue(mockFiles as any)
+    vi.mocked(prisma.fileItem.count).mockResolvedValue(1)
+
+    const request = createRequest({ offset: 'invalid', includeCount: 'false' })
+    const response = await GET(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.offset).toBe(0)
+  })
+
   it('returns correct pagination metadata with custom limit and offset', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

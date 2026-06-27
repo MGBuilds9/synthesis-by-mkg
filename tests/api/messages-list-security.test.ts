@@ -82,4 +82,32 @@ describe('GET /api/messages/list - Security', () => {
       })
     )
   })
+
+  it('handles invalid NaN offset by defaulting to 0', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: 'invalid' })
+    await GET(request)
+
+    expect(prisma.messageThread.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+      })
+    )
+  })
+
+  it('handles negative offset by defaulting to 0', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: '-10' })
+    await GET(request)
+
+    expect(prisma.messageThread.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+      })
+    )
+  })
 })

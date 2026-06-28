@@ -35,3 +35,6 @@
 ## 2024-05-23 - Conditionally rendered elements and aria-controls
 **Learning:** When using aria-controls to link a toggle button to a collapsible panel, the attribute must point to a valid ID. If the target panel is conditionally rendered, the aria-controls attribute should also be conditionally applied to prevent referencing an element that doesn't exist in the DOM.
 **Action:** Always conditionally apply aria-controls using logic that strictly matches the target element's exact rendering condition.
+## 2026-06-28 - Consistent Empty States
+**Learning:** Inconsistent empty states across different sections of an application create a disjointed user experience and missed opportunities for guidance. Providing a visually distinct empty state with an icon, clear messaging, and an actionable link (e.g., to settings) significantly improves discoverability and user orientation.
+**Action:** Always ensure that empty states (like lists with 0 items) share a common design language, use consistent semantic HTML, provide contextual icons, and include clear calls to action to resolve the empty state when applicable.

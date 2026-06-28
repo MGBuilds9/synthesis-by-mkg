@@ -27,3 +27,8 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+
+## 2026-06-28 - Unhandled NaN in Prisma Query
+**Vulnerability:** The `/api/messages/list` and `/api/files/list` endpoints parsed the `offset` query parameter using `parseInt` without validating if the result was `NaN`. This allowed an attacker to pass an invalid offset (e.g., `?offset=invalid`), which resulted in `NaN` being passed directly to the `skip` property of `prisma.findMany`. This triggers an unhandled Prisma exception, leading to a 500 error and potential Denial of Service.
+**Learning:** Unhandled `NaN` values passed to Prisma ORM methods (like `skip` or `take`) cause runtime exceptions. Input validation must explicitly handle `NaN` cases, especially when parsing numeric values from URL query parameters.
+**Prevention:** Always explicitly check for `NaN` when parsing numeric query parameters (e.g., using `isNaN()`) and provide a safe fallback value to prevent invalid arguments from reaching Prisma.

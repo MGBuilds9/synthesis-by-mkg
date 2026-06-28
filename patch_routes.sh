@@ -1,0 +1,2 @@
+sed -i "s/const offset = parseInt(searchParams.get('offset') || '0')/const rawOffset = parseInt(searchParams.get('offset') || '0')\n    const offset = Math.max(0, isNaN(rawOffset) ? 0 : rawOffset)/g" app/api/messages/list/route.ts
+sed -i "s/const offset = parseInt(searchParams.get('offset') || '0')/const rawOffset = parseInt(searchParams.get('offset') || '0')\n    const offset = Math.max(0, isNaN(rawOffset) ? 0 : rawOffset)/g" app/api/files/list/route.ts

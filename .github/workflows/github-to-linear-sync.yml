@@ -25,10 +25,16 @@ jobs:
       - name: Push - Create Linear Issue
         if: github.event_name == 'push'
         env:
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
         run: |
           COMMIT_SHA="${{ github.sha }}"
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          COMMIT_MSG="${COMMIT_MSG_CONTENT}"
           REPO="${{ github.repository }}"
 
           # Determine commit type from conventional commit prefix
@@ -80,7 +86,11 @@ jobs:
         if: github.event_name == 'pull_request'
         id: search
         env:
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
 
@@ -143,7 +153,11 @@ jobs:
       - name: PR - Create or Update Linear Issue
         if: github.event_name == 'pull_request'
         env:
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          COMMIT_MSG_CONTENT: ${{ github.event.head_commit.message }}
           PR_BODY_CONTENT: ${{ github.event.pull_request.body }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"

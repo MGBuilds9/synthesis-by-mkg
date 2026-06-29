@@ -82,4 +82,32 @@ describe('GET /api/messages/list - Security', () => {
       })
     )
   })
+
+  it('caps the offset parameter to 0 when a negative value is requested', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: '-5' })
+    await GET(request)
+
+    expect(prisma.messageThread.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0, // Expect capped value
+      })
+    )
+  })
+
+  it('handles invalid offset parameter by defaulting to 0', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: 'invalid' })
+    await GET(request)
+
+    expect(prisma.messageThread.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0, // Expect default value
+      })
+    )
+  })
 })

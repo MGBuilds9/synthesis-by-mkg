@@ -32,3 +32,7 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+
+## 2026-06-30 - Async Button Feedback
+**Learning:** Primary action buttons (like "Search" in Storage) lack visual feedback during async operations, leading to user uncertainty.
+**Action:** Standardize a "Loading" state pattern for all async action buttons using the `Loader2` icon and disabled state with `disabled:opacity-50 disabled:cursor-not-allowed`.

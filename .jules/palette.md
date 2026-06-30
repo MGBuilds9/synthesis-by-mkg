@@ -32,3 +32,7 @@
 ## 2026-04-13 - Search Keyboard Hints
 **Learning:** Hardcoded keyboard hints like "Search files... (⌘+K)" violate accessibility rules when the literal symbol is used, and dynamic resolution of the key binding can trigger react state errors if not handled correctly. Additionally, duplicate aria-labels are a common anti-pattern that fails build steps.
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
+
+## 2026-06-30 - Focus States on Card Buttons
+**Learning:** Large interactive elements acting as "cards" or "tiles" often lack visible focus states because standard button outlines are disabled by CSS resets, making keyboard navigation difficult to track.
+**Action:** Always add explicit `focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2` (or appropriate brand colors) to custom card-style buttons.

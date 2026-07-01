@@ -33,3 +33,7 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+
+## 2026-07-01 - Prevent React.memo Breakage from Inline Functions
+**Learning:** Passing an inline arrow function (e.g., `onSuggestionClick={(text) => sendMessage(text)}`) as a prop to a `React.memo` component defeats the memoization, causing the child component to unnecessarily re-render on every state change of the parent (like typing in an input field).
+**Action:** Use `useCallback` and `useRef` to create a stable function reference for callbacks passed to memoized components, preventing unnecessary and costly re-renders.

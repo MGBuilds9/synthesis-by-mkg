@@ -9,7 +9,8 @@ export default defineConfig([
     rules: {
       // Existing codebase has broad `any` usage; keep signal without blocking hygiene validation.
       "@typescript-eslint/no-explicit-any": "warn",
-      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
     },
   },
   globalIgnores([

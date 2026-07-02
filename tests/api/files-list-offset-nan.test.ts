@@ -18,7 +18,7 @@ vi.mock('@/lib/prisma', () => ({
 describe('Files List - Offset NaN', () => {
   beforeEach(() => {
     vi.mocked(getServerSession).mockResolvedValue({ user: { id: 'user1' }, expires: '2024-01-01' })
-    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([{ id: 'account1', accountLabel: 'Account', provider: 'google', userId: 'user1' }])
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([{ id: 'account1', accountLabel: 'Account', provider: 'GMAIL' } as any])
     vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
     vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
   })

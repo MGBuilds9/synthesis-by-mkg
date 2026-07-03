@@ -1,0 +1,71 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { NextRequest } from 'next/server'
+import { GET } from '@/app/api/messages/list/route'
+
+vi.mock('@/lib/ratelimit', () => ({
+  rateLimiter: {
+    check: vi.fn(),
+  },
+}))
+
+vi.mock('next-auth', () => ({
+  getServerSession: vi.fn(),
+}))
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    messageThread: {
+      findMany: vi.fn(),
+      count: vi.fn(),
+    },
+    connectedAccount: {
+      findMany: vi.fn(),
+    },
+  },
+}))
+
+vi.mock('@/lib/auth', () => ({
+  authOptions: {},
+}))
+
+import { getServerSession } from 'next-auth'
+import { prisma } from '@/lib/prisma'
+import { rateLimiter } from '@/lib/ratelimit'
+
+describe('GET /api/messages/list - Security Offset', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(rateLimiter.check).mockReturnValue({
+      success: true,
+      limit: 60,
+      remaining: 59,
+      reset: Date.now() + 60000,
+    })
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+    vi.mocked(prisma.connectedAccount.findMany).mockResolvedValue([
+      { id: 'account-1' },
+    ] as any)
+  })
+
+  function createRequest(searchParams: Record<string, string> = {}): NextRequest {
+    const params = new URLSearchParams(searchParams)
+    const url = `http://localhost/api/messages/list${params.toString() ? '?' + params.toString() : ''}`
+    return new NextRequest(url, { method: 'GET' })
+  }
+
+  it('validates offset parameter and defaults to 0 when NaN', async () => {
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: 'invalid' })
+    await GET(request)
+
+    expect(prisma.messageThread.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0, // Expect validated value
+      })
+    )
+  })
+})

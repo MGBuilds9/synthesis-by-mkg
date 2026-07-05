@@ -12,6 +12,7 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     aiMessage: {
       count: vi.fn(),
+      findMany: vi.fn(),
       create: vi.fn().mockResolvedValue({}),
     },
     aiChatSession: {
@@ -45,7 +46,7 @@ describe('POST /api/ai/chat - Context Domain Filtering', () => {
     vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
     vi.mocked(getLLMProvider).mockReturnValue(mockLLM)
     vi.mocked(retrieveAIContext).mockResolvedValue({ messages: [], files: [], notionPages: [] })
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
+    vi.mocked(prisma.aiMessage.findMany).mockResolvedValue([])
   })
 
   it('should exclude email scopes when user disables emails', async () => {

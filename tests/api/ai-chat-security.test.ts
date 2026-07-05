@@ -15,6 +15,7 @@ vi.mock('@/lib/prisma', () => ({
     aiMessage: {
       create: vi.fn(),
       count: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }))
@@ -39,7 +40,7 @@ import { getLLMProvider } from '@/lib/providers/llm'
 describe('POST /api/ai/chat - Security', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
+    vi.mocked(prisma.aiMessage.findMany).mockResolvedValue([])
   })
 
   function createRequest(body: any): NextRequest {
@@ -113,7 +114,7 @@ describe('POST /api/ai/chat - Security', () => {
     } as any)
 
     // Mock count to be equal to or greater than limit (e.g. 10)
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(10)
+    vi.mocked(prisma.aiMessage.findMany).mockResolvedValue(Array(10).fill({ id: "mock" }))
 
     const request = createRequest({
       sessionId: 'session-spam',

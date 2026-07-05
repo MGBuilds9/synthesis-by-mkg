@@ -63,17 +63,21 @@ export async function POST(request: NextRequest) {
     // Count user messages in the last minute
     // We filter by user ID via session relation to ensure we count across all sessions for this user
     try {
-      const recentMessageCount = await prisma.aiMessage.count({
+      // Bolt: Use findMany with take: MAX_MESSAGES_PER_MINUTE and select {id: true}
+      // instead of count() to stop DB scanning early once the limit is reached.
+      const recentMessages = await prisma.aiMessage.findMany({
         where: {
           session: { userId: session.user.id },
           role: 'user',
           createdAt: {
             gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
           }
-        }
+        },
+        take: MAX_MESSAGES_PER_MINUTE,
+        select: { id: true }
       })
 
-      if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
+      if (recentMessages.length >= MAX_MESSAGES_PER_MINUTE) {
         return NextResponse.json(
           { error: 'Too many requests' },
           { status: 429 }

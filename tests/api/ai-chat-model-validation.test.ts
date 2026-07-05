@@ -15,6 +15,7 @@ vi.mock('@/lib/prisma', () => ({
     aiMessage: {
       create: vi.fn(),
       count: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }))
@@ -39,7 +40,7 @@ import { getLLMProvider } from '@/lib/providers/llm'
 describe('POST /api/ai/chat - Model Validation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(0)
+    vi.mocked(prisma.aiMessage.findMany).mockResolvedValue([])
   })
 
   function createRequest(body: any): NextRequest {

@@ -16,6 +16,7 @@ vi.mock('@/lib/prisma', () => ({
     aiMessage: {
       create: vi.fn(),
       count: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }))
@@ -50,7 +51,7 @@ describe('POST /api/ai/chat - Rate Limit Fail Closed', () => {
 
     // 2. Mock DB failure for count (rate limit check)
     // This simulates a database outage or transient error
-    vi.mocked(prisma.aiMessage.count).mockRejectedValue(new Error('DB Connection Failed'))
+    vi.mocked(prisma.aiMessage.findMany).mockRejectedValue(new Error('DB Connection Failed'))
 
     // 3. Mock subsequent calls to succeed if the check fails open
     // If the vulnerability exists (Fail Open), code proceeds to findUnique

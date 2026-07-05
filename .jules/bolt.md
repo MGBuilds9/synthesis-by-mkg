@@ -33,3 +33,7 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+
+## 2026-07-05 - Optimize threshold checks with findMany
+**Learning:** Using `count` to check if a threshold is met (e.g. rate limiting) can be slow if there are many records, as the DB must scan all matching rows to calculate the total.
+**Action:** Use `findMany` with `take: THRESHOLD` and `select: { id: true }` to check thresholds. This allows the database to stop scanning early once the threshold is reached.

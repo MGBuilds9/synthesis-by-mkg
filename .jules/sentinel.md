@@ -32,3 +32,8 @@
 **Vulnerability:** API routes parsed string query parameters like `offset` using `parseInt` without validating if the result was `NaN` or negative before passing them directly to Prisma's `skip` property. This could cause unhandled exceptions and a potential 500 error Denial of Service.
 **Learning:** Functions like `parseInt` can return `NaN`, and Prisma's query engine expects valid bounds. Directly feeding unchecked user inputs to ORM parameters is dangerous.
 **Prevention:** Always validate integer inputs specifically checking for `NaN` (e.g. `isNaN()`) and enforce minimum bounds (e.g. `Math.max(0, value)`) before passing them to ORM methods like `skip` or `take`.
+
+## 2026-07-06 - Command Injection in GitHub Actions
+**Vulnerability:** A GitHub Action workflow (`.github/workflows/github-to-linear-sync.yml`) directly interpolated user-controlled variables (`github.event.head_commit.message` and `github.event.pull_request.title`) into a bash script. This allowed execution of subcommands if the text contained backticks (e.g. \`Math.max()\`).
+**Learning:** Shell evaluation treats unescaped backticks and `` within double quotes as command substitution, executing arbitrary code provided by attackers.
+**Prevention:** Always pass user-provided input, such as commit messages, PR titles, or bodies, into bash scripts through the workflow's `env:` block. The shell can then safely expand the variables (e.g., `$COMMIT_MSG`) instead of directly parsing potentially dangerous strings.

@@ -33,3 +33,6 @@
 ## 2026-05-25 - Prevent Prisma Query with Empty Array in 'in' Operator
 **Learning:** When using the `in` operator (e.g., `where: { id: { in: ids } }`), if the target array is empty, Prisma still executes an unnecessary database query.
 **Action:** Bypass the query conditionally (e.g., `const results = ids.length > 0 ? await db.query() : []`) to eliminate the unnecessary database call.
+## 2026-07-06 - Optimize MessageList Callback
+**Learning:** Passing inline functions (like `(text) => sendMessage(text)`) as props to memoized components breaks `React.memo` and causes unnecessary re-renders on every parent render.
+**Action:** Use `useCallback` and the `useRef` pattern for event handlers passed to memoized child components to preserve referential equality without stale closures.

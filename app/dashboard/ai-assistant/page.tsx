@@ -97,7 +97,7 @@ export default function AIChatPage() {
             <button
               onClick={() => setShowContextSettings(!showContextSettings)}
               aria-expanded={showContextSettings}
-              aria-controls="context-settings-panel"
+            aria-controls={showContextSettings ? "context-settings-panel" : undefined}
               aria-label="Context settings"
               className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
             >

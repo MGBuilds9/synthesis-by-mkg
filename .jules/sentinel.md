@@ -27,3 +27,8 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+
+## 2026-07-08 - Denial of Service via Unvalidated Query Offset
+**Vulnerability:** Prisma queries crashed when provided with a negative or invalid `offset` parsed directly from query parameters without bounds checking, leading to unhandled exceptions and a 500 Denial of Service.
+**Learning:** Passing user-supplied numeric inputs directly to database ORM methods (like `skip`, `take`) without ensuring they are valid integers within expected bounds (e.g., non-negative) creates a vulnerability to Application-level DoS through query exceptions.
+**Prevention:** Always validate and normalize numerical query inputs with bounds checks (e.g., `Math.max(0, isNaN(rawOffset) ? 0 : rawOffset)`) before passing them to the database layer.

@@ -33,7 +33,9 @@ export async function GET(request: NextRequest) {
     const rawLimit = parseInt(searchParams.get('limit') || '50')
     // Sentinel: Cap limit to 100 to prevent DoS
     const limit = Math.max(1, Math.min(100, isNaN(rawLimit) ? 50 : rawLimit))
-    const offset = parseInt(searchParams.get('offset') || '0')
+    const rawOffset = parseInt(searchParams.get('offset') || '0')
+    // Sentinel: Ensure offset is valid to prevent Prisma NaN 500 error
+    const offset = Math.max(0, isNaN(rawOffset) ? 0 : rawOffset)
     const search = searchParams.get('search')
     const includeCount = searchParams.get('includeCount') !== 'false'
 

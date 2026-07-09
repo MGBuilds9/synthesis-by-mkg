@@ -338,6 +338,21 @@ describe('GET /api/messages/list', () => {
     expect(prisma.messageThread.count).not.toHaveBeenCalled()
   })
 
+  it('handles invalid or negative offset gracefully', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.messageThread.findMany).mockResolvedValue([])
+    vi.mocked(prisma.messageThread.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: '-5' })
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(prisma.messageThread.findMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 0 }))
+  })
+
   it('returns 500 on internal error', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

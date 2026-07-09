@@ -370,6 +370,21 @@ describe('GET /api/files/list', () => {
     expect(data.total).toBe(-1)
   })
 
+  it('handles invalid or negative offset gracefully', async () => {
+    vi.mocked(getServerSession).mockResolvedValue({
+      user: { id: 'user-123' },
+    } as any)
+
+    vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
+    vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: 'invalid' })
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(prisma.fileItem.findMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 0 }))
+  })
+
   it('returns 500 on internal error', async () => {
     vi.mocked(getServerSession).mockResolvedValue({
       user: { id: 'user-123' },

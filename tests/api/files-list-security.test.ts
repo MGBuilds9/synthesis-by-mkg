@@ -55,4 +55,32 @@ describe('GET /api/files/list - Security', () => {
       })
     )
   })
+
+  it('handles negative offset', async () => {
+    vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
+    vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: '-10' })
+    await GET(request)
+
+    expect(prisma.fileItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0, // Should be 0 if bounded
+      })
+    )
+  })
+
+  it('handles NaN offset', async () => {
+    vi.mocked(prisma.fileItem.findMany).mockResolvedValue([])
+    vi.mocked(prisma.fileItem.count).mockResolvedValue(0)
+
+    const request = createRequest({ offset: 'invalid' })
+    await GET(request)
+
+    expect(prisma.fileItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0, // Should be 0 if bounded
+      })
+    )
+  })
 })

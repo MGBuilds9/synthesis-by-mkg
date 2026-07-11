@@ -27,3 +27,7 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+## 2026-07-11 - Shell Injection in Push Event
+**Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.head_commit.message }}`) directly into a bash script using inline string interpolation.
+**Learning:** Inline string interpolation of commit messages (`${{ github.event.head_commit.message }}`) creates critical shell injection vulnerabilities, similar to PR bodies.
+**Prevention:** Always pass user-controlled input like commit messages to bash scripts via the `env` context block in GitHub Actions and reference them as environment variables.

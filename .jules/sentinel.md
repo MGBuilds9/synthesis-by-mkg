@@ -27,3 +27,8 @@
 **Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR body to be executed as subcommands.
 **Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or `$()`, the shell will attempt to evaluate them as commands.
 **Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_BODY: ${{ github.event.pull_request.body }}`) and reference them as environment variables (e.g., `$PR_BODY`), rather than interpolating them directly into the script content.
+
+## $(date +%Y-%m-%d) - GitHub Actions Bash Injection
+**Vulnerability:** Interpolating unsanitized GitHub contexts (like `github.event.head_commit.message` or `github.event.pull_request.title`) directly into inline bash scripts (e.g., `TITLE="${{ github.event.pull_request.title }}"`) allows attackers to execute arbitrary bash commands during workflow execution.
+**Learning:** Always use intermediate environment variables (`env:` block) to pass untrusted or user-controlled input into run scripts. GitHub Actions safely injects these env vars without evaluating their contents as code.
+**Prevention:** Pass context properties via `env:` and access them safely in scripts using bash parameter expansion (e.g., `TITLE="${PR_TITLE_ENV}"`).

@@ -32,3 +32,8 @@
 **Vulnerability:** URL query parameters parsed with `parseInt` could evaluate to `NaN` if given invalid input. If passed directly to Prisma's `skip` parameter, it results in an unhandled exception leading to 500 errors.
 **Learning:** External user inputs must always be validated or sanitized before passing to ORMs or database operations to prevent exceptions.
 **Prevention:** Always check if a parsed numeric value `isNaN()` and provide a safe fallback value, such as 0, to ensure database queries execute smoothly.
+
+## 2026-07-11 - Command Injection in GitHub Actions
+**Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) passed user-controlled input (`${{ github.event.pull_request.title }}` and `${{ github.event.pull_request.body }}`) directly into a bash script using inline string interpolation, causing backticks in the PR title or body to be executed as subcommands.
+**Learning:** Inline string interpolation of GitHub context variables (`${{ ... }}`) into bash scripts creates critical shell injection vulnerabilities. If the variable contains backticks (`\``), quotes, or ``, the shell will attempt to evaluate them as commands.
+**Prevention:** Always pass user-controlled input to bash scripts via the `env` context block in GitHub Actions (e.g., `PR_TITLE_CONTENT: ${{ github.event.pull_request.title }}`) and reference them as environment variables (e.g., ``), rather than interpolating them directly into the script content.

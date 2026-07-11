@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
@@ -24,6 +24,19 @@ export default function AIChatPage() {
   
   // Ask before searching context
   const [askBeforeSearching, setAskBeforeSearching] = useState(true)
+
+  // Bolt: Store the latest sendMessage function in a ref to avoid breaking MessageList memoization
+  const sendMessageRef = useRef<((text?: string) => Promise<void>) | null>(null)
+
+  useEffect(() => {
+    sendMessageRef.current = sendMessage
+  })
+
+  const handleSuggestionClick = useCallback((text: string) => {
+    if (sendMessageRef.current) {
+      sendMessageRef.current(text)
+    }
+  }, [])
 
   function toggleContextDomain(domain: keyof typeof contextDomains) {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
@@ -186,7 +199,7 @@ export default function AIChatPage() {
       <MessageList
         messages={messages}
         loading={loading}
-        onSuggestionClick={(text) => sendMessage(text)}
+        onSuggestionClick={handleSuggestionClick}
       />
 
       {/* Input */}

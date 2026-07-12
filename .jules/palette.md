@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-07-12 - Interaction Feedback (Search Button)
+**Learning:** The search button on the storage page lacked a loading state when performing async search operations, leaving users uncertain if the action was triggered.
+**Action:** Always add a loading spinner (`Loader2`) to primary action buttons that trigger async requests, ensuring visual feedback during network operations.

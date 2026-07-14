@@ -111,6 +111,7 @@ export default function AIChatPage() {
               aria-expanded={showContextSettings}
               aria-controls={showContextSettings ? 'context-settings-panel' : undefined}
               aria-label="Context settings"
+              title="Context settings"
               className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
             >
               <Settings className="h-4 w-4" />

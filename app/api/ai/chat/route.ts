@@ -22,7 +22,7 @@ const chatRequestSchema = z.object({
     files: z.boolean().optional(),
     notion: z.boolean().optional(),
   }).optional(),
-}).passthrough()
+}).strict()
 
 // Sentinel: Rate limit configuration
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute

@@ -35,3 +35,12 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-07-14 - Accessibility enhancement: clear search button aria-labels
+**Learning:** Found several places where the clear search button X uses an aria-label but could be better with screen reader only text or a title for hover. Even more impactful, some inputs have associated shortcut hints but lack a clear label when the shortcut isn't visible, though they do use placeholders and aria-labels.
+**Action:** Review search inputs and select dropdowns across the application for accessibility improvements. Many inputs lack associated visible labels and rely purely on aria-labels or placeholders.
+## 2026-07-14 - Focus States Enhancement
+**Learning:** Found several places where the focus states could be improved, particularly on inputs that have placeholder text with shortcuts. When the user navigates by keyboard they might miss the focus indicator or not understand what input they are on. Wait, I should make sure my focus is on a small, isolated change.
+## 2026-07-14 - Adding titles to clear search icon buttons
+**Learning:** Icon-only buttons for clearing search rely on aria-labels, but hover titles provide better usability for sighted users. The aria-label attribute is read by screen readers but standard title tooltips help regular keyboard and mouse users. Wait, the prompt said:
+'Missing tooltips for icon-only buttons'.
+**Action:** Adding title attributes alongside aria-labels for clear search icon-only buttons.

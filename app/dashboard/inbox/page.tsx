@@ -100,6 +100,7 @@ export default function InboxPage() {
                 }}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
                 aria-label="Clear search"
+                title="Clear search"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -109,6 +110,7 @@ export default function InboxPage() {
           <button 
             onClick={() => setShowFilters(!showFilters)}
             aria-label="Toggle filters"
+            title="Toggle filters"
             aria-expanded={showFilters}
             aria-controls={showFilters ? 'filter-panel' : undefined}
             className="p-3 sm:p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"

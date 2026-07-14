@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-07-14 - Input Icon Visual Affordance
+**Learning:** Search inputs placed directly alongside buttons can appear ambiguous if they lack internal visual affordances (like an icon). The `Search` icon was missing in the Storage page input, making it inconsistent with the rest of the app.
+**Action:** Always include a visual icon inside text inputs (using absolute positioning) to clarify the input's purpose without relying solely on placeholder text.

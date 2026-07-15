@@ -81,8 +81,8 @@ jobs:
         id: search
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
 
           SEARCH_RESULT=$(curl -s -X POST https://api.linear.app/graphql \
             -H "Content-Type: application/json" \

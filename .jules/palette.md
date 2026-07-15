@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-07-15 - Missing Form Label Associations
+**Learning:** Filter controls often use `<label>` elements visually but fail to associate them with their respective `<select>` inputs using `htmlFor` and `id`. This breaks form accessibility for screen readers and prevents users from focusing the select by clicking its label.
+**Action:** Always ensure every form `<label>` explicitly targets its input using `htmlFor="[id]"` and `id="[id]"`, rather than relying solely on `aria-label` on the input.

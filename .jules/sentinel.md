@@ -31,3 +31,7 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+## 2026-07-15 - CI Shell Injection via PR Number
+**Vulnerability:** A GitHub Action workflow interpolated `github.event.pull_request.number` directly into a bash script instead of using an env variable.
+**Learning:** Even fields perceived as safe like PR numbers should be passed via env variables to establish secure patterns and defend against potential upstream changes.
+**Prevention:** Always pass user-controlled input to bash scripts via the `env` context block.

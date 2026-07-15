@@ -153,11 +153,12 @@ export default function ChatsPage() {
           <div id="chats-filter-panel" className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
             {showWorkspaceSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                <label htmlFor="workspace-select" className="text-sm font-medium text-gray-700 whitespace-nowrap cursor-pointer">
                   {selectedPlatform === 'discord' ? 'Server:' : selectedPlatform === 'teams' ? 'Team:' : 'Workspace:'}
                 </label>
                 <div className="relative w-full sm:w-auto">
                   <select
+                    id="workspace-select"
                     value={selectedWorkspace}
                     aria-label={selectedPlatform === 'discord' ? 'Select Server' : selectedPlatform === 'teams' ? 'Select Team' : 'Select Workspace'}
                     onChange={(e) => setSelectedWorkspace(e.target.value)}
@@ -174,9 +175,10 @@ export default function ChatsPage() {
 
             {showChannelSelector && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Channel:</label>
+                <label htmlFor="channel-select" className="text-sm font-medium text-gray-700 whitespace-nowrap cursor-pointer">Channel:</label>
                 <div className="relative w-full sm:w-auto">
                   <select
+                    id="channel-select"
                     value={selectedChannel}
                     aria-label="Select Channel"
                     onChange={(e) => setSelectedChannel(e.target.value)}
@@ -194,9 +196,10 @@ export default function ChatsPage() {
 
             {selectedPlatform === 'telegram' && (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Chat:</label>
+                <label htmlFor="telegram-chat-select" className="text-sm font-medium text-gray-700 whitespace-nowrap cursor-pointer">Chat:</label>
                 <div className="relative w-full sm:w-auto">
                   <select
+                    id="telegram-chat-select"
                     value={selectedChannel}
                     aria-label="Select Chat"
                     onChange={(e) => setSelectedChannel(e.target.value)}

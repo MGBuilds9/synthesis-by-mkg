@@ -25,14 +25,20 @@ export default function AIChatPage() {
   // Ask before searching context
   const [askBeforeSearching, setAskBeforeSearching] = useState(true)
 
+  const stateRef = useRef({ input, sessionId, provider, contextDomains, askBeforeSearching })
+  useEffect(() => {
+    stateRef.current = { input, sessionId, provider, contextDomains, askBeforeSearching }
+  }, [input, sessionId, provider, contextDomains, askBeforeSearching])
+
   function toggleContextDomain(domain: keyof typeof contextDomains) {
     setContextDomains(prev => ({ ...prev, [domain]: !prev[domain] }))
   }
 
   const sendMessageRef = useRef<((textOverride?: string) => Promise<void>) | null>(null);
 
-  async function sendMessage(textOverride?: string) {
-    const messageText = typeof textOverride === 'string' ? textOverride : input
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const { input: currentInput, sessionId: currentSessionId, provider: currentProvider, contextDomains: currentContextDomains, askBeforeSearching: currentAskBeforeSearching } = stateRef.current
+    const messageText = typeof textOverride === 'string' ? textOverride : currentInput
     if (!messageText.trim()) return
 
     const userMessage: Message = { role: 'user', content: messageText }
@@ -48,11 +54,11 @@ export default function AIChatPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sessionId,
+          sessionId: currentSessionId,
           message: messageText,
-          provider,
-          contextDomains,
-          askBeforeSearchingContext: askBeforeSearching,
+          provider: currentProvider,
+          contextDomains: currentContextDomains,
+          askBeforeSearchingContext: currentAskBeforeSearching,
         }),
       })
 
@@ -70,7 +76,7 @@ export default function AIChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, []);
 
   useEffect(() => {
     sendMessageRef.current = sendMessage;

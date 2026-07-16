@@ -37,3 +37,7 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+
+## 2026-07-16 - Prevent Unnecessary Re-renders with Stable useCallback Dependencies
+**Learning:** While wrapping a function in `useCallback` provides referential stability, passing rapidly changing state variables (like `input` on every keystroke) into its dependency array causes the function to be recreated on every render, defeating the memoization of child components relying on it.
+**Action:** Use a `useRef` to hold the latest state values and read from the ref inside the `useCallback` to avoid adding volatile variables to its dependency array, maintaining a truly stable function reference.

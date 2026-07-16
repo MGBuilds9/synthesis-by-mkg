@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-07-16 - Focus Visible Styles for Dashboard Cards
+**Learning:** Card-based navigation links often lack explicit keyboard focus states, making them difficult to navigate for keyboard-only users because the browser's default outline might be suppressed or hard to see against the UI.
+**Action:** Always add explicit `focus-visible` utility classes (e.g., `focus-visible:ring-2`) to interactive card elements to ensure clear keyboard accessibility.

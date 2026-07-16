@@ -95,7 +95,7 @@ export default function DashboardPage() {
       <div className="mb-6 sm:mb-8">
         <h2 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Quick Navigation</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          <Link href="/dashboard/inbox" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation">
+          <Link href="/dashboard/inbox" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
             <div className="flex flex-col items-center">
               <div className="h-10 sm:h-12 w-10 sm:w-12 bg-blue-100 rounded-full flex items-center justify-center mb-2 sm:mb-3">
                 <Mail className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
@@ -104,7 +104,7 @@ export default function DashboardPage() {
             </div>
           </Link>
 
-          <Link href="/dashboard/chats" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation">
+          <Link href="/dashboard/chats" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
             <div className="flex flex-col items-center">
               <div className="h-10 sm:h-12 w-10 sm:w-12 bg-green-100 rounded-full flex items-center justify-center mb-2 sm:mb-3">
                 <MessageSquare className="h-5 sm:h-6 w-5 sm:w-6 text-green-600" />
@@ -113,7 +113,7 @@ export default function DashboardPage() {
             </div>
           </Link>
 
-          <Link href="/dashboard/storage" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation">
+          <Link href="/dashboard/storage" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
             <div className="flex flex-col items-center">
               <div className="h-10 sm:h-12 w-10 sm:w-12 bg-orange-100 rounded-full flex items-center justify-center mb-2 sm:mb-3">
                 <FolderOpen className="h-5 sm:h-6 w-5 sm:w-6 text-orange-600" />
@@ -122,7 +122,7 @@ export default function DashboardPage() {
             </div>
           </Link>
 
-          <Link href="/dashboard/notion" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation">
+          <Link href="/dashboard/notion" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
             <div className="flex flex-col items-center">
               <div className="h-10 sm:h-12 w-10 sm:w-12 bg-purple-100 rounded-full flex items-center justify-center mb-2 sm:mb-3">
                 <FileText className="h-5 sm:h-6 w-5 sm:w-6 text-purple-600" />
@@ -131,7 +131,7 @@ export default function DashboardPage() {
             </div>
           </Link>
 
-          <Link href="/dashboard/ai-assistant" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation">
+          <Link href="/dashboard/ai-assistant" className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all hover:scale-105 active:scale-95 text-center touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
             <div className="flex flex-col items-center">
               <div className="h-10 sm:h-12 w-10 sm:w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-2 sm:mb-3">
                 <Bot className="h-5 sm:h-6 w-5 sm:w-6 text-indigo-600" />

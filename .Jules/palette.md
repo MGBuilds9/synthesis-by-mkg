@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-17 - Associate Form Labels with Selects
+**Learning:** In React, 'label' elements visually describe form inputs but fail accessibility tools and click-focus behaviors unless explicitly associated via 'htmlFor' (and matching 'id' on the input/select).
+**Action:** Always add an 'id' to form inputs and a matching 'htmlFor' to their corresponding <label> elements to ensure screen readers can read them and clicking the label focuses the control.

@@ -31,3 +31,8 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+
+## 2026-07-18 - Secure GitHub Actions Interpolation
+**Vulnerability:** A GitHub Action workflow (`github-to-linear-sync.yml`) interpolated `${{ github.event.pull_request.number }}` directly into a bash script. While PR numbers are typically safe, this practice violates security standards and can fail SAST scanners by creating a potential shell injection pattern.
+**Learning:** Even context fields perceived as safe from shell injection (e.g., PR numbers) should never be directly interpolated into inline bash scripts. This establishes secure patterns, defends against upstream changes, and passes automated security checks.
+**Prevention:** Always pass GitHub Actions context variables to bash scripts via the `env` context block and reference them as environment variables, regardless of their perceived safety.

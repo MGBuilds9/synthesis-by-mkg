@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-19 - Storage Page Empty and Search State Polish
+**Learning:** Adding loading spinners, fixing fixed widths, and adding search icons to inputs provides a significantly better user experience and feels less "stuck". Empty state text changes are also helpful to explicitly indicate action taking place.
+**Action:** Enhance loading states on async actions and ensure empty/loading states communicate what's happening more clearly.

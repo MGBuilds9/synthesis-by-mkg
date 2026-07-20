@@ -45,13 +45,15 @@ describe("StoragePage UX", () => {
     expect(input).toHaveFocus();
   });
 
-  it("shows shortcut hint when empty", async () => {
+  it("shows shortcut hint visually instead of in placeholder", async () => {
     render(<StoragePage />);
     await waitForLoad();
 
-    // The placeholder includes the shortcut hint like "Search files... (⌘+K)" or "Search files... (Ctrl+K)"
     const input = screen.getByLabelText("Search files");
-    expect(input).toHaveAttribute("placeholder", expect.stringContaining("+K)"));
+    expect(input).not.toHaveAttribute("placeholder", expect.stringContaining("+K)"));
+
+    // Hint should be visible
+    expect(screen.getByText(/K/)).toBeInTheDocument();
   });
 
   it("hides shortcut hint when typing", async () => {
@@ -59,12 +61,10 @@ describe("StoragePage UX", () => {
     await waitForLoad();
 
     const input = screen.getByLabelText("Search files");
-
     fireEvent.change(input, { target: { value: "test" } });
 
-    // The placeholder is always there, value just overlays it
-    // This test is checking behavior that doesn't apply - input value doesn't hide placeholder
-    expect(input).toHaveValue("test");
+    // Hint element should disappear when typing
+    expect(screen.queryByText(/K/)).not.toBeInTheDocument();
   });
 
   it("focuses input after clearing search", async () => {

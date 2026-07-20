@@ -118,12 +118,19 @@ export default function ChatsPage() {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder={`Search chats... (${shortcutSymbol}+K)`}
+              placeholder="Search chats..."
               aria-label="Search chats"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
+              className="w-full pl-10 pr-16 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px] sm:min-h-0"
             />
+            {!searchQuery && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none hidden sm:flex items-center">
+                <kbd suppressHydrationWarning className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-300 rounded-md">
+                  {shortcutSymbol} K
+                </kbd>
+              </div>
+            )}
             {searchQuery && (
               <button
                 onClick={() => {

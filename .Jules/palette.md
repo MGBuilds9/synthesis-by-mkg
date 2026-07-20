@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-20 - Keyboard Shortcut Hint Accessibility
+**Learning:** Hardcoded keyboard hints in input placeholders (e.g., `placeholder="Search files... (⌘+K)"`) violate accessibility best practices because screen readers read them awkwardly. Furthermore, dynamically injecting platform-specific symbols like '⌘' or 'Ctrl' can lead to React hydration mismatches if not handled properly with `suppressHydrationWarning`.
+**Action:** When implementing keyboard shortcuts in search inputs, move the hint out of the `placeholder` attribute and render it visually as a positioned `<kbd>` element. Ensure it is hidden from screen readers (or positioned correctly) and use `suppressHydrationWarning` on the element rendering the platform-specific symbol.

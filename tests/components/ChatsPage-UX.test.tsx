@@ -33,11 +33,13 @@ describe("ChatsPage UX", () => {
     expect(input).toHaveFocus();
   });
 
-  it("shows shortcut hint when empty", () => {
+  it("shows shortcut hint visually instead of in placeholder", () => {
     render(<ChatsPage />);
 
     const input = screen.getByLabelText("Search chats") as HTMLInputElement;
-    expect(input.placeholder).toMatch(/\((⌘|Ctrl)\+K\)/);
+    expect(input.placeholder).not.toMatch(/\((⌘|Ctrl)\+K\)/);
+
+    expect(screen.getByText(/K/)).toBeInTheDocument();
   });
 
   it("clears search and focuses input when clear button is clicked", () => {

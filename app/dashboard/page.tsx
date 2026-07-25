@@ -157,10 +157,16 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
           {connectedAccounts.map((account) => {
             const Icon = account.icon
+            const statusText = account.status === 'connected' ? 'Connected' :
+                               account.status === 'needs_attention' ? 'Needs Attention' :
+                               'Not Connected'
             return (
-              <div 
+              <Link
+                href="/dashboard/settings"
                 key={account.provider}
-                className="relative bg-gray-50 rounded-lg p-3 sm:p-4 text-center border-2 border-transparent hover:border-indigo-200 active:border-indigo-300 transition-colors touch-manipulation"
+                className="block relative bg-gray-50 rounded-lg p-3 sm:p-4 text-center border-2 border-transparent hover:border-indigo-200 active:border-indigo-300 transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                aria-label={`${account.provider} account. Status: ${statusText}`}
+                title={`Manage ${account.provider} (Status: ${statusText})`}
               >
                 <div className={`h-8 sm:h-10 w-8 sm:w-10 mx-auto mb-2 rounded-full flex items-center justify-center ${
                   account.status === 'connected' ? 'bg-green-100' :
@@ -171,21 +177,21 @@ export default function DashboardPage() {
                     account.status === 'connected' ? 'text-green-600' :
                     account.status === 'needs_attention' ? 'text-yellow-600' :
                     'text-gray-400'
-                  }`} />
+                  }`} aria-hidden="true" />
                 </div>
                 <p className="text-xs font-medium text-gray-900 mb-1 truncate">{account.provider}</p>
                 <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2">
                   {account.status === 'connected' && (
-                    <CheckCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-green-500" />
+                    <CheckCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-green-500" aria-hidden="true" />
                   )}
                   {account.status === 'needs_attention' && (
-                    <AlertCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-yellow-500" />
+                    <AlertCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-yellow-500" aria-hidden="true" />
                   )}
                   {account.status === 'not_connected' && (
-                    <PlusCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-gray-400" />
+                    <PlusCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-gray-400" aria-hidden="true" />
                   )}
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>

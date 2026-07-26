@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-26 - Adding explicit loading spinners to storage search
+**Learning:** Adding an animated spinner and disabled state to search buttons improves accessibility by visually indicating to all users that an asynchronous operation is in progress, reducing perceived wait times and preventing duplicate submissions.
+**Action:** Always include a visual loading indicator (e.g., `Loader2` from lucide-react) and apply `disabled:opacity-75 disabled:cursor-not-allowed` utility classes to buttons that trigger async operations. Also, enhance loading placeholders with similar visual cues.

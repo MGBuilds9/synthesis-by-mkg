@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-26 - Async Button Loading States
+**Learning:** The "Search" button on the Storage page lacked a visual loading spinner, relying solely on text changes and disabled states, which is inconsistent with the primary action buttons pattern and reduces visual feedback.
+**Action:** Standardize the "Loading" state pattern for the Storage page search button using the `Loader2` icon with `animate-spin` and a disabled state.

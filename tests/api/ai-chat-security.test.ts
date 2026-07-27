@@ -112,8 +112,9 @@ describe('POST /api/ai/chat - Security', () => {
       messages: [],
     } as any)
 
-    // Mock count to be equal to or greater than limit (e.g. 10)
-    vi.mocked(prisma.aiMessage.count).mockResolvedValue(10)
+    // Mock rate limit failure
+    const { rateLimiter } = await import('@/lib/ratelimit')
+    vi.spyOn(rateLimiter, 'check').mockReturnValue({ success: false, limit: 10, remaining: 0, reset: Date.now() + 60000 })
 
     const request = createRequest({
       sessionId: 'session-spam',

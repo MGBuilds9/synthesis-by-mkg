@@ -49,8 +49,9 @@ describe('POST /api/ai/chat - Rate Limit Fail Closed', () => {
     } as any)
 
     // 2. Mock DB failure for count (rate limit check)
-    // This simulates a database outage or transient error
-    vi.mocked(prisma.aiMessage.count).mockRejectedValue(new Error('DB Connection Failed'))
+    // This simulates an error occurring in the rate limit check
+    const { rateLimiter } = await import('@/lib/ratelimit')
+    vi.spyOn(rateLimiter, 'check').mockImplementation(() => { throw new Error('Rate Limiter Failed') })
 
     // 3. Mock subsequent calls to succeed if the check fails open
     // If the vulnerability exists (Fail Open), code proceeds to findUnique

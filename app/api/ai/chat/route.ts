@@ -8,6 +8,7 @@ import { ALLOWED_MODELS } from '@/lib/providers/llm/constants'
 import { AiProvider } from '@prisma/client'
 import { z } from 'zod'
 import logger from '@/lib/logger'
+import { rateLimiter } from '@/lib/ratelimit'
 
 // Sentinel: Validation schema
 const chatRequestSchema = z.object({
@@ -60,20 +61,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Sentinel: Rate Limiting
-    // Count user messages in the last minute
-    // We filter by user ID via session relation to ensure we count across all sessions for this user
+    // Bolt: Optimized by using in-memory rate limiter instead of expensive DB count with JOIN
+    // This achieves the same cross-session user limiting with O(1) latency
     try {
-      const recentMessageCount = await prisma.aiMessage.count({
-        where: {
-          session: { userId: session.user.id },
-          role: 'user',
-          createdAt: {
-            gte: new Date(Date.now() - RATE_LIMIT_WINDOW)
-          }
-        }
-      })
-
-      if (recentMessageCount >= MAX_MESSAGES_PER_MINUTE) {
+      const rateLimit = rateLimiter.check(session.user.id)
+      if (!rateLimit.success) {
         return NextResponse.json(
           { error: 'Too many requests' },
           { status: 429 }

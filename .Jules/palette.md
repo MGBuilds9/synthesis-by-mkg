@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-27 - Form Label Association
+**Learning:** Custom select dropdowns in filter panels often lack explicit `htmlFor` associations with their visible text labels. While visual users can identify the relationship by proximity, this breaks programmatic association for assistive technologies, meaning screen readers do not announce the label when the input receives focus.
+**Action:** Always add an `id` to form inputs (including `select` elements) and explicitly link them using the `htmlFor` attribute on the corresponding <label> element to ensure full accessibility.

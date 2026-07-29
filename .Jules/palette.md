@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-07-29 - Add loading state to Storage search button
+**Learning:** The Storage search button lacked a visual loading state beyond text changes, making the "disabled" state unclear without cursor cues. Using an animated icon and explicit disabled styling provides better interaction feedback.
+**Action:** Always add disabled styling (opacity/cursor) and visual indicators (like spinners) to buttons that trigger async operations. Set `min-w` on buttons that change text content to prevent layout shifts.

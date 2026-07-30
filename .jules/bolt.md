@@ -37,3 +37,7 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+
+## 2026-07-30 - Prevent Large List Re-renders on Keystrokes
+**Learning:** Controlled search inputs at the page root level cause the entire component, including any large un-memoized lists (e.g., file tables), to re-render on every keystroke, resulting in severe typing latency.
+**Action:** Always extract large lists mapped from arrays into their own `React.memo` components to decouple keystroke state from heavy renders.

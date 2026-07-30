@@ -231,10 +231,11 @@ export default function AIChatPage() {
               className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-all min-w-[100px] h-[48px]"
             >
               {loading ? (
-                <>
+                <span role="status" className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Sending...</span>
-                </>
+                  <span className="sr-only">Sending...</span>
+                  <span aria-hidden="true">Sending...</span>
+                </span>
               ) : (
                 <>
                   <span>Send</span>

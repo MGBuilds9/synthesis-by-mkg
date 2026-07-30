@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-07-30 - Screen Reader Async Loading Text Duplication
+**Learning:** Adding screen reader text isn't enough if the visual text is also read, causing duplication. The visual text must be explicitly hidden from screen readers.
+**Action:** Always pair `sr-only` descriptive text with `aria-hidden="true"` on the corresponding visual text when using `role="status"` for loading buttons.

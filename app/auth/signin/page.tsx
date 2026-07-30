@@ -62,10 +62,11 @@ export default function SignInPage() {
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
-                Signing in...
-              </>
+              <span role="status" className="flex items-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span className="sr-only">Signing in...</span>
+                <span aria-hidden="true">Signing in...</span>
+              </span>
             ) : (
               'Sign In'
             )}

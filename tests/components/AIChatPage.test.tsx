@@ -62,13 +62,13 @@ describe('AIChatPage', () => {
     fireEvent.click(button)
 
     // Button should show sending state and be disabled
-    expect(screen.getByText('Sending...')).toBeInTheDocument()
+    expect(screen.getAllByText('Sending...').length).toBeGreaterThan(0)
     const sendButton = screen.getByRole('button', { name: /sending/i })
     expect(sendButton).toBeDisabled()
 
     // Wait for fetch to complete and state to revert
     await waitFor(() => {
-      expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
+      expect(screen.queryAllByText('Sending...').length).toBe(0)
     })
 
     // Button should be back to "Send"
@@ -87,10 +87,10 @@ describe('AIChatPage', () => {
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
 
     // Should show sending state
-    expect(screen.getByText('Sending...')).toBeInTheDocument()
+    expect(screen.getAllByText('Sending...').length).toBeGreaterThan(0)
 
     await waitFor(() => {
-      expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
+      expect(screen.queryAllByText('Sending...').length).toBe(0)
     })
   })
 
@@ -106,7 +106,7 @@ describe('AIChatPage', () => {
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter', shiftKey: true })
 
     // Should NOT show sending state (button still says "Send")
-    expect(screen.queryByText('Sending...')).not.toBeInTheDocument()
+    expect(screen.queryAllByText('Sending...').length).toBe(0)
     expect(screen.getByText('Send')).toBeInTheDocument()
   })
 })

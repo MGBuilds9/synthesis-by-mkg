@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-07-30 - Consistent Loading States
+**Learning:** Inconsistent or plain text loading indicators in interactive components (like search buttons or data tables) reduce user confidence and accessibility.
+**Action:** Always replace plain text "Loading..." or "Searching..." indicators with a consistent animated icon (like `Loader2`) paired with appropriate accessible structure (e.g., `role="status"` and `aria-hidden="true"` on the visual spinner) and disabled state styles.

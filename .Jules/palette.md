@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-07-31 - Storage Loading States
+**Learning:** The Storage page search functionality lacked accessible and visual loading indicators during async operations, which could leave users uncertain about background processes, especially screen reader users. Tests needed to be updated when making visually hidden screen reader text alongside visible UI text.
+**Action:** Add spinner `Loader2` to async action buttons and file list loaders alongside proper `role="status"`, `aria-hidden="true"` for visual text, and `sr-only` for accessible text description to ensure a smooth and accessible UX experience. Update related vitest testing logic when implementing these accessibility fixes.

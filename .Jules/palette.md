@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-07-31 - Storage Loading State Accessibility
+**Learning:** Visual-only loading text like "Searching..." in the storage page lacks context for screen readers and can be confusing. Also, duplicating visually hidden and aria-hidden text for screen readers requires updating test assertions that use `getAllByText`.
+**Action:** Always add an accessible spinner icon, `role="status"`, and both visually hidden and `aria-hidden` text to provide explicit loading state context for all users. Update `toHaveLength` test assertions to `toBeGreaterThan(0)` to accommodate the duplicated text nodes.

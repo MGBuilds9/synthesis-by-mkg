@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-01 - Add loading spinner to async search button
+**Learning:** While disabling a button and changing its text to "Searching..." provides some feedback, adding a visual loading indicator like a spinner significantly improves UX by providing immediate, recognizable visual feedback that an asynchronous operation is in progress.
+**Action:** Always include a visual loading indicator (e.g., `Loader2` with `animate-spin`) in buttons that trigger asynchronous operations, ensuring it is hidden from screen readers (`aria-hidden="true"`) if the button's text or `aria-busy` attribute already conveys the loading state.

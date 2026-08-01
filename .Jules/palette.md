@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-01 - Add loading spinner to async submit button
+**Learning:** Providing clear visual feedback (like a loading spinner) during asynchronous operations improves user perception of performance and prevents duplicate clicks.
+**Action:** Always include a visual loading indicator (e.g., `Loader2` with `animate-spin`) inside submit buttons when they trigger async actions, along with disabling the button and setting `aria-busy`.

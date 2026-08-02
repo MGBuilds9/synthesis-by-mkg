@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-08-02 - Interaction Feedback
+**Learning:** Empty states without a clear visual indicator often leave users feeling lost or unsure of the next step. Simple, descriptive empty states with icons significantly improve user understanding and onboarding.
+**Action:** Enhance empty states (e.g. storage files list when no files are synced) with a descriptive icon, a bold main title, and subtitle text guiding the user towards a resolution (such as adjusting filters or connecting an integration). Additionally, handle the loading state using the standard `Loader2` accessible visual feedback.

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, FolderOpen, Loader2 } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -168,11 +168,19 @@ export default function StoragePage() {
           <button
             type="button"
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[140px]"
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <span className="sr-only">Searching files</span>
+                <span aria-hidden="true">Searching...</span>
+              </>
+            ) : (
+              'Search'
+            )}
           </button>
         </div>
 
@@ -220,14 +228,30 @@ export default function StoragePage() {
       {/* Files List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Searching...
+          <div className="p-12 text-center text-gray-500 flex flex-col items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" aria-hidden="true" />
+            <div role="status">
+              <span className="sr-only">Searching storage</span>
+              <span className="text-lg font-medium text-gray-900" aria-hidden="true">Searching...</span>
+            </div>
           </div>
         ) : files.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            {selectedProvider === "ALL"
-              ? "No files yet. Connect your storage accounts to start syncing."
-              : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
+          <div className="p-12 text-center text-gray-500">
+            <FolderOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" aria-hidden="true" />
+            <p className="text-lg font-medium text-gray-900 mb-1">
+              {selectedProvider === "ALL" ? "No files yet" : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found`}
+            </p>
+            <p className="text-sm mt-1 px-4">
+              {selectedProvider === "ALL" ? (
+                <>
+                  <Link href="/dashboard/settings" className="text-blue-600 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
+                    Connect your storage accounts
+                  </Link> to start syncing.
+                </>
+              ) : (
+                "Try adjusting your search or filter to find what you're looking for."
+              )}
+            </p>
           </div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">

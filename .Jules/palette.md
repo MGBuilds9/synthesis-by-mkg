@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-03 - Accessible Async Button Loading State
+**Learning:** Replacing visual-only text like "Searching..." with accessible loading spinners and text nodes (sr-only + aria-hidden) causes `getByText` and `queryByText` queries to fail because React Testing Library finds multiple matching nodes.
+**Action:** When implementing accessible loading states using `<span className="sr-only">` alongside `<span aria-hidden="true">`, update affected tests to use `getAllByText` and `queryAllByText` and assert on length.

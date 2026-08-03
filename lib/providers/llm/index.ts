@@ -4,17 +4,30 @@ import { OpenAIProvider } from './openai'
 import { GeminiProvider } from './gemini'
 import { ClaudeProvider } from './claude'
 
+const providerCache = new Map<AiProvider, LLMProvider>()
+
 export function getLLMProvider(provider: AiProvider): LLMProvider {
+  if (providerCache.has(provider)) {
+    return providerCache.get(provider)!
+  }
+
+  let client: LLMProvider
   switch (provider) {
     case 'OPENAI':
-      return new OpenAIProvider(process.env.OPENAI_API_KEY || '')
+      client = new OpenAIProvider(process.env.OPENAI_API_KEY || '')
+      break
     case 'GEMINI':
-      return new GeminiProvider(process.env.GEMINI_API_KEY || '')
+      client = new GeminiProvider(process.env.GEMINI_API_KEY || '')
+      break
     case 'CLAUDE':
-      return new ClaudeProvider(process.env.ANTHROPIC_API_KEY || '')
+      client = new ClaudeProvider(process.env.ANTHROPIC_API_KEY || '')
+      break
     default:
       throw new Error(`Unsupported AI provider: ${provider}`)
   }
+
+  providerCache.set(provider, client)
+  return client
 }
 
 export * from './openai'

@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-04 - Add accessible loading state to Storage search button
+**Learning:** Loading states on interactive elements like search buttons are critical for users on slower networks or when backend operations take time. Combining a visual spinner with screen reader text (using sr-only and aria-hidden) ensures both sighted and visually impaired users get immediate feedback that an action is processing.
+**Action:** When implementing async buttons, always include a visual loading indicator alongside disabled states, and ensure it's accessible by explicitly hiding the visual text with aria-hidden="true" when paired with a screen-reader only description.

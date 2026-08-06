@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-06 - Add visual loading indicators to async buttons
+**Learning:** Adding a spinner to a button that only changed its text (e.g. "Search" to "Searching...") provides immediate visual feedback and improves interaction clarity. Ensuring the spinner has `aria-hidden="true"` prevents redundant screen reader announcements while maintaining visual accessibility.
+**Action:** When creating async action buttons, include a visual loading indicator alongside the loading text and use `aria-hidden="true"` on the decorative spinner.

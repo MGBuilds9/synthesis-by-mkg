@@ -1,0 +1,3 @@
+## 2026-08-07 - Module-level Caching of LLM SDK Clients
+**Learning:** Instantiating external SDK clients (e.g., OpenAI, Anthropic, Gemini) per-request introduces unnecessary TLS handshake latency (TTFB) because the underlying HTTP keep-alive agents aren't reused across requests. This is especially impactful in serverless or highly concurrent Node.js environments.
+**Action:** Cache external SDK client instances at the module level (e.g., using a singleton pattern or simple module-scoped variables) and reuse them across requests instead of creating a new instance on every invocation of `getLLMProvider()`.

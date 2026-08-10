@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2024-05-23 - Button Loading State Visibility
+**Learning:** Adding a spinner to a loading button is a common pattern, but it's important to ensure it maintains a minimum width and centers content so the layout doesn't shift dramatically when the text changes to "Searching...".
+**Action:** Always include layout stability classes like `min-w-[Xpx]` and `flex items-center justify-center gap-X` when implementing button loading states.

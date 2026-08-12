@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-12 - Focus Rings and Tooltips for Icon Buttons
+**Learning:** Absolute positioned icon-only buttons (like the Clear Search 'X' buttons inside inputs) across the app were consistently missing explicitly visible focus rings, making them invisible to keyboard navigation, and missing tooltips for sighted mouse users.
+**Action:** Always add explicit `focus-visible:ring-2` styles and native `title` tooltips to interactive, absolutely positioned utility buttons.

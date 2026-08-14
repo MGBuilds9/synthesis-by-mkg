@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-14 - Missing aria-label on select elements
+**Learning:** Some `<select>` elements across the dashboard use visual labels (like "Email Account:") next to them but lack an explicit `id` and `htmlFor` association, or an `aria-label` attribute, making their purpose unclear to screen reader users when navigating directly to the form controls.
+**Action:** Always ensure `<select>` elements are properly labeled, either by explicitly associating a `<label>` using `id` and `htmlFor`, or by providing a descriptive `aria-label` directly on the `<select>` element.

@@ -33,9 +33,12 @@ vi.mock('@google/generative-ai', () => {
   }
 })
 
+import { resetProviderCache } from '@/lib/providers/llm/index'
+
 describe('LLM Provider Factory', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    resetProviderCache()
     process.env.OPENAI_API_KEY = 'test-openai-key'
     process.env.ANTHROPIC_API_KEY = 'test-anthropic-key'
     process.env.GEMINI_API_KEY = 'test-gemini-key'

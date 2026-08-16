@@ -39,3 +39,9 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-16 - Explicit label associations for select elements
+**Learning:** Found a recurring accessibility pattern where `<select>` elements had visual labels but lacked explicit `id` and `htmlFor` associations, relying solely on visual proximity. Some were also missing `aria-label` attributes entirely.
+**Action:** Always ensure that every `<select>` element has an `id` that is explicitly referenced by its accompanying `<label>` using the `htmlFor` attribute. If no visual label is appropriate, an explicit `aria-label` must be provided.
+## 2026-08-16 - Explicit label associations vs explicit aria labels
+**Learning:** Adding both `htmlFor` on a visible label and `aria-label` on the input itself is slightly redundant, as the `aria-label` will override the visible label for screen readers.
+**Action:** When a visible label properly describes the purpose of the input, rely on `htmlFor` associations and omit the `aria-label`.

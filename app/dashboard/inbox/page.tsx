@@ -120,9 +120,10 @@ export default function InboxPage() {
         {showFilters && (
           <div id="filter-panel" className="flex gap-3 sm:gap-4 flex-wrap items-center bg-gray-50 p-3 sm:p-4 rounded-lg">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-              <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Email Account:</label>
+              <label htmlFor="email-account-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Email Account:</label>
               <div className="relative w-full sm:w-auto">
                 <select
+                  id="email-account-filter"
                   value={selectedEmailAddress}
                   onChange={(e) => setSelectedEmailAddress(e.target.value)}
                   className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
@@ -136,9 +137,10 @@ export default function InboxPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
-              <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Date Range:</label>
+              <label htmlFor="date-range-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Date Range:</label>
               <div className="relative w-full sm:w-auto">
                 <select
+                  id="date-range-filter"
                   value={selectedDateRange}
                   onChange={(e) => setSelectedDateRange(e.target.value)}
                   className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"

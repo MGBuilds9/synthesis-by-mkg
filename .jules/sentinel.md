@@ -31,3 +31,7 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+## 2026-08-16 - Disable X-Powered-By Header
+**Vulnerability:** Next.js exposes 'X-Powered-By: Next.js' in HTTP headers by default, which can leak technology stack information.
+**Learning:** Framework defaults often leak fingerprinting information that attackers can use to identify known vulnerabilities.
+**Prevention:** Always explicitly disable `poweredByHeader` in `next.config.js` for Next.js applications to reduce the attack surface.

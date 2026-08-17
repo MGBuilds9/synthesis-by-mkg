@@ -67,5 +67,8 @@ describe('InboxPage', () => {
     expect(filterButton).toHaveAttribute('aria-controls', 'filter-panel')
     expect(screen.getByText('Email Account:')).toBeInTheDocument()
     expect(screen.getByText('Date Range:')).toBeInTheDocument()
+
+    expect(screen.getByRole('combobox', { name: /filter by email account/i })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: /filter by date range/i })).toBeInTheDocument()
   })
 })

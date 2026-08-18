@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-18 - Select Input Accessibility
+**Learning:** Although a `<select>` may have a linked `<label>` using `htmlFor`, adding an explicit `aria-label` provides a more robust and predictable experience for screen readers, and updating tests to query by role (`getByRole('combobox', { name: /.../i })`) validates this improvement.
+**Action:** Always include an explicit `aria-label` on `<select>` inputs and update testing library queries to verify the accessible name.

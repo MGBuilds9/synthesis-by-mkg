@@ -39,3 +39,6 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+## 2026-08-20 - Accessible Select Elements
+**Learning:** <select> elements must have explicit accessible names. When a visual <label> element is used without a linking `htmlFor` attribute, the associated <select> element remains inaccessible to screen readers unless an explicit `aria-label` is applied.
+**Action:** Always ensure that <select> dropdowns have an `aria-label` when not explicitly linked via an `id` and `htmlFor`.

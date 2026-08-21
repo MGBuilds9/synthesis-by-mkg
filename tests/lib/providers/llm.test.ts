@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
-import { getLLMProvider, OpenAIProvider, ClaudeProvider, GeminiProvider } from '@/lib/providers/llm'
+import { getLLMProvider, resetProviderCache, OpenAIProvider, ClaudeProvider, GeminiProvider } from '@/lib/providers/llm'
 
 // Mock the SDK modules
 vi.mock('openai', () => {
@@ -36,6 +36,7 @@ vi.mock('@google/generative-ai', () => {
 describe('LLM Provider Factory', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    resetProviderCache()
     process.env.OPENAI_API_KEY = 'test-openai-key'
     process.env.ANTHROPIC_API_KEY = 'test-anthropic-key'
     process.env.GEMINI_API_KEY = 'test-gemini-key'

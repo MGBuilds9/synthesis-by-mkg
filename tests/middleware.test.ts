@@ -17,5 +17,10 @@ describe('Middleware Security Headers', () => {
     // Note: Vitest/JSDOM environment might handle headers differently, but NextRequest/Response
     // are standard Fetch API objects or polyfills provided by Next.js
     expect(res.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains')
+
+    // Test for CSP header and lack of unsafe-eval
+    const csp = res.headers.get('Content-Security-Policy')
+    expect(csp).toBeTruthy()
+    expect(csp).not.toContain('unsafe-eval')
   })
 })

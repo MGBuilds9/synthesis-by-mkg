@@ -36,3 +36,8 @@
 **Vulnerability:** The Content-Security-Policy (CSP) `script-src` directive included `'unsafe-eval'` unconditionally. While needed for Next.js Fast Refresh (Webpack HMR) in development, it exposes production environments to XSS attacks allowing execution of arbitrary code via `eval()`.
 **Learning:** Development tooling requirements (like HMR) can introduce critical security risks if their necessary relaxed permissions are inadvertently shipped to production environments.
 **Prevention:** Always conditionally apply relaxed CSP directives (like `'unsafe-eval'`) strictly to development environments (e.g., using `process.env.NODE_ENV !== 'production'`) and ensure production builds employ strict CSP rules.
+
+## 2026-08-23 - Modifying NODE_ENV in Tests
+**Vulnerability:** Directly assigning `process.env.NODE_ENV = 'something'` in tests failed the typechecker because TypeScript types NodeJS environments such that `NODE_ENV` is read-only.
+**Learning:** Testing environment variables must account for TypeScript constraints and test runner environments to ensure builds don't fail in CI.
+**Prevention:** Always use test runner native utilities like Vitest's `vi.stubEnv('NODE_ENV', 'production')` and `vi.unstubAllEnvs()` to safely manipulate environment variables during tests without violating TypeScript read-only constraints.

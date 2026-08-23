@@ -1,12 +1,10 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { middleware } from '../middleware'
 import { NextRequest } from 'next/server'
 
 describe('Middleware Security Headers', () => {
-  const originalNodeEnv = process.env.NODE_ENV
-
   afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv
+    vi.unstubAllEnvs()
   })
 
   it('should add security headers to the response', () => {
@@ -26,7 +24,7 @@ describe('Middleware Security Headers', () => {
   })
 
   it('should include unsafe-eval in development CSP', () => {
-    process.env.NODE_ENV = 'development'
+    vi.stubEnv('NODE_ENV', 'development')
     const req = new NextRequest(new URL('http://localhost:3000/'))
     const res = middleware(req)
 
@@ -35,7 +33,7 @@ describe('Middleware Security Headers', () => {
   })
 
   it('should not include unsafe-eval in production CSP', () => {
-    process.env.NODE_ENV = 'production'
+    vi.stubEnv('NODE_ENV', 'production')
     const req = new NextRequest(new URL('http://localhost:3000/'))
     const res = middleware(req)
 

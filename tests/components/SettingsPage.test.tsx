@@ -37,7 +37,7 @@ describe('SettingsPage', () => {
     expect(screen.getByText('AI Preferences')).toBeInTheDocument()
     expect(screen.getByText('Default AI Provider')).toBeInTheDocument()
 
-    const providerSelect = screen.getByDisplayValue('OpenAI')
+    const providerSelect = screen.getByRole('combobox', { name: /select default ai provider/i })
     expect(providerSelect).toBeInTheDocument()
     expect(providerSelect.tagName).toBe('SELECT')
 

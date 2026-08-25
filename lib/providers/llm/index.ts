@@ -4,17 +4,38 @@ import { OpenAIProvider } from './openai'
 import { GeminiProvider } from './gemini'
 import { ClaudeProvider } from './claude'
 
+// Cache SDK clients at module level to reuse underlying HTTP keep-alive agents
+// and significantly reduce TLS handshake latency (TTFB).
+const providerCache: Partial<Record<AiProvider, LLMProvider>> = {}
+
+export function resetProviderCache() {
+  for (const key of Object.keys(providerCache)) {
+    delete providerCache[key as AiProvider]
+  }
+}
+
 export function getLLMProvider(provider: AiProvider): LLMProvider {
+  if (providerCache[provider]) {
+    return providerCache[provider]!
+  }
+
+  let instance: LLMProvider
   switch (provider) {
     case 'OPENAI':
-      return new OpenAIProvider(process.env.OPENAI_API_KEY || '')
+      instance = new OpenAIProvider(process.env.OPENAI_API_KEY || '')
+      break
     case 'GEMINI':
-      return new GeminiProvider(process.env.GEMINI_API_KEY || '')
+      instance = new GeminiProvider(process.env.GEMINI_API_KEY || '')
+      break
     case 'CLAUDE':
-      return new ClaudeProvider(process.env.ANTHROPIC_API_KEY || '')
+      instance = new ClaudeProvider(process.env.ANTHROPIC_API_KEY || '')
+      break
     default:
       throw new Error(`Unsupported AI provider: ${provider}`)
   }
+
+  providerCache[provider] = instance
+  return instance
 }
 
 export * from './openai'

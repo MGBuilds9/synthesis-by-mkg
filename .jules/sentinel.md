@@ -31,3 +31,8 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+
+## 2026-08-26 - Conditional CSP Directives
+**Vulnerability:** The Content-Security-Policy (CSP) header included the `'unsafe-eval'` directive unconditionally, which allows execution of untrusted code via `eval()` and weakens XSS mitigation in production environments.
+**Learning:** Next.js requires `'unsafe-eval'` during development for Fast Refresh (Webpack HMR), leading developers to mistakenly leave it hardcoded in the policy for all environments.
+**Prevention:** Conditionally construct CSP headers using `process.env.NODE_ENV === 'development'` to allow necessary relaxed policies locally while enforcing strictly evaluation-free rules in production.

@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-08-26 - Dropdown Select Accessibility
+**Learning:** Visual labels placed near `<select>` inputs without an `id` and `htmlFor` association result in screen readers missing the context. This pattern (e.g., using a separate div/label next to a dropdown) requires the select to explicitly define its own accessible name.
+**Action:** Always include an explicit `aria-label` attribute on `<select>` elements when implementing visual labels without `htmlFor`, ensuring proper context is announced. Update related React Testing Library tests from `getByDisplayValue` to `getByRole('combobox', { name: /.../i })` to validate the semantic structure.

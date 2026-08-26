@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { retrieveAIContext } from '@/lib/context/retrieval'
-import { getLLMProvider } from '@/lib/providers/llm'
+import { getLLMProvider, resetProviderCache } from '@/lib/providers/llm'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 
 // Mock dependencies
@@ -26,6 +26,7 @@ vi.mock('@/lib/context/retrieval', () => ({
 }))
 vi.mock('@/lib/providers/llm', () => ({
   getLLMProvider: vi.fn(),
+  resetProviderCache: vi.fn(),
 }))
 
 // Mock logger to avoid cluttering test output
@@ -42,6 +43,7 @@ describe('POST /api/ai/chat - Context Domain Filtering', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    resetProviderCache()
     vi.mocked(getServerSession).mockResolvedValue(mockSession as any)
     vi.mocked(getLLMProvider).mockReturnValue(mockLLM)
     vi.mocked(retrieveAIContext).mockResolvedValue({ messages: [], files: [], notionPages: [] })

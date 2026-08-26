@@ -22,6 +22,7 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/lib/providers/llm', () => ({
   getLLMProvider: vi.fn(),
+  resetProviderCache: vi.fn(),
 }))
 
 vi.mock('@/lib/context/retrieval', () => ({
@@ -35,11 +36,12 @@ vi.mock('@/lib/auth', () => ({
 
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
-import { getLLMProvider } from '@/lib/providers/llm'
+import { getLLMProvider, resetProviderCache } from '@/lib/providers/llm'
 
 describe('POST /api/ai/chat - Rate Limit Fail Closed', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    resetProviderCache()
   })
 
   it('fails closed: returns 503 when rate limit check (DB) fails', async () => {

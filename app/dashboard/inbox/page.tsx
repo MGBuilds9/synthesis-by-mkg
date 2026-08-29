@@ -125,6 +125,7 @@ export default function InboxPage() {
                 <select
                   value={selectedEmailAddress}
                   onChange={(e) => setSelectedEmailAddress(e.target.value)}
+                  aria-label="Select email account"
                   className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
                 >
                   <option value="all">All Accounts</option>
@@ -141,6 +142,7 @@ export default function InboxPage() {
                 <select
                   value={selectedDateRange}
                   onChange={(e) => setSelectedDateRange(e.target.value)}
+                  aria-label="Select date range"
                   className="appearance-none w-full sm:w-auto pl-4 pr-10 py-2.5 sm:py-2 text-base sm:text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer touch-manipulation"
                 >
                   <option value="all">All Time</option>

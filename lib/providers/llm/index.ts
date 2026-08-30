@@ -4,17 +4,36 @@ import { OpenAIProvider } from './openai'
 import { GeminiProvider } from './gemini'
 import { ClaudeProvider } from './claude'
 
+// Bolt: Cache external SDK client instances at the module level rather than instantiating them per-request.
+// This allows the reuse of underlying HTTP keep-alive agents and significantly reduces TLS handshake latency (TTFB).
+const providerCache = new Map<AiProvider, LLMProvider>()
+
+export function resetProviderCache() {
+  providerCache.clear()
+}
+
 export function getLLMProvider(provider: AiProvider): LLMProvider {
+  if (providerCache.has(provider)) {
+    return providerCache.get(provider)!
+  }
+
+  let instance: LLMProvider
   switch (provider) {
     case 'OPENAI':
-      return new OpenAIProvider(process.env.OPENAI_API_KEY || '')
+      instance = new OpenAIProvider(process.env.OPENAI_API_KEY || '')
+      break
     case 'GEMINI':
-      return new GeminiProvider(process.env.GEMINI_API_KEY || '')
+      instance = new GeminiProvider(process.env.GEMINI_API_KEY || '')
+      break
     case 'CLAUDE':
-      return new ClaudeProvider(process.env.ANTHROPIC_API_KEY || '')
+      instance = new ClaudeProvider(process.env.ANTHROPIC_API_KEY || '')
+      break
     default:
       throw new Error(`Unsupported AI provider: ${provider}`)
   }
+
+  providerCache.set(provider, instance)
+  return instance
 }
 
 export * from './openai'

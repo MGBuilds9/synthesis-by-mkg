@@ -22,6 +22,7 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/lib/providers/llm', () => ({
   getLLMProvider: vi.fn(),
+  resetProviderCache: vi.fn(),
 }))
 
 vi.mock('@/lib/context/retrieval', () => ({

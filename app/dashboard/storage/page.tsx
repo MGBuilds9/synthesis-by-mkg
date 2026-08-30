@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, Search, Loader2 } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -140,12 +140,13 @@ export default function StoragePage() {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" aria-hidden="true" />
             <input
               ref={searchInputRef}
               type="text"
               aria-label="Search files"
               placeholder={`Search files... (${shortcutSymbol}+K)`}
-              className="w-full px-4 py-2 border rounded-lg pr-8"
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -158,7 +159,7 @@ export default function StoragePage() {
                   fetchFiles(selectedProvider, "");
                   searchInputRef.current?.focus();
                 }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus:outline-none"
                 aria-label="Clear search"
               >
                 <X className="w-4 h-4" />
@@ -168,11 +169,18 @@ export default function StoragePage() {
           <button
             type="button"
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[130px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Searching...</span>
+              </>
+            ) : (
+              <span>Search</span>
+            )}
           </button>
         </div>
 

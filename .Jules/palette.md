@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2024-05-18 - Search Button Loading State Refinement
+**Learning:** Adding a minimum width class to buttons whose text changes dynamically (like "Search" -> "Searching...") prevents layout jitter/jumping which disrupts visual stability. Combining this with standard loading indicators (like `Loader2` from `lucide-react`) provides a cleaner UX. For standalone indicators, wrapping in a container with `role="status"` and an `sr-only` text ensures accessibility.
+**Action:** Always add a `min-w-[...]` (e.g. `min-w-[130px]`) utility class to dynamic buttons along with spinner icons for a smooth async experience. Always wrap standalone loaders in `role="status"`.

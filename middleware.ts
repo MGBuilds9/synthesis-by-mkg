@@ -24,9 +24,11 @@ export function middleware(request: NextRequest) {
   )
 
   // Sentinel: Add Content-Security-Policy to mitigate XSS and data injection attacks
+  // Strip 'unsafe-eval' in production for better security, keep in dev for Fast Refresh
+  const isProd = process.env.NODE_ENV === 'production';
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    script-src 'self' 'unsafe-inline' ${!isProd ? "'unsafe-eval'" : ""};
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data:;
     font-src 'self';

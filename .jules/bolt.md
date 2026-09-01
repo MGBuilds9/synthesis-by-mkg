@@ -37,3 +37,6 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+## 2026-09-01 - Cache LLM Provider Instances
+**Learning:** Instantiating external SDK clients per-request introduces unnecessary TLS handshake latency. Caching them at the module level allows reuse of underlying HTTP keep-alive connections, significantly reducing TTFB.
+**Action:** Implement module-level caching using a Map for provider instances, and expose a reset function for testing.

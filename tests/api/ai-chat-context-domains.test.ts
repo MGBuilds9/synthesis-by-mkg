@@ -26,6 +26,7 @@ vi.mock('@/lib/context/retrieval', () => ({
 }))
 vi.mock('@/lib/providers/llm', () => ({
   getLLMProvider: vi.fn(),
+  resetProviderCache: vi.fn(),
 }))
 
 // Mock logger to avoid cluttering test output

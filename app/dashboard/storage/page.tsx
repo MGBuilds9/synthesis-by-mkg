@@ -168,7 +168,7 @@ export default function StoragePage() {
           <button
             type="button"
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-w-[120px]"
             disabled={loading}
             aria-busy={loading}
           >

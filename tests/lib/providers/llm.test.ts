@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest'
-import { getLLMProvider, OpenAIProvider, ClaudeProvider, GeminiProvider } from '@/lib/providers/llm'
+import { getLLMProvider, OpenAIProvider, ClaudeProvider, GeminiProvider, resetProviderCache } from '@/lib/providers/llm'
 
 // Mock the SDK modules
 vi.mock('openai', () => {
@@ -42,6 +42,20 @@ describe('LLM Provider Factory', () => {
   })
 
   describe('getLLMProvider', () => {
+    beforeEach(() => {
+      resetProviderCache()
+    })
+
+    it('should cache and return the same instance for the same provider', () => {
+      const provider1 = getLLMProvider('OPENAI' as any)
+      const provider2 = getLLMProvider('OPENAI' as any)
+      expect(provider1).toBe(provider2)
+
+      resetProviderCache()
+      const provider3 = getLLMProvider('OPENAI' as any)
+      expect(provider1).not.toBe(provider3)
+    })
+
     it('should return OpenAIProvider for OPENAI provider', () => {
       const provider = getLLMProvider('OPENAI' as any)
       expect(provider).toBeInstanceOf(OpenAIProvider)

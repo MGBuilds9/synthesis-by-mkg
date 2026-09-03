@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2023-10-24 - Dynamic Action Button Layout Shift
+**Learning:** When action buttons dynamically change text (e.g., from "Search" to "Searching...") during async operations, it frequently causes an abrupt layout shift that makes the UI feel janky and unpolished.
+**Action:** Always apply a minimum width utility class (e.g., Tailwind's `min-w-[120px]`) and stable flex centering (`flex items-center justify-center gap-2`) to action buttons to ensure they maintain a consistent footprint across states.

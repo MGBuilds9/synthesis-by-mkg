@@ -31,3 +31,7 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+## 2026-09-03 - Prevent XSS in AI Source Links
+**Vulnerability:** XSS vulnerability where un-sanitized source URLs from AI could be rendered as malicious `javascript:` links.
+**Learning:** Even URLs provided by internal services or AI responses must be treated as untrusted user input, as AI can hallucinate or reflect malicious content.
+**Prevention:** Always validate URLs against allowed protocols (like `http://` and `https://`) before using them in `href` attributes.

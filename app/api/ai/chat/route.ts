@@ -134,14 +134,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (!chatSession) {
-      chatSession = await prisma.aiChatSession.create({
+      // Bolt: Avoid unnecessary include joins on create since a new session has no relations
+      const newSession = await prisma.aiChatSession.create({
         data: {
           userId: session.user.id,
           provider: provider as AiProvider,
           model,
         },
-        include,
       })
+      chatSession = {
+        ...newSession,
+        messages: [],
+        ...(useContext ? { contextScopes: [] } : {}),
+      }
     }
 
     // Add user message to database

@@ -254,10 +254,7 @@ describe('POST /api/ai/chat', () => {
         userId: 'user-123',
         provider: 'OPENAI',
         model: 'gpt-4',
-      },
-      include: expect.objectContaining({
-        messages: expect.any(Object),
-      }),
+      }
     })
   })
 

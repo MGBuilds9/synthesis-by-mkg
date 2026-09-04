@@ -76,6 +76,29 @@ describe('MessageList', () => {
     expect(screen.getByText('Project details')).toBeInTheDocument()
   })
 
+  it('sanitizes javascript: URLs in sources to prevent XSS', () => {
+    const messages: Message[] = [
+      {
+        role: 'assistant',
+        content: 'Check this link',
+        sources: [
+          { title: 'Malicious Link', url: 'javascript:alert(1)' },
+          { title: 'Safe Link', url: 'https://example.com' },
+        ],
+      },
+    ]
+
+    render(<MessageList messages={messages} loading={false} />)
+
+    // The safe link should have an anchor tag
+    const safeLink = screen.getByText('Safe Link').closest('a')
+    expect(safeLink).toHaveAttribute('href', 'https://example.com')
+
+    // The malicious link should NOT have an anchor tag (fallback to plain text)
+    const maliciousLink = screen.getByText('Malicious Link').closest('a')
+    expect(maliciousLink).toBeNull()
+  })
+
   it('is memoized', () => {
     expect(MessageList.$$typeof.toString()).toBe('Symbol(react.memo)')
   })

@@ -1,6 +1,16 @@
 import { ExternalLink, Sparkles } from 'lucide-react'
 import { memo, useRef, useEffect } from 'react'
 
+// Sentinel: Security enhancement - validate untrusted URLs from AI to prevent XSS
+const isValidUrl = (urlStr: string) => {
+  try {
+    const url = new URL(urlStr);
+    return ['http:', 'https:'].includes(url.protocol);
+  } catch (e) {
+    return false;
+  }
+};
+
 const SUGGESTIONS = [
   "Summarize my recent emails",
   "Find files about Q1 projects",
@@ -76,7 +86,7 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                     <div className="space-y-1">
                       {msg.sources.map((source: any, idx: number) => (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          {source.url ? (
+                          {source.url && isValidUrl(source.url) ? (
                             <a
                               href={source.url}
                               target="_blank"

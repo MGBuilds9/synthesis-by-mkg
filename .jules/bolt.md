@@ -37,3 +37,7 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+
+## 2026-09-04 - Avoid Prisma Includes on Entity Creation
+**Learning:** In Prisma, applying an `include` block to fetch relations on a newly created entity (e.g., `await prisma.entity.create({ ..., include: { relations: true } })`) causes unnecessary database JOIN queries, as the relations are guaranteed to be initially empty.
+**Action:** Omit the `include` and manually initialize empty relational arrays on the returned object (e.g., `entity.relations = []`) to satisfy TypeScript constraints without database overhead.

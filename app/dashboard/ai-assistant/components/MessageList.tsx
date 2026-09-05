@@ -74,9 +74,12 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                   <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <p className="text-xs font-semibold text-blue-900 mb-2">Sources Used:</p>
                     <div className="space-y-1">
-                      {msg.sources.map((source: any, idx: number) => (
+                      {msg.sources.map((source: any, idx: number) => {
+                        // Sentinel: Validate URL protocol to prevent XSS (e.g., javascript: URIs)
+                        const isValidUrl = source.url && (source.url.startsWith('http://') || source.url.startsWith('https://'));
+                        return (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          {source.url ? (
+                          {isValidUrl ? (
                             <a
                               href={source.url}
                               target="_blank"
@@ -104,7 +107,8 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                             </>
                           )}
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

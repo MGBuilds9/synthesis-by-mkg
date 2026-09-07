@@ -34,4 +34,9 @@
 **Action:** Always ensure that search inputs use a single semantic aria-label, properly clean up any duplicated aria-label properties in JSX elements.
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
+
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-07-28 - Standardize Visual Loading States
+**Learning:** Adding a spinner to loading states without minimum widths causes layout shift, and standalone text loading indicators without proper roles (like `role="status"`) are unhelpful for screen reader users.
+**Action:** When implementing async states, wrap text in a `role="status"` container with an `sr-only` description, use `Loader2` (animate-spin), and apply `min-w-[...]` to buttons to ensure visual stability when the label length changes.

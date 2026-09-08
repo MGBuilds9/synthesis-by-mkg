@@ -1,6 +1,19 @@
 import { ExternalLink, Sparkles } from 'lucide-react'
 import { memo, useRef, useEffect } from 'react'
 
+// Sentinel: URL validation to prevent XSS from hallucinated or malicious citations
+function isSafeUrl(url: string | null | undefined): boolean {
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url);
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch {
+    // If URL parsing fails, check if it's a relative path
+    return url.startsWith('/');
+  }
+}
+
 const SUGGESTIONS = [
   "Summarize my recent emails",
   "Find files about Q1 projects",
@@ -76,7 +89,7 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                     <div className="space-y-1">
                       {msg.sources.map((source: any, idx: number) => (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          {source.url ? (
+                          {isSafeUrl(source.url) ? (
                             <a
                               href={source.url}
                               target="_blank"

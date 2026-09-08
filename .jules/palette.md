@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-08 - Stable Action Buttons
+**Learning:** Action buttons whose text changes dynamically during async operations (e.g., from 'Search' to 'Searching...') cause layout jitter that shifts nearby elements.
+**Action:** Always apply a minimum width utility class (e.g., Tailwind's `min-w-[140px]`) to ensure the button maintains a stable visual layout across all its states.

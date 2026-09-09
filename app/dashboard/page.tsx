@@ -176,13 +176,13 @@ export default function DashboardPage() {
                 <p className="text-xs font-medium text-gray-900 mb-1 truncate">{account.provider}</p>
                 <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2">
                   {account.status === 'connected' && (
-                    <CheckCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-green-500" />
+                    <CheckCircle aria-label="Connected" className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-green-500" />
                   )}
                   {account.status === 'needs_attention' && (
-                    <AlertCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-yellow-500" />
+                    <AlertCircle aria-label="Needs attention" className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-yellow-500" />
                   )}
                   {account.status === 'not_connected' && (
-                    <PlusCircle className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-gray-400" />
+                    <PlusCircle aria-label="Not connected" className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-gray-400" />
                   )}
                 </div>
               </div>

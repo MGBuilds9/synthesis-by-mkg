@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-09 - Visual Status Indicators
+**Learning:** Visual-only status indicators (like colored dots or checkmarks) for items in a grid/list leave screen reader users unaware of the item's state (e.g., connected vs. disconnected).
+**Action:** Always provide an `aria-label` or visually hidden text for status icons to ensure the state is conveyed to assistive technologies.

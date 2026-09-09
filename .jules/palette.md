@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-09 - Add Visual Loading Indicators
+**Learning:** When adding visual loading spinners to existing text elements, maintaining the exact visible string and avoiding duplicated screen-reader text prevents breaking `@testing-library` exact text assertions while still improving UX.
+**Action:** Use `Loader2` and apply `role="status"` on wrapping containers without duplicating the visible state text.

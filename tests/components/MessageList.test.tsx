@@ -76,6 +76,25 @@ describe('MessageList', () => {
     expect(screen.getByText('Project details')).toBeInTheDocument()
   })
 
+  it('does not render javascript: links in sources (XSS protection)', () => {
+    const messages: Message[] = [
+      {
+        role: 'assistant',
+        content: 'Check out this file',
+        sources: [
+          { title: 'Malicious File', url: 'javascript:alert(1)' },
+        ],
+      },
+    ]
+
+    render(<MessageList messages={messages} loading={false} />)
+
+    // The title should be rendered, but NOT as a link
+    expect(screen.getByText('Malicious File')).toBeInTheDocument()
+    const link = screen.queryByRole('link', { name: /Open Malicious File in new tab/i })
+    expect(link).not.toBeInTheDocument()
+  })
+
   it('is memoized', () => {
     expect(MessageList.$$typeof.toString()).toBe('Symbol(react.memo)')
   })

@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## 2026-09-10 - Dynamic Button Widths
+**Learning:** Buttons that change text content during async operations (like "Search" to "Searching...") cause layout jitter if their width changes.
+**Action:** Always apply a minimum width utility class (e.g., `min-w-[140px]`) along with `flex justify-center` to ensure visual stability during state transitions.

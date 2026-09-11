@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-11 - Duplicated Text in Tests
+**Learning:** Adding `sr-only` text for accessibility that duplicates visible text will cause `getAllByText` queries in tests to fail due to finding extra elements.
+**Action:** Always update tests that rely on exact text matches to account for duplicated strings introduced for screen readers.

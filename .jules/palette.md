@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-09-11 - Accessible Visual Loading States
+**Learning:** Replacing text-only loading indicators (like "Searching...") with visual spinners alongside `sr-only` text can inadvertently break tests relying on exact text matching. Using spans allows tests to still find the text while improving the visual UX. We should standardise on `Loader2` for this.
+**Action:** Always wrap visual loading spinners in `role="status"` containers with an `sr-only` span containing the original text. When modifying UI text, double-check test files for `getByText` assertions to avoid regressions, and use `getAllByText` if duplicate `sr-only` and visible texts exist.

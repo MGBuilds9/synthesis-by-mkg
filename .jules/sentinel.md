@@ -31,3 +31,7 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+## 2026-09-12 - Prevent Plaintext Credential Logging in UI Components
+**Vulnerability:** The client-side sign-in form explicitly logged the user's email and plaintext password to the browser console.
+**Learning:** Even placeholder or demonstrative code can inadvertently leak highly sensitive credentials to the browser console, which is a major security risk for users in shared environments or when interacting with malicious browser extensions.
+**Prevention:** Never use `console.log` or other logging mechanisms to output sensitive user inputs (passwords, tokens, API keys) in frontend code. Use proper authentication flow libraries (like NextAuth) and restrict logging to safe, non-sensitive context.

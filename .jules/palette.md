@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## $(date +%Y-%m-%d) - Layout Shift Prevention
+**Learning:** Adding loading spinners to action buttons can cause Layout Jitter/Shift (jank) if the button's content changes size (e.g., from "Search" to a wider "[Spinner] Searching...").
+**Action:** Always apply a minimum width utility class (like `min-w-[...]`) to dynamic action buttons to ensure they maintain a stable layout across states.

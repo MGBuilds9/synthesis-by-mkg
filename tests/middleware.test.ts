@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { middleware } from '../middleware'
 import { NextRequest } from 'next/server'
 
@@ -20,8 +20,7 @@ describe('Middleware Security Headers', () => {
   })
 
   it('should not include unsafe-eval in production CSP', () => {
-    const originalEnv = process.env.NODE_ENV
-    process.env.NODE_ENV = 'production'
+    vi.stubEnv('NODE_ENV', 'production')
 
     const req = new NextRequest(new URL('http://localhost:3000/'))
     const res = middleware(req)
@@ -29,6 +28,6 @@ describe('Middleware Security Headers', () => {
 
     expect(csp).not.toContain('unsafe-eval')
 
-    process.env.NODE_ENV = originalEnv
+    vi.unstubAllEnvs()
   })
 })

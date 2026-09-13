@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2024-05-25 - Async Loading Accessibility
+**Learning:** Visual-only text like "Searching..." inside an async action button or placeholder is often insufficient for screen reader users to understand a state change, and sudden layout jitter from changing text widths creates a poor visual experience.
+**Action:** Always include a visual spinner (like `Loader2`) alongside text in disabled async buttons. For empty state loaders, use `role="status"` and an `sr-only` descriptive span. Prevent layout jitter by applying a fixed or minimum width class (e.g., `min-w-[140px]`) to the action button.

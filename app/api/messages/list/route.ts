@@ -56,8 +56,13 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const accountIds = accounts.map((account) => account.id)
-    const accountMap = new Map(accounts.map(a => [a.id, a]))
+    // Bolt: Use single pass to build IDs and Map to reduce redundant O(N) operations
+    const accountIds: string[] = []
+    const accountMap = new Map()
+    for (const a of accounts) {
+      accountIds.push(a.id)
+      accountMap.set(a.id, a)
+    }
 
     const whereClause: any = {
       connectedAccountId: { in: accountIds },

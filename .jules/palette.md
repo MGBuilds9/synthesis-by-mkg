@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-09-13 - Add visual loading states to StoragePage
+**Learning:** Adding visual `Loader2` spinners to async searching states enhances UI feedback, but you must ensure existing test asserts checking for explicit text like `screen.getAllByText('Searching...')` are not broken by simply replacing the text. Utilizing `sr-only` keeps the accessibility explicit text while allowing visual enhancement.
+**Action:** When improving loading states on buttons and standalone placeholders, use `Loader2` from `lucide-react`, maintain the descriptive text visually if appropriate or via `sr-only` class to ensure `screen.getAllByText` test assertions do not regress. Include `role="status"` on standalone loading placeholders.

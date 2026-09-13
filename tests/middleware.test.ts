@@ -18,4 +18,17 @@ describe('Middleware Security Headers', () => {
     // are standard Fetch API objects or polyfills provided by Next.js
     expect(res.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains')
   })
+
+  it('should not include unsafe-eval in production CSP', () => {
+    const originalEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'production'
+
+    const req = new NextRequest(new URL('http://localhost:3000/'))
+    const res = middleware(req)
+    const csp = res.headers.get('Content-Security-Policy')
+
+    expect(csp).not.toContain('unsafe-eval')
+
+    process.env.NODE_ENV = originalEnv
+  })
 })

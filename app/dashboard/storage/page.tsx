@@ -4,6 +4,19 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { ExternalLink, X } from "lucide-react";
 
+function validateUrl(url: string | undefined): string {
+  if (!url) return '#';
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return url;
+    }
+  } catch (e) {
+    // Ignore invalid URLs
+  }
+  return '#';
+}
+
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -277,7 +290,7 @@ export default function StoragePage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <a
-                      href={file.webViewLink}
+                      href={validateUrl(file.webViewLink)}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Open ${file.name} in new tab`}

@@ -1,6 +1,19 @@
 import { ExternalLink, Sparkles } from 'lucide-react'
 import { memo, useRef, useEffect } from 'react'
 
+function validateUrl(url: string | undefined): string {
+  if (!url) return '#';
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return url;
+    }
+  } catch (e) {
+    // Ignore invalid URLs
+  }
+  return '#';
+}
+
 const SUGGESTIONS = [
   "Summarize my recent emails",
   "Find files about Q1 projects",
@@ -78,7 +91,7 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                         <div key={idx} className="flex items-start gap-2 text-xs">
                           {source.url ? (
                             <a
-                              href={source.url}
+                              href={validateUrl(source.url)}
                               target="_blank"
                               rel="noopener noreferrer"
                               aria-label={`Open ${source.title} in new tab`}

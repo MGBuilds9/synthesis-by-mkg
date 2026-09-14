@@ -6,10 +6,10 @@ import { Mail, MessageSquare, FolderOpen, FileText, Bot, CheckCircle, AlertCircl
 
 export default function DashboardPage() {
   const [todayStats, setTodayStats] = useState({
-    newEmails: 0,
-    newChats: 0,
-    recentFiles: 0,
-    recentNotionPages: 0,
+    newEmails: 5,
+    newChats: 12,
+    recentFiles: 8,
+    recentNotionPages: 3,
   })
 
   const [connectedAccounts, _setConnectedAccounts] = useState([
@@ -21,17 +21,6 @@ export default function DashboardPage() {
     { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
     { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
   ])
-
-  useEffect(() => {
-    // Fetch today's stats
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTodayStats({
-      newEmails: 5,
-      newChats: 12,
-      recentFiles: 8,
-      recentNotionPages: 3,
-    })
-  }, [])
 
   return (
     <div className="p-4 sm:p-6">

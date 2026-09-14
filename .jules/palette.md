@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-09-14 - Async Button Layout Jitter
+**Learning:** Changing button text during async operations (e.g., from "Search" to "Searching...") often causes layout jitter due to width changes, which is visually jarring.
+**Action:** Always apply a minimum width utility class (e.g., `min-w-[140px]`) alongside flex centering when a button's content changes dynamically during async operations to maintain layout stability.

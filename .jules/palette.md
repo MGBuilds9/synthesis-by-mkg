@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-09-15 - Add loading spinner to async search button
+**Learning:** Adding a spinner to a button that triggers async search significantly improves UX by giving immediate visual feedback. It's important to use `min-w-[...]` to avoid the button resizing and causing layout shift when text changes.
+**Action:** Always consider layout shift and immediate visual feedback when modifying button text for loading states.

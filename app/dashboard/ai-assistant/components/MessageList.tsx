@@ -76,7 +76,7 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                     <div className="space-y-1">
                       {msg.sources.map((source: any, idx: number) => (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          {source.url ? (
+                          {source.url && (source.url.startsWith('http://') || source.url.startsWith('https://')) ? (
                             <a
                               href={source.url}
                               target="_blank"

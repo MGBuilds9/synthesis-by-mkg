@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { middleware } from '../middleware'
 import { NextRequest } from 'next/server'
 
@@ -17,5 +17,29 @@ describe('Middleware Security Headers', () => {
     // Note: Vitest/JSDOM environment might handle headers differently, but NextRequest/Response
     // are standard Fetch API objects or polyfills provided by Next.js
     expect(res.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains')
+  })
+
+  it('should include unsafe-eval in development CSP', () => {
+    vi.stubEnv('NODE_ENV', 'development')
+
+    const req = new NextRequest(new URL('http://localhost:3000/'))
+    const res = middleware(req)
+
+    const csp = res.headers.get('Content-Security-Policy')
+    expect(csp).toContain("'unsafe-eval'")
+
+    vi.unstubAllEnvs()
+  })
+
+  it('should not include unsafe-eval in production CSP', () => {
+    vi.stubEnv('NODE_ENV', 'production')
+
+    const req = new NextRequest(new URL('http://localhost:3000/'))
+    const res = middleware(req)
+
+    const csp = res.headers.get('Content-Security-Policy')
+    expect(csp).not.toContain("'unsafe-eval'")
+
+    vi.unstubAllEnvs()
   })
 })

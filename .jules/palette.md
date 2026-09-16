@@ -35,3 +35,11 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## $(date +%Y-%m-%d) - Handling sr-only elements in testing-library
+**Learning:** Adding `sr-only` elements that duplicate visual text creates duplicate DOM nodes, which causes single-element queries like `getByText` to fail in tests. Also wrapping button text with `aria-hidden` breaks `getByRole('button', { name: /text/ })`.
+**Action:** When adding `sr-only` tags for accessibility, always check existing test files and update assertions to use `getAllByText().toHaveLength(X)` or index-based selectors instead.
+
+## $(date +%Y-%m-%d) - Reverting brittle tests in favor of fixing accessibility
+**Learning:** Bypassing a failing test by replacing an accessibility-focused query (`getByRole`) with a brittle index-based selector masks the underlying accessibility regression.
+**Action:** When a `getByRole` test fails after a UX change, prioritize fixing the DOM to be correctly accessible rather than making the test brittle. Ensure any `aria-hidden` text is paired with an `.sr-only` alternative inside interactive elements like buttons.

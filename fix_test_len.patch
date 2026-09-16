@@ -1,0 +1,11 @@
+--- tests/components/StoragePage.test.tsx
++++ tests/components/StoragePage.test.tsx
+@@ -20,7 +20,7 @@
+     expect(screen.getByLabelText('Search files')).toBeInTheDocument()
+     // Initially searching on load because of useEffect
+     // "Searching..." appears in both button and file list area
+-    expect(screen.getAllByText('Searching...')).toHaveLength(3)
++    expect(screen.getAllByText('Searching...')).toHaveLength(4)
+
+     await waitFor(() => {
+       expect(screen.getByText('Search')).toBeInTheDocument()

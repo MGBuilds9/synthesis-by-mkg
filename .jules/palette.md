@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-16 - Adding Spinners to existing text buttons
+**Learning:** When adding an SVG spinner alongside existing text inside a button, if the button state toggles between "Search" and "Searching...", it can cause a visual layout jitter. Also, if you use `role="status"` on the spinner but it is inside a button that already has `aria-busy={loading}`, it is redundant.
+**Action:** Always add a `min-w-[Xpx]` utility class (e.g. `min-w-[140px]`) along with `flex items-center justify-center gap-2` to prevent layout shifts. Do not add `role="status"` on an element that also has `aria-hidden="true"`.

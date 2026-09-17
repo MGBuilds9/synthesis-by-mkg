@@ -80,7 +80,7 @@ describe("StoragePage UX", () => {
 
     // Wait for search to complete
     await waitFor(() => {
-      expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+      expect(screen.queryAllByText("Searching...")).toHaveLength(0);
     });
 
     expect(input).toHaveValue("");

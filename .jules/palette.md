@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## $(date +%Y-%m-%d) - Adding loading spinner to search button
+**Learning:** Duplicating text for visual styling and screen reader (`sr-only`) breaks standard test assertions using `queryByText`. We must use `queryAllByText` or assert on array length instead.
+**Action:** When adding accessible loading states that duplicate text, immediately update relevant test assertions to accommodate the new DOM structure.

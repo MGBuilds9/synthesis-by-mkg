@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { ExternalLink, X } from "lucide-react";
 
@@ -92,11 +92,80 @@ export default function StoragePage() {
     fetchFiles(selectedProvider, searchQuery);
   }
 
+  // Bolt: Memoize the files table to prevent O(N) re-renders on every keystroke in the search input
+  const filesTable = useMemo(
+    () => (
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Name
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Provider
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Last Modified
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {files.map((file: any) => (
+            <tr key={file.id} className="hover:bg-gray-50">
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm font-medium text-gray-900">
+                  {file.name}
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="text-xs font-medium text-gray-500 uppercase">
+                  {file.provider === "GDRIVE" ? "Google Drive" : "OneDrive"}
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {new Date(file.modifiedTime).toLocaleDateString()}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <a
+                  href={file.webViewLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${file.name} in new tab`}
+                  className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                >
+                  Open <ExternalLink className="w-3 h-3" />
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ),
+    [files],
+  );
+
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Storage</h1>
-        <p className="text-gray-600">View and manage all your synced files from Google Drive and OneDrive.</p>
+        <p className="text-gray-600">
+          View and manage all your synced files from Google Drive and OneDrive.
+        </p>
       </div>
 
       {/* Storage Accounts */}
@@ -107,8 +176,12 @@ export default function StoragePage() {
         >
           <div className="flex items-center mb-4">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/>
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z" />
               </svg>
             </div>
             <div>
@@ -124,8 +197,12 @@ export default function StoragePage() {
         >
           <div className="flex items-center mb-4">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0a12 12 0 0 0-4.8 23.04l1.44-1.2a10.08 10.08 0 1 1 6.72 0l1.44 1.2A12 12 0 0 0 12 0z"/>
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 0a12 12 0 0 0-4.8 23.04l1.44-1.2a10.08 10.08 0 1 1 6.72 0l1.44 1.2A12 12 0 0 0 12 0z" />
               </svg>
             </div>
             <div>
@@ -172,12 +249,16 @@ export default function StoragePage() {
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? "Searching..." : "Search"}
           </button>
         </div>
 
         {/* Provider Filter */}
-        <div className="mt-4 flex gap-2" role="group" aria-label="Filter by provider">
+        <div
+          className="mt-4 flex gap-2"
+          role="group"
+          aria-label="Filter by provider"
+        >
           <button
             type="button"
             onClick={() => setSelectedProvider("ALL")}
@@ -220,9 +301,7 @@ export default function StoragePage() {
       {/* Files List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Searching...
-          </div>
+          <div className="p-8 text-center text-gray-500">Searching...</div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             {selectedProvider === "ALL"
@@ -230,66 +309,7 @@ export default function StoragePage() {
               : `No ${selectedProvider === "GDRIVE" ? "Google Drive" : "OneDrive"} files found.`}
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Name
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Provider
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Last Modified
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {files.map((file: any) => (
-                <tr key={file.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {file.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-xs font-medium text-gray-500 uppercase">
-                      {file.provider === "GDRIVE" ? "Google Drive" : "OneDrive"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(file.modifiedTime).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <a
-                      href={file.webViewLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Open ${file.name} in new tab`}
-                      className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
-                    >
-                      Open <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          filesTable
         )}
       </div>
     </div>

@@ -39,3 +39,7 @@
 ## 2026-06-09 - External Link Interaction
 **Learning:** Referenced sources returned by the AI assistant often have valid URLs but were only displaying a visual icon without an actual anchor tag, breaking the expected interaction pattern for users trying to access original source material.
 **Action:** Always verify that elements visually representing external links (like the `ExternalLink` icon) are wrapped in functional `<a>` tags with proper `target="_blank"` and `rel="noopener noreferrer"` attributes when destination URLs are present.
+
+## $(date +%Y-%m-%d) - Prevent Layout Shift on Button Spinners
+**Learning:** Adding a loading spinner next to text inside a button during async operations causes the button's width to change, resulting in visually jarring layout shifts.
+**Action:** Always apply a minimum width utility class (e.g., `min-w-[140px]`) alongside flex centering to buttons that will show loading states.

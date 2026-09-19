@@ -1,14 +1,36 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { middleware } from '../middleware'
 import { NextRequest } from 'next/server'
 
 describe('Middleware Security Headers', () => {
-  it('should add security headers to the response', () => {
+  it('should add security headers to the response in production without unsafe-eval', () => {
+    vi.stubEnv('NODE_ENV', 'production')
+
     // Create a mock request
     const req = new NextRequest(new URL('http://localhost:3000/'))
 
     // Call the middleware
     const res = middleware(req)
+    const csp = res.headers.get('Content-Security-Policy') || ''
+    expect(csp).not.toContain('unsafe-eval')
+
+    vi.unstubAllEnvs()
+  })
+
+  it('should add security headers to the response in development with unsafe-eval', () => {
+    vi.stubEnv('NODE_ENV', 'development')
+
+    // Create a mock request
+    const req = new NextRequest(new URL('http://localhost:3000/'))
+
+    // Call the middleware
+    const res = middleware(req)
+    const csp = res.headers.get('Content-Security-Policy') || ''
+    expect(csp).toContain('unsafe-eval')
+
+    vi.unstubAllEnvs()
+
+    // Assert headers are present
 
     // Assert headers are present
     expect(res.headers.get('X-Frame-Options')).toBe('DENY')

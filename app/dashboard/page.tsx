@@ -4,23 +4,29 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Mail, MessageSquare, FolderOpen, FileText, Bot, CheckCircle, AlertCircle, PlusCircle } from 'lucide-react'
 
-export default function DashboardPage() {
-  const [todayStats, setTodayStats] = useState({
-    newEmails: 0,
-    newChats: 0,
-    recentFiles: 0,
-    recentNotionPages: 0,
-  })
+// Bolt: Extracted static arrays and objects outside the component to prevent
+// unnecessary memory reallocation on every render cycle.
+const INITIAL_STATS = {
+  newEmails: 0,
+  newChats: 0,
+  recentFiles: 0,
+  recentNotionPages: 0,
+}
 
-  const [connectedAccounts, _setConnectedAccounts] = useState([
-    { provider: 'Gmail', status: 'connected', icon: Mail },
-    { provider: 'Discord', status: 'connected', icon: MessageSquare },
-    { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
-    { provider: 'Notion', status: 'not_connected', icon: FileText },
-    { provider: 'Outlook', status: 'not_connected', icon: Mail },
-    { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
-    { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
-  ])
+const INITIAL_ACCOUNTS = [
+  { provider: 'Gmail', status: 'connected', icon: Mail },
+  { provider: 'Discord', status: 'connected', icon: MessageSquare },
+  { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
+  { provider: 'Notion', status: 'not_connected', icon: FileText },
+  { provider: 'Outlook', status: 'not_connected', icon: Mail },
+  { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
+  { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
+]
+
+export default function DashboardPage() {
+  const [todayStats, setTodayStats] = useState(INITIAL_STATS)
+
+  const [connectedAccounts, _setConnectedAccounts] = useState(INITIAL_ACCOUNTS)
 
   useEffect(() => {
     // Fetch today's stats

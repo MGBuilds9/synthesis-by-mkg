@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-20 - Screen Reader Feedback for Async Search
+**Learning:** The default "Searching..." text state for async operations in the storage page lacks proper screen reader announcements and visual cues, creating user uncertainty. When replacing single text with duplicated sr-only/visual text, it breaks test queries using `getByText` or `queryByText`.
+**Action:** Always pair visual loading animations with `role="status"` and `sr-only` text description. Use `queryAllByText` in tests to verify elements that duplicate text for screen readers.

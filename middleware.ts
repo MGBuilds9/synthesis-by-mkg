@@ -1,32 +1,37 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  const response = NextResponse.next();
 
   // Sentinel: Add security headers to all responses
-  const headers = response.headers
+  const headers = response.headers;
 
   // X-Frame-Options: Prevent clickjacking
-  headers.set('X-Frame-Options', 'DENY')
+  headers.set("X-Frame-Options", "DENY");
 
   // X-Content-Type-Options: Prevent MIME sniffing
-  headers.set('X-Content-Type-Options', 'nosniff')
+  headers.set("X-Content-Type-Options", "nosniff");
 
   // Referrer-Policy: Control referrer information
-  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
   // Strict-Transport-Security: Enforce HTTPS (HSTS)
   // This is critical for production environments.
   headers.set(
-    'Strict-Transport-Security',
-    'max-age=31536000; includeSubDomains'
-  )
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains",
+  );
 
   // Sentinel: Add Content-Security-Policy to mitigate XSS and data injection attacks
+  const isProd = process.env.NODE_ENV === "production";
+  const scriptSrc = isProd
+    ? "'self' 'unsafe-inline'"
+    : "'self' 'unsafe-inline' 'unsafe-eval'";
+
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    script-src ${scriptSrc};
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data:;
     font-src 'self';
@@ -34,11 +39,13 @@ export function middleware(request: NextRequest) {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-  `.replace(/\s{2,}/g, ' ').trim()
+  `
+    .replace(/\s{2,}/g, " ")
+    .trim();
 
-  headers.set('Content-Security-Policy', cspHeader)
+  headers.set("Content-Security-Policy", cspHeader);
 
-  return response
+  return response;
 }
 
 export const config = {
@@ -49,6 +56,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
-}
+};

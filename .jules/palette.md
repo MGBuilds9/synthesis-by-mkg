@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-09-22 - Adding Spinners to Buttons
+
+**Learning:** When transitioning a standard width text button (e.g., 'Search') to a loading state with a spinner + longer text (e.g., 'Searching...'), the button expands. This layout jitter breaks UX polish.
+**Action:** When adding spinners, apply a standard fixed minimum width (e.g., `min-w-[140px]`) and use flexbox `flex items-center justify-center gap-2` to keep the layout perfectly stable during state transitions. Ensure the spinner gets `aria-hidden="true"` so screen readers only read the text change.

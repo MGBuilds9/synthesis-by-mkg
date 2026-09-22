@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## $(date +%Y-%m-%d) - Adding Spinners for Async Actions Avoids Layout Jitter
+**Learning:** Replacing text-only loading states (like "Searching...") with icons alone can break layout if button widths aren't fixed, and removing the text removes accessibility. By keeping the text visually hidden (`sr-only`) and enforcing a minimum width, we maintain accessibility while reducing visual layout jitter. Also, ensure spinning loader SVG uses `aria-hidden="true"`.
+**Action:** When adding visual loading indicators (like spinners) into text buttons, pair them with `sr-only` text and fixed/min widths (`min-w-[140px]`) to preserve screen reader polite announcements while avoiding UI jitter.

@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## $(date +%Y-%m-%d) - Testing Multiple Visually Hidden Elements
+**Learning:** Testing-library's `queryByText` and `getByText` will throw if multiple instances of visually hidden `sr-only` text are found, even if they aren't visible to users. When an element replicates accessibility labels (like "Searching...") across multiple states (button and table), using `queryAllByText(text).toHaveLength(X)` avoids multiple-match errors while maintaining robust assertions.
+**Action:** When adding identical `sr-only` accessibility texts inside multiple components that render simultaneously (like a search button and loading table), update component tests to use `queryAllByText` and `getAllByText` instead of `queryByText` and `getByText` to avoid CI errors due to duplicate test matches.

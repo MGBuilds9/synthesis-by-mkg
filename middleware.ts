@@ -24,9 +24,14 @@ export function middleware(request: NextRequest) {
   )
 
   // Sentinel: Add Content-Security-Policy to mitigate XSS and data injection attacks
+  const isProd = process.env.NODE_ENV === 'production'
+  const scriptSrc = isProd
+    ? "'self' 'unsafe-inline'"
+    : "'self' 'unsafe-inline' 'unsafe-eval'"
+
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    script-src ${scriptSrc};
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data:;
     font-src 'self';

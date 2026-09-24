@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-09-24 - Add accessible loading spinners to async buttons
+**Learning:** Replacing plain text like 'Searching...' with loading spinners requires adding `role="status"` and `sr-only` text to maintain screen reader accessibility, while also applying a minimum width (e.g., `min-w-[140px]`) to prevent visual layout jitter. When doing this, `@testing-library/react` single-element queries like `queryByText` will fail if text is duplicated (visible + sr-only), so tests must be updated to use `queryAllByText(text).toHaveLength(0)`.
+**Action:** Always pair visual loading spinners with `sr-only` descriptions and `role="status"`, use `min-w` utilities on buttons to prevent layout shift, and remember to update tests to handle potential duplicated text queries.

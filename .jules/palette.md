@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2024-10-24 - Add loading spinners to Storage page search
+**Learning:** Adding loaders to components (like buttons) without enforcing min-widths causes them to jitter in size as the state and text changes, creating a jarring UX.
+**Action:** Always combine standard flex centering (`flex items-center justify-center`) with a `min-w-[...]` utility class to constrain the button's layout bounding box during dynamic state changes.

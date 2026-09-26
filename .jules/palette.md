@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## $(date +%Y-%m-%d) - Add loading spinner to async submit button
+**Learning:** Adding a loading spinner to a button that changes text can cause layout jitter if the new content has a different width.
+**Action:** Always apply a minimum width utility class (e.g., `min-w-[140px]`) alongside standard flex centering when swapping button content during async operations.

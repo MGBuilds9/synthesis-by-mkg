@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2026-09-27 - Add loading spinner to async submit button
+**Learning:** When an UI enhancement duplicates text within a component (e.g., adding an `sr-only` accessibility span that matches existing visible text for visual loading animations), `@testing-library/react` single-element queries like `getByText` or `queryByText` will fail.
+**Action:** Update assertions in the test files to use `getAllByText` (and assert the new length) or `queryAllByText(text).toHaveLength(0)` when duplicating text for accessibility purposes.

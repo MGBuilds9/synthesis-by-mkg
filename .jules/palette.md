@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## $(date +%Y-%m-%d) - Add accessible loading spinner to search button
+**Learning:** Adding visual loading spinners that swap text or add an icon can easily cause layout shift (jitter) and accessibility issues (e.g. redundant reading or losing role context).
+**Action:** When adding spinners, apply a minimum width to the container to prevent jitter, wrap the entire feedback block in `role="status"` for screen reader announcements, and apply `aria-hidden="true"` on the spinner icon and original text to keep the reading experience clean via an `sr-only` description.

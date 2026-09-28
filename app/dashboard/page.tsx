@@ -4,6 +4,16 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Mail, MessageSquare, FolderOpen, FileText, Bot, CheckCircle, AlertCircle, PlusCircle } from 'lucide-react'
 
+const CONNECTED_ACCOUNTS = [
+  { provider: 'Gmail', status: 'connected', icon: Mail },
+  { provider: 'Discord', status: 'connected', icon: MessageSquare },
+  { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
+  { provider: 'Notion', status: 'not_connected', icon: FileText },
+  { provider: 'Outlook', status: 'not_connected', icon: Mail },
+  { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
+  { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
+]
+
 export default function DashboardPage() {
   const [todayStats, setTodayStats] = useState({
     newEmails: 0,
@@ -11,16 +21,6 @@ export default function DashboardPage() {
     recentFiles: 0,
     recentNotionPages: 0,
   })
-
-  const [connectedAccounts, _setConnectedAccounts] = useState([
-    { provider: 'Gmail', status: 'connected', icon: Mail },
-    { provider: 'Discord', status: 'connected', icon: MessageSquare },
-    { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
-    { provider: 'Notion', status: 'not_connected', icon: FileText },
-    { provider: 'Outlook', status: 'not_connected', icon: Mail },
-    { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
-    { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
-  ])
 
   useEffect(() => {
     // Fetch today's stats
@@ -155,7 +155,7 @@ export default function DashboardPage() {
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
-          {connectedAccounts.map((account) => {
+          {CONNECTED_ACCOUNTS.map((account) => {
             const Icon = account.icon
             return (
               <div 

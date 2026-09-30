@@ -1,37 +1,31 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Mail, MessageSquare, FolderOpen, FileText, Bot, CheckCircle, AlertCircle, PlusCircle } from 'lucide-react'
 
+// Bolt: Extracted static arrays and objects outside the component to prevent memory reallocation on every render
+const INITIAL_STATS = {
+  newEmails: 5,
+  newChats: 12,
+  recentFiles: 8,
+  recentNotionPages: 3,
+}
+
+const INITIAL_ACCOUNTS = [
+  { provider: 'Gmail', status: 'connected', icon: Mail },
+  { provider: 'Discord', status: 'connected', icon: MessageSquare },
+  { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
+  { provider: 'Notion', status: 'not_connected', icon: FileText },
+  { provider: 'Outlook', status: 'not_connected', icon: Mail },
+  { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
+  { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
+]
+
 export default function DashboardPage() {
-  const [todayStats, setTodayStats] = useState({
-    newEmails: 0,
-    newChats: 0,
-    recentFiles: 0,
-    recentNotionPages: 0,
-  })
-
-  const [connectedAccounts, _setConnectedAccounts] = useState([
-    { provider: 'Gmail', status: 'connected', icon: Mail },
-    { provider: 'Discord', status: 'connected', icon: MessageSquare },
-    { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
-    { provider: 'Notion', status: 'not_connected', icon: FileText },
-    { provider: 'Outlook', status: 'not_connected', icon: Mail },
-    { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
-    { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
-  ])
-
-  useEffect(() => {
-    // Fetch today's stats
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTodayStats({
-      newEmails: 5,
-      newChats: 12,
-      recentFiles: 8,
-      recentNotionPages: 3,
-    })
-  }, [])
+  // Bolt: Initialized state directly to prevent an unnecessary second render cycle caused by useEffect
+  const [todayStats, setTodayStats] = useState(INITIAL_STATS)
+  const [connectedAccounts, _setConnectedAccounts] = useState(INITIAL_ACCOUNTS)
 
   return (
     <div className="p-4 sm:p-6">

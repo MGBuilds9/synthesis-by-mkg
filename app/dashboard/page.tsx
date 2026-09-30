@@ -1,37 +1,28 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Mail, MessageSquare, FolderOpen, FileText, Bot, CheckCircle, AlertCircle, PlusCircle } from 'lucide-react'
 
+// Bolt: Extracted static configuration outside component to prevent memory re-allocation on every render
+const CONNECTED_ACCOUNTS = [
+  { provider: 'Gmail', status: 'connected', icon: Mail },
+  { provider: 'Discord', status: 'connected', icon: MessageSquare },
+  { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
+  { provider: 'Notion', status: 'not_connected', icon: FileText },
+  { provider: 'Outlook', status: 'not_connected', icon: Mail },
+  { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
+  { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
+]
+
 export default function DashboardPage() {
+  // Bolt: Initialized static data directly to prevent unnecessary second render cycle and delayed TTI from useEffect
   const [todayStats, setTodayStats] = useState({
-    newEmails: 0,
-    newChats: 0,
-    recentFiles: 0,
-    recentNotionPages: 0,
+    newEmails: 5,
+    newChats: 12,
+    recentFiles: 8,
+    recentNotionPages: 3,
   })
-
-  const [connectedAccounts, _setConnectedAccounts] = useState([
-    { provider: 'Gmail', status: 'connected', icon: Mail },
-    { provider: 'Discord', status: 'connected', icon: MessageSquare },
-    { provider: 'Google Drive', status: 'needs_attention', icon: FolderOpen },
-    { provider: 'Notion', status: 'not_connected', icon: FileText },
-    { provider: 'Outlook', status: 'not_connected', icon: Mail },
-    { provider: 'Slack', status: 'not_connected', icon: MessageSquare },
-    { provider: 'Teams', status: 'not_connected', icon: MessageSquare },
-  ])
-
-  useEffect(() => {
-    // Fetch today's stats
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTodayStats({
-      newEmails: 5,
-      newChats: 12,
-      recentFiles: 8,
-      recentNotionPages: 3,
-    })
-  }, [])
 
   return (
     <div className="p-4 sm:p-6">
@@ -155,7 +146,7 @@ export default function DashboardPage() {
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
-          {connectedAccounts.map((account) => {
+          {CONNECTED_ACCOUNTS.map((account) => {
             const Icon = account.icon
             return (
               <div 

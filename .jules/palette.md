@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-10-01 - Loading States Accessibility
+**Learning:** Visual-only or plain-text loading states during async actions (like searching for files) lack clarity for users. Adding a spinner improves visual feedback, and `sr-only` descriptive text ensures screen reader accessibility, aligning with our interaction and screen reader feedback guidelines.
+**Action:** Always add `role="status"` and `sr-only` text to loading animations to notify screen reader users of the background fetching process.

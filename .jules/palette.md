@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2024-05-27 - Added loading spinner and disabled state for Storage Search
+**Learning:** When using visual loading animations (like spinners) for async operations, they must be paired with `role="status"` and a `sr-only` text description. If duplicating original text alongside the spinner, adding `aria-hidden="true"` prevents screen readers from redundantly announcing the state. Adding a minimum width class to the button (e.g. `min-w-[140px]`) prevents visual layout jitter during text changes between 'Search' and 'Searching...'.
+**Action:** Always wrap loading states in accessible containers and enforce min-widths for buttons with dynamic text content.

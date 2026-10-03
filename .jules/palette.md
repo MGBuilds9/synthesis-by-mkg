@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2024-10-03 - Button Loading States Jitter
+**Learning:** Adding dynamic loading states to buttons (like text changes or spinners) causes visual layout jitter if the button width changes between states.
+**Action:** Always apply a minimum width utility class (e.g., `min-w-[140px]`) alongside standard flex centering (`flex items-center justify-center`) to buttons with dynamic content or loading spinners to prevent layout jitter.

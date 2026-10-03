@@ -41,6 +41,11 @@ export class RateLimiter {
     // Update the map with the cleaned (and potentially updated) timestamps
     this.requests.set(key, timestamps)
 
+    // Sentinel: Prune map if it grows too large to prevent memory leak / DoS
+    if (this.requests.size > 10000) {
+      this.prune()
+    }
+
     // Calculate remaining requests
     const remaining = Math.max(0, this.limit - timestamps.length)
 

@@ -16,6 +16,13 @@ export class RateLimiter {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+
+    // Periodic cleanup to prevent memory leaks from inactive users
+    if (typeof setInterval !== 'undefined') {
+      const interval = setInterval(() => this.prune(), Math.max(windowMs, 60000))
+      // Prevent the interval from keeping the Node.js event loop alive
+      if (interval.unref) interval.unref()
+    }
   }
 
   /**

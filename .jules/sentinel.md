@@ -31,3 +31,7 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+## 2026-10-04 - Remove unsafe-eval from Content-Security-Policy
+**Vulnerability:** The Content-Security-Policy (CSP) allowed 'unsafe-eval' in the script-src directive.
+**Learning:** Allowing 'unsafe-eval' defeats a major layer of defense against XSS by allowing attackers to execute malicious injected strings.
+**Prevention:** Avoid relying on 'unsafe-eval' and remove it from CSP.

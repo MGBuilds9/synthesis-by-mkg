@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2024-10-04 - Accessible Loading States with Layout Stability
+**Learning:** Using flex layouts for centering button content paired with `min-w-[Xpx]` prevents layout jitter during asynchronous actions that swap text or display spinners.
+**Action:** Always combine standard flex centering (`flex items-center justify-center`) and a min-width utility class for async action buttons. Furthermore, visually appealing loading spinners should be explicitly paired with `role="status"` and a `.sr-only` descriptive span to improve screen reader experience, setting `aria-hidden="true"` on duplicated visual text and the spinner itself.

@@ -37,3 +37,6 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+## 2026-10-04 - Replace O(N) filter with O(log N) binary search in rate limiter
+**Learning:** Rate limiter sliding window timestamps are naturally appended chronologically, meaning the array is strictly sorted. Using an O(N) Array.prototype.filter to evict old items becomes a CPU bottleneck when pruning thousands of rate limit buckets simultaneously.
+**Action:** When filtering chronological/sorted arrays by a time threshold, use an O(log N) binary search to find the cutoff index, followed by Array.prototype.slice() to efficiently retain the valid subset without per-item callback overhead.

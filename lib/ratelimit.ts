@@ -19,6 +19,28 @@ export class RateLimiter {
   }
 
   /**
+   * Helper to find the first index in a sorted array that is strictly greater than the target.
+   * Since timestamps are appended chronologically, the array is strictly sorted.
+   * Uses O(log N) binary search.
+   */
+  private findFirstValidIndex(arr: number[], target: number): number {
+    let left = 0
+    let right = arr.length - 1
+    let result = arr.length
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2)
+      if (arr[mid] > target) {
+        result = mid
+        right = mid - 1
+      } else {
+        left = mid + 1
+      }
+    }
+    return result
+  }
+
+  /**
    * Checks if a request is allowed for the given key.
    * Returns an object with the result and rate limit headers information.
    */
@@ -28,8 +50,13 @@ export class RateLimiter {
 
     let timestamps = this.requests.get(key) || []
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    // Bolt: Optimized filtering using O(log N) binary search and slice instead of O(N) filter
+    if (timestamps.length > 0) {
+      const firstValidIdx = this.findFirstValidIndex(timestamps, windowStart)
+      if (firstValidIdx > 0) {
+        timestamps = timestamps.slice(firstValidIdx)
+      }
+    }
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -67,11 +94,13 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
-      if (validTimestamps.length === 0) {
+      // Bolt: Optimized filtering using O(log N) binary search instead of O(N) filter
+      const firstValidIdx = this.findFirstValidIndex(timestamps, windowStart)
+
+      if (firstValidIdx === timestamps.length) {
         this.requests.delete(key)
-      } else {
-        this.requests.set(key, validTimestamps)
+      } else if (firstValidIdx > 0) {
+        this.requests.set(key, timestamps.slice(firstValidIdx))
       }
     }
   }

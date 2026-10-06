@@ -37,3 +37,7 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+
+## 2026-10-06 - Avoid React state initialization in useEffect
+**Learning:** Using `useEffect` to synchronously initialize static or mock data causes an unnecessary double render and delays Time to Interactive (TTI), as React renders once with the default state and then again after the effect runs. Also, initializing static arrays or objects directly in the `useState` hook inside the component function causes memory to be re-allocated on every re-render.
+**Action:** Extract static constants outside of the component definition, and initialize state directly in the `useState` hook (e.g., `const [state] = useState(STATIC_DATA)`) rather than setting it post-mount in a `useEffect`.

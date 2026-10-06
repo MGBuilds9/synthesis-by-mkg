@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-10-06 - Table Loading Feedback
+**Learning:** Table-based data fetches often replace the entire table with a small text string (e.g. 'Searching...'), breaking the visual structure and lacking screen reader clarity.
+**Action:** Full-page loading indicators for data tables should use a prominent spinner with `role="status"` and `sr-only` text rather than plain text that shifts the layout.

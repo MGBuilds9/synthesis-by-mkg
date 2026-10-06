@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2024-10-06 - Search Button Loading State Clarity
+**Learning:** Text-only loading states (like "Searching...") on primary action buttons do not provide enough immediate visual feedback to indicate a network request is in progress, especially for users who might miss the text change. Using a loading icon improves recognition. Additionally, tests checking for generic "Searching..." text can become brittle if the text appears in multiple places simultaneously (e.g., the button and an empty state).
+**Action:** Always include a visual loading spinner (like `Loader2`) alongside text in action buttons during async operations. When writing or updating tests for these states, assert against specific roles and accessible names (e.g., `screen.getByRole('button', { name: /searching/i })`) rather than generic text lookups.

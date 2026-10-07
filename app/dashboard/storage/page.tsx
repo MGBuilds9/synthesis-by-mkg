@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, Loader2 } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -172,7 +172,14 @@ export default function StoragePage() {
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2" role="status">
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <span className="sr-only">Searching...</span>
+              </span>
+            ) : (
+              'Search'
+            )}
           </button>
         </div>
 

@@ -5,6 +5,13 @@ import Link from 'next/link'
 import { Settings, Mail, MessageSquare, FolderOpen, FileText, ChevronDown, ChevronUp, Send, Loader2 } from 'lucide-react'
 import MessageList, { Message } from './components/MessageList'
 
+const INITIAL_CONTEXT_DOMAINS = {
+  emails: true,
+  chats: true,
+  files: true,
+  notion: true,
+}
+
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -15,12 +22,7 @@ export default function AIChatPage() {
   const [showContextSettings, setShowContextSettings] = useState(false)
   
   // Context domain toggles
-  const [contextDomains, setContextDomains] = useState({
-    emails: true,
-    chats: true,
-    files: true,
-    notion: true,
-  })
+  const [contextDomains, setContextDomains] = useState(INITIAL_CONTEXT_DOMAINS)
   
   // Ask before searching context
   const [askBeforeSearching, setAskBeforeSearching] = useState(true)

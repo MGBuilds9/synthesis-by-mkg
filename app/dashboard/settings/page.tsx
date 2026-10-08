@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
+const INITIAL_ACCOUNTS: any[] = [
+  // Placeholder data
+]
+
 export default function SettingsPage() {
-  const [accounts] = useState([
-    // Placeholder data
-  ])
+  const [accounts] = useState(INITIAL_ACCOUNTS)
 
   return (
     <div className="min-h-screen bg-gray-50">

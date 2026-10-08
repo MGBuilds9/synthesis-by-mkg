@@ -4,8 +4,10 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { ExternalLink, X } from "lucide-react";
 
+const INITIAL_FILES: any[] = [];
+
 export default function StoragePage() {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState(INITIAL_FILES);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("ALL");

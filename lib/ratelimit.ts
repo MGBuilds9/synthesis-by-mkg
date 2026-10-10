@@ -39,7 +39,11 @@ export class RateLimiter {
     }
 
     // Update the map with the cleaned (and potentially updated) timestamps
-    this.requests.set(key, timestamps)
+    if (timestamps.length === 0) {
+      this.requests.delete(key)
+    } else {
+      this.requests.set(key, timestamps)
+    }
 
     // Calculate remaining requests
     const remaining = Math.max(0, this.limit - timestamps.length)

@@ -31,3 +31,7 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+## $(date +%Y-%m-%d) - Memory Leak DoS in Rate Limiter
+**Vulnerability:** The in-memory rate limiter stored request timestamps in a Map using the user's ID as the key. As old timestamps expired, empty arrays were kept in the Map indefinitely because the cleanup method (`prune`) was never called, leading to a slow memory leak (Denial of Service).
+**Learning:** In-memory caching or state tracking mechanisms (like Maps) without automatic eviction policies (e.g. LRU Cache) or scheduled cleanups will inevitably cause out-of-memory crashes as unique keys accumulate over time.
+**Prevention:** Always actively delete keys from Maps/Sets during the normal execution path when their associated values become empty or invalid, rather than relying exclusively on unverified background cleanup tasks.

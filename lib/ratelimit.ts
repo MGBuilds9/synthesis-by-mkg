@@ -7,6 +7,27 @@
  * as a "best effort" protection layer. For strict distributed rate limiting,
  * consider using Redis (e.g., @upstash/ratelimit).
  */
+/**
+ * Binary search to find the index of the first element greater than a target value.
+ * Assumes the array is sorted in ascending order.
+ */
+function findValidIndex(timestamps: number[], target: number): number {
+  let low = 0
+  let high = timestamps.length - 1
+  let validIdx = timestamps.length
+
+  while (low <= high) {
+    const mid = (low + high) >> 1
+    if (timestamps[mid] > target) {
+      validIdx = mid
+      high = mid - 1
+    } else {
+      low = mid + 1
+    }
+  }
+  return validIdx
+}
+
 export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
@@ -29,7 +50,9 @@ export class RateLimiter {
     let timestamps = this.requests.get(key) || []
 
     // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    // Bolt: Use binary search + slice instead of O(N) filter on sorted array
+    const validIdx = findValidIndex(timestamps, windowStart)
+    timestamps = validIdx === 0 ? timestamps : timestamps.slice(validIdx)
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -67,7 +90,10 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
+      // Bolt: Use binary search + slice instead of O(N) filter on sorted array
+      const validIdx = findValidIndex(timestamps, windowStart)
+      const validTimestamps = validIdx === 0 ? timestamps : timestamps.slice(validIdx)
+
       if (validTimestamps.length === 0) {
         this.requests.delete(key)
       } else {

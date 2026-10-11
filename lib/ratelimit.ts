@@ -26,10 +26,26 @@ export class RateLimiter {
     const now = Date.now()
     const windowStart = now - this.windowMs
 
-    let timestamps = this.requests.get(key) || []
+    let timestamps = this.requests.get(key)
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    // Replace O(N) filter with O(log N) binary search since array is chronologically sorted
+    if (timestamps) {
+      let low = 0
+      let high = timestamps.length
+      while (low < high) {
+        const mid = (low + high) >>> 1
+        if (timestamps[mid] > windowStart) {
+          high = mid
+        } else {
+          low = mid + 1
+        }
+      }
+      if (low > 0) {
+        timestamps = timestamps.slice(low)
+      }
+    } else {
+      timestamps = []
+    }
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -38,8 +54,12 @@ export class RateLimiter {
       timestamps.push(now)
     }
 
-    // Update the map with the cleaned (and potentially updated) timestamps
-    this.requests.set(key, timestamps)
+    // Proactively remove empty keys to prevent memory leaks
+    if (timestamps.length === 0) {
+      this.requests.delete(key)
+    } else {
+      this.requests.set(key, timestamps)
+    }
 
     // Calculate remaining requests
     const remaining = Math.max(0, this.limit - timestamps.length)
@@ -67,11 +87,22 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
-      if (validTimestamps.length === 0) {
+      // Replace O(N) filter with O(log N) binary search since array is chronologically sorted
+      let low = 0
+      let high = timestamps.length
+      while (low < high) {
+        const mid = (low + high) >>> 1
+        if (timestamps[mid] > windowStart) {
+          high = mid
+        } else {
+          low = mid + 1
+        }
+      }
+
+      if (low === timestamps.length) {
         this.requests.delete(key)
-      } else {
-        this.requests.set(key, validTimestamps)
+      } else if (low > 0) {
+        this.requests.set(key, timestamps.slice(low))
       }
     }
   }

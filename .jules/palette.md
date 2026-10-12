@@ -35,3 +35,7 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+
+## 2026-10-12 - Async Action Feedback
+**Learning:** Primary action buttons and loading states (like the Search button on the Storage page) lacked visual feedback (spinners) during async operations, leading to user uncertainty.
+**Action:** Standardize a "Loading" state pattern for all async action buttons and states using the `Loader2` icon (from `lucide-react`) combined with `role="status"` and `aria-hidden="true"` to ensure accessibility and clarity.

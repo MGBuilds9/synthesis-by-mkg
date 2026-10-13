@@ -31,3 +31,8 @@
 **Vulnerability:** API endpoints relying on parsed URL query parameters (like `offset`) passed unchecked integers into Prisma queries. Supplying negative values or non-numeric strings resulting in `NaN` would cause unhandled database exceptions and potential DoS via 500 errors.
 **Learning:** URL query parameters are untrusted input. Type conversion (like `parseInt`) is insufficient on its own because it can return `NaN` or unexpected valid integers (like negatives) that violate database constraints.
 **Prevention:** Always validate, set fallbacks for `NaN` (using `isNaN()`), and enforce strict boundaries (e.g., `Math.max(0, value)`) on pagination inputs before passing them to ORM methods like `skip` or `take`.
+
+## 2024-05-26 - In-Memory State Tracking DoS
+**Vulnerability:** The in-memory `RateLimiter` accumulated a key in its `requests` Map for every unique client (e.g. IP address or user ID) that made a request. Because the `prune` method was only called manually, attackers could flood the server with unique keys that never return, causing a memory leak leading to an Out-Of-Memory (OOM) Denial of Service (DoS).
+**Learning:** In-memory state tracking structures (like Maps or Sets) used on the critical request path must implement automatic background cleanup to evict stale entries. Relying on active access paths to clean up state leaves the system vulnerable to memory exhaustion.
+**Prevention:** Implement a periodic background interval (e.g., `setInterval`) to prune stale keys, and ensure the interval is unreferenced (`unref()`) to prevent blocking process shutdown.

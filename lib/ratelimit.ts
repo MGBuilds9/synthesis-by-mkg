@@ -11,11 +11,29 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private intervalId?: NodeJS.Timeout
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+
+    // Sentinel: Implement background pruning to prevent OOM DoS
+    // We unref the timer so it doesn't block process shutdown
+    this.intervalId = setInterval(() => this.prune(), Math.max(windowMs, 60000))
+    if (this.intervalId.unref) {
+      this.intervalId.unref()
+    }
+  }
+
+  /**
+   * Cleans up the rate limiter intervals and state.
+   */
+  destroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
+    this.requests.clear()
   }
 
   /**

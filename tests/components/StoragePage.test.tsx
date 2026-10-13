@@ -19,8 +19,9 @@ describe('StoragePage', () => {
     render(<StoragePage />)
     expect(screen.getByLabelText('Search files')).toBeInTheDocument()
     // Initially searching on load because of useEffect
-    // "Searching..." appears in both button and file list area
-    expect(screen.getAllByText('Searching...')).toHaveLength(2)
+    // "Searching..." appears in both button (as sr-only and aria-hidden) and file list area (as sr-only)
+    // plus "Searching files..." in the table view
+    expect(screen.getAllByText('Searching...')).toHaveLength(3)
 
     await waitFor(() => {
       expect(screen.getByText('Search')).toBeInTheDocument()
@@ -45,7 +46,7 @@ describe('StoragePage', () => {
     fireEvent.click(button)
 
     // Should show loading state - appears in button and file list area
-    expect(screen.getAllByText('Searching...')).toHaveLength(2)
+    expect(screen.getAllByText('Searching...')).toHaveLength(3)
 
     // Use getByRole to find the button, dealing with the fact that text content changes
     // "Searching..." is inside the button now

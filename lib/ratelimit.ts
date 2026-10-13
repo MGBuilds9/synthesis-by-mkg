@@ -16,6 +16,14 @@ export class RateLimiter {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+
+    // Sentinel: Start background interval to periodically prune stale requests
+    // This prevents a memory leak (DoS) if many unique IPs make a single request and never return
+    const intervalId = setInterval(() => this.prune(), Math.max(windowMs, 60000))
+    // Unref so the interval doesn't prevent Node from exiting
+    if (intervalId.unref) {
+      intervalId.unref()
+    }
   }
 
   /**

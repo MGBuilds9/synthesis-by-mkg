@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, Loader2 } from "lucide-react";
 
 export default function StoragePage() {
   const [files, setFiles] = useState([]);
@@ -168,11 +168,18 @@ export default function StoragePage() {
           <button
             type="button"
             onClick={handleSearch}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center min-w-[120px] gap-2"
             disabled={loading}
             aria-busy={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <span>Searching...</span>
+              </>
+            ) : (
+              <span>Search</span>
+            )}
           </button>
         </div>
 
@@ -218,10 +225,11 @@ export default function StoragePage() {
       </div>
 
       {/* Files List */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden" role="status">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Searching...
+          <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" aria-hidden="true" />
+            <span>Searching...</span>
           </div>
         ) : files.length === 0 ? (
           <div className="p-8 text-center text-gray-500">

@@ -35,3 +35,6 @@
 ## 2026-07-11 - Conditional ARIA Controls
 **Learning:** Hardcoding `aria-controls` attributes to an element ID that is conditionally rendered (e.g., a collapsible panel) creates a broken reference when the panel is hidden, violating accessibility guidelines.
 **Action:** Always dynamically set `aria-controls` to `undefined` when the target element is not rendered in the DOM.
+## 2024-10-15 - Prevent layout shift in Loading states
+**Learning:** Adding dynamic loading text to a button often causes jarring layout shifts as the button resizes to fit "Searching..." vs "Search".
+**Action:** Always apply a `min-w` and flex-centering (`flex items-center justify-center`) to buttons that change text content during loading states to maintain visual stability.

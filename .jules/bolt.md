@@ -37,3 +37,7 @@
 ## 2026-07-11 - Prevent Inline Functions from Defeating React.memo
 **Learning:** Passing an inline function (e.g. `onSuggestionClick={(text) => sendMessage(text)}`) to a memoized component (`React.memo`) causes the component to re-render on every parent render (like during keystrokes in an input field), defeating the memoization.
 **Action:** Use a stable reference for the callback, such as wrapping the handler in `useCallback` and using a `useRef` to store the latest callback state to avoid stale closures without adding unnecessary dependencies.
+
+## 2026-10-16 - O(log N) Binary Search for Chronological Array Filtering
+**Learning:** Filtering chronologically appended arrays (like timestamps) using Array.prototype.filter() is an O(N) operation. For large arrays or high-frequency endpoints, this consumes excessive CPU.
+**Action:** Use an O(log N) binary search to find the start index and slice the array instead of iterating over every element.

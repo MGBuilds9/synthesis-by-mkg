@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { RateLimiter } from '../../lib/ratelimit'
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest'
+import { RateLimiter, rateLimiter as globalRateLimiter } from '../../lib/ratelimit'
 
 describe('RateLimiter', () => {
   let rateLimiter: RateLimiter
@@ -7,6 +7,14 @@ describe('RateLimiter', () => {
   beforeEach(() => {
     // 60 requests per 1 minute
     rateLimiter = new RateLimiter(60000, 60)
+  })
+
+  afterEach(() => {
+    rateLimiter.destroy()
+  })
+
+  afterAll(() => {
+    globalRateLimiter.destroy()
   })
 
   it('allows requests within limit', () => {

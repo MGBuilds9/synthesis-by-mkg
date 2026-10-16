@@ -11,11 +11,41 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private pruneInterval?: NodeJS.Timeout
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+
+    // Background task to prune stale keys and prevent memory leaks
+    this.pruneInterval = setInterval(() => this.prune(), this.windowMs)
+    if (this.pruneInterval.unref) {
+      this.pruneInterval.unref()
+    }
+  }
+
+  destroy() {
+    if (this.pruneInterval) {
+      clearInterval(this.pruneInterval)
+    }
+  }
+
+  private findStartIndex(timestamps: number[], threshold: number): number {
+    let left = 0
+    let right = timestamps.length - 1
+    let index = timestamps.length
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2)
+      if (timestamps[mid] > threshold) {
+        index = mid
+        right = mid - 1
+      } else {
+        left = mid + 1
+      }
+    }
+    return index
   }
 
   /**
@@ -28,8 +58,9 @@ export class RateLimiter {
 
     let timestamps = this.requests.get(key) || []
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    // Filter out timestamps older than the window using binary search
+    const idx = this.findStartIndex(timestamps, windowStart)
+    timestamps = idx > 0 ? timestamps.slice(idx) : timestamps
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -67,7 +98,8 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
+      const idx = this.findStartIndex(timestamps, windowStart)
+      const validTimestamps = idx > 0 ? timestamps.slice(idx) : timestamps
       if (validTimestamps.length === 0) {
         this.requests.delete(key)
       } else {

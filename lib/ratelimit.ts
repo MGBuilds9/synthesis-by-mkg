@@ -11,11 +11,15 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private pruneIntervalId: ReturnType<typeof setInterval> | null = null
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+    const interval = setInterval(() => this.prune(), windowMs)
+    if (interval.unref) interval.unref()
+    this.pruneIntervalId = interval
   }
 
   /**
@@ -28,8 +32,13 @@ export class RateLimiter {
 
     let timestamps = this.requests.get(key) || []
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    let l = 0, r = timestamps.length - 1;
+    while (l <= r) {
+      const m = (l + r) >> 1;
+      if (timestamps[m] <= windowStart) l = m + 1;
+      else r = m - 1;
+    }
+    timestamps = timestamps.slice(l);
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -67,12 +76,24 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
+      let l = 0, r = timestamps.length - 1;
+      while (l <= r) {
+        const m = (l + r) >> 1;
+        if (timestamps[m] <= windowStart) l = m + 1;
+        else r = m - 1;
+      }
+      const validTimestamps = timestamps.slice(l);
       if (validTimestamps.length === 0) {
         this.requests.delete(key)
       } else {
         this.requests.set(key, validTimestamps)
       }
+    }
+  }
+
+  destroy() {
+    if (this.pruneIntervalId) {
+      clearInterval(this.pruneIntervalId)
     }
   }
 }

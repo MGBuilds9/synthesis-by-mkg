@@ -11,11 +11,18 @@ export class RateLimiter {
   private requests: Map<string, number[]>
   private windowMs: number
   private limit: number
+  private intervalId?: NodeJS.Timeout
 
   constructor(windowMs: number = 60000, limit: number = 60) {
     this.requests = new Map()
     this.windowMs = windowMs
     this.limit = limit
+
+    // Sentinel: Background cleanup to prevent out-of-memory DoS vulnerabilities
+    this.intervalId = setInterval(() => this.prune(), this.windowMs)
+    if (this.intervalId.unref) {
+      this.intervalId.unref()
+    }
   }
 
   /**
@@ -73,6 +80,15 @@ export class RateLimiter {
       } else {
         this.requests.set(key, validTimestamps)
       }
+    }
+  }
+
+  /**
+   * Cleans up the interval to prevent open handles.
+   */
+  destroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
     }
   }
 }

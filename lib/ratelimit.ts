@@ -18,6 +18,22 @@ export class RateLimiter {
     this.limit = limit
   }
 
+  private _pruneTimestamps(timestamps: number[], windowStart: number): number[] {
+    let left = 0;
+    let right = timestamps.length - 1;
+    let firstValidIndex = timestamps.length;
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      if (timestamps[mid] > windowStart) {
+        firstValidIndex = mid;
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+    return timestamps.slice(firstValidIndex);
+  }
+
   /**
    * Checks if a request is allowed for the given key.
    * Returns an object with the result and rate limit headers information.
@@ -29,7 +45,7 @@ export class RateLimiter {
     let timestamps = this.requests.get(key) || []
 
     // Filter out timestamps older than the window
-    timestamps = timestamps.filter(t => t > windowStart)
+    timestamps = this._pruneTimestamps(timestamps, windowStart)
 
     const currentUsage = timestamps.length
     const success = currentUsage < this.limit
@@ -67,7 +83,7 @@ export class RateLimiter {
     const windowStart = now - this.windowMs
 
     for (const [key, timestamps] of this.requests.entries()) {
-      const validTimestamps = timestamps.filter(t => t > windowStart)
+      const validTimestamps = this._pruneTimestamps(timestamps, windowStart)
       if (validTimestamps.length === 0) {
         this.requests.delete(key)
       } else {

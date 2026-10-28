@@ -12,7 +12,7 @@ export default function SignInPage() {
     e.preventDefault()
     setLoading(true)
     // Sign in logic will be implemented with NextAuth
-    console.log('Sign in with:', { email, password })
+    // Never log credentials; sign-in is not wired up yet.
     // Simulate network request for UX demonstration
     setTimeout(() => setLoading(false), 1000)
   }

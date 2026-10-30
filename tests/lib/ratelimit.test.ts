@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { RateLimiter } from '../../lib/ratelimit'
 
 describe('RateLimiter', () => {
@@ -7,6 +7,12 @@ describe('RateLimiter', () => {
   beforeEach(() => {
     // 60 requests per 1 minute
     rateLimiter = new RateLimiter(60000, 60)
+  })
+
+  afterEach(() => {
+    if (rateLimiter) {
+      rateLimiter.destroy()
+    }
   })
 
   it('allows requests within limit', () => {
@@ -31,6 +37,7 @@ describe('RateLimiter', () => {
   it('resets after window', () => {
     const key = 'user3'
     const windowMs = 1000
+    if (rateLimiter) rateLimiter.destroy()
     rateLimiter = new RateLimiter(windowMs, 2)
 
     // Use fake timers
@@ -60,6 +67,29 @@ describe('RateLimiter', () => {
     expect(result.success).toBe(true)
     expect(result.remaining).toBe(1)
 
+    vi.useRealTimers()
+  })
+
+  it('prunes old keys from map', () => {
+    const key = 'user4'
+    rateLimiter.check(key)
+
+    // Key should be in map
+    expect((rateLimiter as any).requests.has(key)).toBe(true)
+
+    // Fast forward past the window
+    vi.useFakeTimers()
+    const now = Date.now()
+    vi.setSystemTime(now)
+
+    // Re-check with new time
+    vi.setSystemTime(now + 60001)
+
+    // Prune
+    rateLimiter.prune()
+
+    // Key should be removed
+    expect((rateLimiter as any).requests.has(key)).toBe(false)
     vi.useRealTimers()
   })
 })

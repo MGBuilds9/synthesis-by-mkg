@@ -1,6 +1,5 @@
 import { prisma } from '../prisma'
 import logger, { logProviderActivity } from '../logger'
-import { ProviderType, SyncScopeType } from '@prisma/client'
 import { subDays } from 'date-fns'
 
 export class SyncEngine {

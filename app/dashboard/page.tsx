@@ -28,7 +28,6 @@ export default function DashboardPage() {
     <div className="p-4 sm:p-6">
       <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Command Center</h1>
 
-      {/* Today Widgets */}
       <div className="mb-6 sm:mb-8">
         <h2 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Today</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -82,7 +81,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Navigation */}
       <div className="mb-6 sm:mb-8">
         <h2 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Quick Navigation</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -133,7 +131,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Connected Accounts Status Strip */}
       <div className="bg-white rounded-lg shadow p-4 sm:p-6">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900">Connected Accounts</h2>

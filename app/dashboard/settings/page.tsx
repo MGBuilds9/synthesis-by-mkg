@@ -18,7 +18,6 @@ export default function SettingsPage() {
           </Link>
         </div>
 
-        {/* Connected Accounts */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">Connected Accounts</h2>
@@ -71,7 +70,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* AI Provider Preferences */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">AI Preferences</h2>
@@ -106,7 +104,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Provider Health */}
         <div className="bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">Provider Health</h2>

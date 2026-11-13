@@ -69,7 +69,6 @@ const MessageList = memo(function MessageList({ messages, loading, onSuggestionC
                   {msg.content}
                 </div>
 
-                {/* Sources Display */}
                 {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                   <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <p className="text-xs font-semibold text-blue-900 mb-2">Sources Used:</p>

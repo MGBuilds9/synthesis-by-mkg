@@ -99,7 +99,6 @@ export default function StoragePage() {
         <p className="text-gray-600">View and manage all your synced files from Google Drive and OneDrive.</p>
       </div>
 
-      {/* Storage Accounts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Link
           href="/dashboard/integrations"
@@ -136,7 +135,6 @@ export default function StoragePage() {
         </Link>
       </div>
 
-      {/* Search and Filter */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
@@ -176,7 +174,6 @@ export default function StoragePage() {
           </button>
         </div>
 
-        {/* Provider Filter */}
         <div className="mt-4 flex gap-2" role="group" aria-label="Filter by provider">
           <button
             type="button"
@@ -217,7 +214,6 @@ export default function StoragePage() {
         </div>
       </div>
 
-      {/* Files List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">

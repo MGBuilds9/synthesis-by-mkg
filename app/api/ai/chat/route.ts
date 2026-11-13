@@ -144,7 +144,6 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Add user message to database
     // Bolt: Optimized to start DB write in background and await it in parallel with LLM call
     const saveUserMessagePromise = prisma.aiMessage.create({
       data: {
@@ -156,7 +155,6 @@ export async function POST(request: NextRequest) {
     // Bolt: Ensure unhandled rejections are caught if the request fails early (e.g. context retrieval error)
     saveUserMessagePromise.catch(() => {})
 
-    // Retrieve context if requested
     let systemPrompt: string | undefined
     if (useContext) {
       // Sentinel: Filter context scopes based on user preference (contextDomains)
@@ -198,14 +196,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Prepare messages for LLM
     const messages = chatSession.messages.map((msg: any) => ({
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
     }))
     messages.push({ role: 'user', content: message })
 
-    // Call LLM
     const llmProvider = getLLMProvider(provider as AiProvider)
 
     // Bolt: Optimized to await user message save and LLM response in parallel
@@ -215,7 +211,6 @@ export async function POST(request: NextRequest) {
       llmProvider.chat(messages, model, systemPrompt),
     ])
 
-    // Save assistant response
     await prisma.aiMessage.create({
       data: {
         sessionId: chatSession.id,

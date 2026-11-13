@@ -13,16 +13,14 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState(`session-${Date.now()}`)
   const [showContextSettings, setShowContextSettings] = useState(false)
-  
-  // Context domain toggles
+
   const [contextDomains, setContextDomains] = useState({
     emails: true,
     chats: true,
     files: true,
     notion: true,
   })
-  
-  // Ask before searching context
+
   const [askBeforeSearching, setAskBeforeSearching] = useState(true)
 
   function toggleContextDomain(domain: keyof typeof contextDomains) {
@@ -84,7 +82,6 @@ export default function AIChatPage() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -120,7 +117,6 @@ export default function AIChatPage() {
           </div>
         </div>
         
-        {/* Context Settings Panel */}
         {showContextSettings && (
           <div
             id="context-settings-panel"
@@ -193,7 +189,6 @@ export default function AIChatPage() {
         )}
       </div>
 
-      {/* Messages */}
       {/* Bolt: Optimized with memoized component to prevent re-renders on input changes */}
       <MessageList
         messages={messages}
@@ -201,7 +196,6 @@ export default function AIChatPage() {
         onSuggestionClick={handleSuggestionClick}
       />
 
-      {/* Input */}
       <div className="bg-white border-t border-gray-200 px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex gap-2 items-end">

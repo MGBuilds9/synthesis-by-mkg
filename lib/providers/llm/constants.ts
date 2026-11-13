@@ -21,9 +21,3 @@ export const ALLOWED_MODELS: Record<AiProvider, string[]> = {
     'claude-3-haiku-20240307'
   ]
 }
-
-export const DEFAULT_MODELS: Record<AiProvider, string> = {
-  OPENAI: 'gpt-4o-mini',
-  GEMINI: 'gemini-1.5-flash',
-  CLAUDE: 'claude-3-5-sonnet-20241022'
-}

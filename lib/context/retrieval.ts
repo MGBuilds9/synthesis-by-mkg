@@ -1,7 +1,7 @@
 import { prisma } from '../prisma'
 import { subDays } from 'date-fns'
 
-export interface ContextOptions {
+interface ContextOptions {
   sessionId: string
   timeWindowDays?: number
   maxItemsPerScope?: number
